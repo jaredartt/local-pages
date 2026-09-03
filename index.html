@@ -442,6 +442,12 @@ body.dragging-now *{cursor:grabbing !important}
 }
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important;animation-duration:.01ms !important}}
 
+/* An id selector outranks the browser's own [hidden]{display:none}, so
+   anything given a display here must opt back out explicitly or it can
+   never be hidden by setting .hidden = true. This one rule covers every
+   element in the page, present and future. */
+[hidden]{display:none!important}
+
 /* ---------- sign in ---------- */
 #gate{position:fixed;inset:0;z-index:400;display:grid;place-items:center;background:var(--bg);padding:24px}
 .gate-card{width:100%;max-width:380px;text-align:center}
@@ -2307,7 +2313,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v3 · 3 Sep";
+const APP_VERSION = "v4 · 3 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
