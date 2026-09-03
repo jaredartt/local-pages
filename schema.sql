@@ -52,10 +52,16 @@ create trigger on_auth_user_created
 
 -- Nobody can promote themselves: only an existing admin may change
 -- is_admin or color_index. Everyone may rename themselves.
+--
+-- auth.uid() is null when the statement comes from the SQL Editor or the
+-- service key rather than from a signed-in browser. That is you, in the
+-- dashboard, and it must be allowed through -- otherwise granting somebody
+-- admin by hand looks like it worked and silently reverts.
 create or replace function public.guard_profile_update()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if not coalesce((select p.is_admin from public.profiles p where p.id = auth.uid()), false) then
+  if auth.uid() is not null
+     and not coalesce((select p.is_admin from public.profiles p where p.id = auth.uid()), false) then
     new.is_admin    := old.is_admin;
     new.color_index := old.color_index;
     new.email       := old.email;
