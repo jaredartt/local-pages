@@ -17,6 +17,7 @@ create table if not exists public.profiles (
   email       text,
   name        text        not null default '',
   color_index int         not null default 0,   -- 0..9, in order of joining
+  avatar      text        not null default '',   -- small square data URL, set from the app
   is_admin    boolean     not null default false,
   created_at  timestamptz not null default now()
 );

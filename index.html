@@ -477,6 +477,58 @@ body.dragging-now *{cursor:grabbing !important}
 .whoami{display:flex;align-items:center;gap:8px;padding:7px 8px 7px 13px;border-radius:999px;background:var(--surface);
   box-shadow:var(--shadow);font-size:13px;font-weight:400;color:var(--ink-2);flex:none}
 .whoami .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10.5px;font-weight:500;flex:none}
+
+/* a face, wherever one is needed */
+.av{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:500;flex:none;
+    overflow:hidden;background-size:cover;background-position:center;user-select:none}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* who else has this open */
+.presence{display:flex;align-items:center;padding-right:2px}
+.presence .av{width:26px;height:26px;font-size:11px;margin-left:-7px;
+              box-shadow:0 0 0 2.5px var(--bg);transition:transform .2s ease;cursor:default}
+.presence .av:first-child{margin-left:0}
+.presence .av:hover{transform:translateY(-2px)}
+
+/* somebody else just changed this */
+@keyframes touched{0%{background:var(--acc-soft)}100%{background:transparent}}
+.just-touched{animation:touched 2.8s ease-out}
+
+/* profile sheet */
+.pf-top{display:flex;flex-direction:column;align-items:center;gap:13px;margin-bottom:20px}
+.pf-av{width:88px;height:88px;font-size:32px;position:relative;cursor:pointer}
+.pf-av .pf-edit{position:absolute;inset:auto 0 0 0;height:26px;background:rgba(0,0,0,.42);
+  color:#fff;font-size:10px;font-weight:400;display:grid;place-items:center;letter-spacing:.03em;
+  opacity:0;transition:.2s ease}
+.pf-av:hover .pf-edit{opacity:1}
+.pf-hint{font-size:11.5px;color:var(--ink-3);font-weight:300;text-align:center;line-height:1.5}
+.pf-clear{font-size:11.5px;color:var(--danger);font-weight:300}
+
+/* people panel */
+.pp-row{display:flex;align-items:center;gap:11px;padding:9px 2px}
+.pp-row .av{width:30px;height:30px;font-size:12px}
+.pp-name{font-size:13px;font-weight:400;line-height:1.35}
+.pp-sub{font-size:11px;color:var(--ink-3);font-weight:300}
+.pp-tag{margin-left:auto;font-size:11px;font-weight:400;padding:4px 11px;border-radius:999px;
+  background:var(--sunk);color:var(--ink-2);transition:.18s ease;flex:none}
+.pp-tag.admin{background:var(--f-done-soft,#E4F4EA);color:var(--f-done)}
+.pp-tag.locked{opacity:.55;cursor:default}
+.pp-tag:not(.locked):hover{filter:brightness(.95)}
+.pp-head{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:400;margin:22px 0 4px}
+.pp-head.first{margin-top:0}
+.pp-add{display:flex;gap:8px;margin-top:12px}
+.pp-add input{flex:1;min-width:0}
+.pp-none{font-size:12px;color:var(--ink-3);font-weight:300;padding:7px 2px}
+.pp-x{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);
+  opacity:.45;transition:.15s ease;flex:none;margin-left:auto}
+.pp-row:hover .pp-x{opacity:.75}
+.pp-x:hover{opacity:1!important;background:var(--danger-soft);color:var(--danger)}
+.pp-x svg{width:10px;height:10px}
+
+/* a face on every comment */
+.cmt-meta .av{width:20px;height:20px;font-size:9.5px;margin-right:-2px}
+
 .live{width:7px;height:7px;border-radius:50%;background:var(--f-done);flex:none;transition:background-color .3s ease}
 .live.off{background:var(--danger)}
 .live.busy{background:var(--f-prog)}
@@ -531,6 +583,7 @@ body.readonly .crumb{pointer-events:auto}
     </div>
     <button class="crumb" id="crumb" aria-haspopup="true"></button>
     <button class="cog" id="cog" aria-haspopup="true" aria-label="More options"></button>
+    <div class="presence" id="presence" aria-label="Who else is here"></div>
     <div class="whoami" id="whoami" role="button" tabindex="0"></div>
   </div>
 </header>
@@ -595,6 +648,24 @@ function personColor(name){
   if (!Array.isArray(DB.people)) return "";
   const i = DB.people.findIndex(x => x.toLowerCase() === k);
   return i < 0 ? "" : PERSON_COLORS[i % PERSON_COLORS.length];
+}
+/* Everyone's picture, keyed by lower-cased display name, so a comment
+   written months ago still finds the face of whoever wrote it. */
+function personAvatar(name){
+  if (!name || !DB.peopleAvatars) return "";
+  return DB.peopleAvatars[name.trim().toLowerCase()] || "";
+}
+/* One face. `size` is the pixel box; the picture wins, otherwise the
+   first letter of the name on that person's colour. */
+function avatarHTML(name, size, cls){
+  const col = personColor(name) || PERSON_COLORS[0];
+  const pic = personAvatar(name);
+  const letter = esc((name || "?").trim().slice(0, 1).toUpperCase());
+  const style = "width:" + size + "px;height:" + size + "px;" +
+    (pic ? "" : "background:" + col + ";");
+  return '<span class="av' + (cls ? " " + cls : "") + '" style="' + style + '" title="' +
+    esc(name || "") + '">' +
+    (pic ? '<img src="' + esc(pic) + '" alt="">' : letter) + "</span>";
 }
 function registerPeople(){
   if (!Array.isArray(DB.people)) DB.people = [];
@@ -1449,7 +1520,8 @@ function commentBox(getArr, placeholder, onChange, ctx){
       const it = document.createElement("div");
       it.className = "cmt-item";
       const col = personColor(n.by);
-      it.innerHTML = '<div class="cmt-meta"><b' + (col ? ' style="color:' + col + '"' : "") + ">" +
+      it.innerHTML = '<div class="cmt-meta">' + avatarHTML(n.by, 20) +
+        "<b" + (col ? ' style="color:' + col + '"' : "") + ">" +
         esc(n.by || "Someone") + "</b><span>" + esc(relTime(n.at)) +
         '</span><button type="button" class="cmt-del" aria-label="Delete comment">' + XMARK + "</button></div><p></p>";
       it.querySelector("p").textContent = n.text;
@@ -1693,6 +1765,7 @@ function buildCard(ed, isFresh){
       const row = document.createElement("div");
       row.className = "step type-" + s.type;
       row.dataset.id = s.id;
+      row.dataset.flash = ed.id + "|" + s.id;   /* so a colleague's edit can glow here */
       row.innerHTML = '<span class="step-label">' + esc(s.label) + "</span>";
       row.appendChild(gripFor(row));
       row.oncontextmenu = e => {
@@ -2294,6 +2367,7 @@ function openCog(){
       fn:toggleAllEditions});
     items.push({sep:true});
   }
+  if (CAN_EDIT) items.push({icon:I_USER, label:"People", fn:peopleSheet});
   items.push({icon:I_CLOCK, label:"History", fn:historySheet});
   items.push({icon:I_DOWN,  label:"Download backup (.json)", fn:exportJSON});
   items.push({icon:I_TABLE, label:"Download for Excel (.csv)", fn:exportCSV});
@@ -2313,7 +2387,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v4 · 3 Sep";
+const APP_VERSION = "v5 · 3 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2324,6 +2398,9 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, {
 let ME = null;          // row from profiles
 let CAN_EDIT = false;   // is_admin
 let LIVE = null;        // realtime channel
+let HERE = null;        // presence channel
+let ONLINE = [];        // everyone with the app open, me included
+let PROFILES = [];      // every account, for the People panel
 let booted = false;
 
 function setLive(state){
@@ -2361,14 +2438,16 @@ async function loadAll(){
     })),
     issues: [], data: {},
     me: {name:(ME && ME.name) || ""},
-    people: [], peopleColors: {}
+    people: [], peopleColors: {}, peopleAvatars: {}
   };
 
-  profiles.data.sort((a, b) => (a.color_index || 0) - (b.color_index || 0)).forEach(p => {
+  PROFILES = profiles.data.slice().sort((a, b) => (a.color_index || 0) - (b.color_index || 0));
+  PROFILES.forEach(p => {
     const nm = (p.name || p.email || "").trim();
     if (!nm) return;
     db.people.push(nm);
     db.peopleColors[nm.toLowerCase()] = PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length];
+    if (p.avatar) db.peopleAvatars[nm.toLowerCase()] = p.avatar;
   });
 
   const edsFor = {};
@@ -2507,9 +2586,71 @@ function listen(){
   LIVE = sb.channel("localpages")
     .on("postgres_changes", {event:"*", schema:"public"}, payload => {
       if (payload.table === "history") return;
+      /* Somebody else moved something: glow it, so the change is seen
+         rather than just silently appearing. Our own writes are skipped. */
+      if (payload.table === "entries"){
+        const row = payload.new || payload.old || {};
+        if (row.updated_by && ME && row.updated_by !== ME.id) flashStep(row);
+      }
       scheduleReload();
     })
     .subscribe(status => { setLive(status === "SUBSCRIBED" ? "" : "busy"); });
+}
+
+/* Mark a step as just-touched. The re-render lands a moment later and
+   wipes the class, so the mark is re-applied after it settles too. */
+let flashQueue = [];
+function flashStep(row){
+  const key = row.month_id + "|" + row.edition_id + "|" + row.step_id;
+  if (flashQueue.indexOf(key) < 0) flashQueue.push(key);
+  paintFlashes();
+  setTimeout(paintFlashes, 700);
+  setTimeout(() => {
+    flashQueue = flashQueue.filter(k => k !== key);
+  }, 3200);
+}
+function paintFlashes(){
+  flashQueue.forEach(key => {
+    const [m, e, s] = key.split("|");
+    if (m !== current) return;
+    const el = document.querySelector('[data-flash="' + e + "|" + s + '"]');
+    if (el && !el.classList.contains("just-touched")){
+      el.classList.add("just-touched");
+      setTimeout(() => el.classList.remove("just-touched"), 2900);
+    }
+  });
+}
+
+/* ---------- who else is here ---------- */
+function joinPresence(){
+  if (HERE) sb.removeChannel(HERE);
+  if (!ME) return;
+  HERE = sb.channel("who", {config:{presence:{key:ME.id}}});
+  HERE.on("presence", {event:"sync"}, () => {
+      const state = HERE.presenceState();
+      const seen = {};
+      Object.keys(state).forEach(id => {
+        const meta = (state[id] || [])[0];
+        if (meta && !seen[id]) seen[id] = {id, name:meta.name || "", at:meta.at};
+      });
+      ONLINE = Object.values(seen);
+      paintPresence();
+    })
+    .subscribe(async status => {
+      if (status === "SUBSCRIBED")
+        await HERE.track({name:ME.name || "", at:new Date().toISOString()});
+    });
+}
+function paintPresence(){
+  const el = document.getElementById("presence");
+  if (!el) return;
+  /* Me first, then everyone else, oldest arrival first so the row is stable. */
+  const others = ONLINE.filter(p => !ME || p.id !== ME.id)
+                       .sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  el.innerHTML = others.map(p => avatarHTML(p.name, 26)).join("");
+  el.title = others.length
+    ? others.map(p => p.name).join(", ") + (others.length === 1 ? " is here too" : " are here too")
+    : "";
 }
 
 /* ---------- sign in ---------- */
@@ -2537,32 +2678,256 @@ async function afterSignIn(session){
   open = new Set(); openPhase.clear();
   renderAll();
   listen();
+  joinPresence();
 }
 function paintWhoami(){
   const el = document.getElementById("whoami");
   if (!el || !ME) return;
-  const col = personColor(ME.name) || PERSON_COLORS[(ME.color_index || 0) % PERSON_COLORS.length];
   el.innerHTML = '<span class="live" id="liveDot"></span>' +
     "<span>" + esc(ME.name) + (CAN_EDIT ? "" : " · read only") + "</span>" +
-    '<span class="av" style="background:' + col + '">' + esc((ME.name || "?").slice(0, 1).toUpperCase()) + "</span>";
-  el.onclick = () => {
-    closeCtx();
-    const r = el.getBoundingClientRect();
-    openCtx(r.right - 220, r.bottom + 8, [
-      {icon:I_USER, label:"Rename yourself", dot:col, fn:() => promptSheet("Your name",
-        "This is the name on your comments and in the history.",
-        [{key:"name", label:"Name", value:ME.name}], "Save", async o => {
-          const {error} = await sb.from("profiles").update({name:o.name}).eq("id", ME.id);
-          if (!error){ ME.name = o.name; DB.me.name = o.name; paintWhoami(); scheduleReload(); }
-        })},
-      {sep:true},
-      {icon:I_UNDO, label:"Sign out", danger:true, fn:async () => {
-        if (LIVE) sb.removeChannel(LIVE);
-        await sb.auth.signOut();
-        location.reload();
-      }}
-    ]);
+    avatarHTML(ME.name, 22);
+  el.onclick = profileSheet;
+  paintPresence();
+}
+
+/* ---------- your profile ---------- */
+
+/* Shrink whatever they picked to a small square before it ever goes near
+   the database: a phone photo is several megabytes, and this has to sit
+   in a row that loads with every page. 160px is plenty for a 26px face
+   on a retina screen. */
+function shrinkImage(file, px){
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onerror = () => reject(new Error("That file couldn't be read."));
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("That doesn't look like an image."));
+      img.onload = () => {
+        const side = Math.min(img.width, img.height);           /* centre crop to a square */
+        const cv = document.createElement("canvas");
+        cv.width = cv.height = px;
+        const cx = cv.getContext("2d");
+        cx.imageSmoothingQuality = "high";
+        cx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, px, px);
+        let out = "";
+        try { out = cv.toDataURL("image/webp", 0.82); } catch(e){}
+        if (!out || out.indexOf("data:image/webp") !== 0) out = cv.toDataURL("image/jpeg", 0.82);
+        resolve(out);
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+function profileSheet(){
+  closeCtx();
+  let pending = ME.avatar || "";      /* not saved until Save is pressed */
+  const sheet = openSheet(
+    '<h3>Your profile</h3>' +
+    '<div class="pf-top">' +
+      '<div class="pf-av av" id="pfAv"></div>' +
+      '<p class="pf-hint" id="pfHint"></p>' +
+    "</div>" +
+    '<div class="field"><label for="pfName">Display name</label>' +
+      '<input type="text" id="pfName" maxlength="40"></div>' +
+    '<p class="pf-hint" style="margin-top:-4px;text-align:left">' +
+      "This is the name on your comments and in the history.</p>" +
+    '<div class="actions">' +
+      '<button type="button" class="btn ghostbtn" id="pfOut">Sign out</button>' +
+      '<button type="button" class="btn primary" id="pfSave">Save</button>' +
+    "</div>");
+
+  const avEl   = sheet.querySelector("#pfAv");
+  const hintEl = sheet.querySelector("#pfHint");
+  const nameEl = sheet.querySelector("#pfName");
+  nameEl.value = ME.name || "";
+
+  const file = document.createElement("input");
+  file.type = "file"; file.accept = "image/*"; file.hidden = true;
+  sheet.appendChild(file);
+
+  const paintAv = () => {
+    const col = personColor(ME.name) || PERSON_COLORS[(ME.color_index || 0) % PERSON_COLORS.length];
+    avEl.style.background = pending ? "" : col;
+    avEl.innerHTML = (pending ? '<img src="' + esc(pending) + '" alt="">' :
+        esc((nameEl.value || "?").trim().slice(0, 1).toUpperCase())) +
+      '<span class="pf-edit">Change</span>';
+    hintEl.innerHTML = pending
+      ? 'Click the picture to swap it · <button type="button" class="pf-clear" id="pfClear">remove</button>'
+      : "Click to add a picture. It shows on your comments.";
+    const clr = hintEl.querySelector("#pfClear");
+    if (clr) clr.onclick = () => { pending = ""; paintAv(); };
   };
+  paintAv();
+
+  avEl.onclick = () => file.click();
+  nameEl.oninput = () => { if (!pending) paintAv(); };
+  file.onchange = async () => {
+    const f = file.files && file.files[0];
+    if (!f) return;
+    if (!/^image\//.test(f.type)){ hintEl.textContent = "That needs to be an image."; return; }
+    hintEl.textContent = "Shrinking…";
+    try { pending = await shrinkImage(f, 160); paintAv(); }
+    catch(err){ hintEl.textContent = err.message || "That image couldn't be used."; }
+    file.value = "";
+  };
+
+  sheet.querySelector("#pfOut").onclick = async () => {
+    if (LIVE) sb.removeChannel(LIVE);
+    if (HERE) sb.removeChannel(HERE);
+    await sb.auth.signOut();
+    location.reload();
+  };
+  sheet.querySelector("#pfSave").onclick = async () => {
+    const nm = nameEl.value.trim();
+    if (!nm){ hintEl.textContent = "A name, please."; return; }
+    const btn = sheet.querySelector("#pfSave");
+    btn.disabled = true; btn.textContent = "Saving…";
+    const {error} = await sb.from("profiles")
+      .update({name:nm, avatar:pending}).eq("id", ME.id);
+    if (error){
+      btn.disabled = false; btn.textContent = "Save";
+      hintEl.textContent = error.message.indexOf("avatar") >= 0
+        ? "The database has no avatar column yet — run the migration."
+        : error.message;
+      return;
+    }
+    ME.name = nm; ME.avatar = pending;
+    DB.me.name = nm;
+    DB.peopleAvatars[nm.toLowerCase()] = pending;
+    closeSheet();
+    paintWhoami();
+    if (HERE) await HERE.track({name:nm, at:new Date().toISOString()});
+    scheduleReload();
+  };
+}
+
+/* ---------- who's on the team ---------- */
+async function peopleSheet(){
+  const sheet = openSheet(
+    "<h3>People</h3>" +
+    "<p class='hint'>Anyone on the approved list gets full access the moment " +
+    "they create an account. Everyone else can look but not change anything.</p>" +
+    '<div id="ppBody"><p class="pp-none">Loading…</p></div>');
+
+  const body = sheet.querySelector("#ppBody");
+
+  const draw = async () => {
+    const [profs, allowed] = await Promise.all([
+      sb.from("profiles").select("*").order("color_index"),
+      sb.from("allowed_emails").select("*")
+    ]);
+    if (profs.error || allowed.error){
+      body.innerHTML = '<p class="pp-none">' +
+        esc((profs.error || allowed.error).message) + "</p>";
+      return;
+    }
+    PROFILES = profs.data;
+    const registered = {};
+    profs.data.forEach(p => { if (p.email) registered[p.email.toLowerCase()] = true; });
+    const waiting = allowed.data
+      .map(a => a.email)
+      .filter(e => e && !registered[e.toLowerCase()])
+      .sort();
+
+    const onlineIds = {};
+    ONLINE.forEach(o => { onlineIds[o.id] = true; });
+
+    let html = '<p class="pp-head first">Accounts</p>';
+    html += profs.data.map(p => {
+      const nm = (p.name || p.email || "").trim();
+      const me = ME && p.id === ME.id;
+      return '<div class="pp-row">' + avatarHTML(nm, 30) +
+        "<div><div class='pp-name'>" + esc(nm) + (me ? " <span class='pp-sub'>· you</span>" : "") +
+          (onlineIds[p.id] ? " <span class='live' style='display:inline-block'></span>" : "") +
+          "</div>" +
+        "<div class='pp-sub'>" + esc(p.email || "") + "</div></div>" +
+        '<button type="button" class="pp-tag' + (p.is_admin ? " admin" : "") +
+          (me ? " locked" : "") + '" data-id="' + esc(p.id) + '" data-admin="' +
+          (p.is_admin ? "1" : "0") + '"' + (me ? " disabled" : "") + ">" +
+          (p.is_admin ? "Full access" : "Read only") + "</button></div>";
+    }).join("");
+
+    html += '<p class="pp-head">Approved, not yet registered</p>';
+    html += waiting.length
+      ? waiting.map(e =>
+          '<div class="pp-row"><div><div class="pp-name">' + esc(e) + "</div>" +
+          "<div class='pp-sub'>can create an account with full access</div></div>" +
+          '<button type="button" class="pp-x" data-drop="' + esc(e) +
+          '" aria-label="Remove">' + XMARK + "</button></div>").join("")
+      : '<p class="pp-none">Nobody waiting.</p>';
+
+    html += '<div class="pp-add"><input type="email" id="ppNew" ' +
+      'placeholder="colleague@churchofjesuschrist.org">' +
+      '<button type="button" class="btn primary" id="ppAdd">Approve</button></div>';
+
+    body.innerHTML = html;
+
+    /* full access <-> read only */
+    body.querySelectorAll(".pp-tag:not(.locked)").forEach(b => {
+      b.onclick = async () => {
+        const makeAdmin = b.dataset.admin !== "1";
+        b.disabled = true;
+        const {error} = await sb.from("profiles")
+          .update({is_admin: makeAdmin}).eq("id", b.dataset.id);
+        if (error){ b.disabled = false; alertNote(error.message); return; }
+        draw();
+      };
+    });
+
+    /* un-approve someone who hasn't signed up yet */
+    body.querySelectorAll("[data-drop]").forEach(b => {
+      b.onclick = () => {
+        const em = b.dataset.drop;
+        confirmAsk("Remove " + esc(em) + "?",
+          "They won't be able to create an account with full access. " +
+          "You can approve them again at any time.", "Remove", async () => {
+            await sb.from("allowed_emails").delete().eq("email", em);
+            draw();
+          });
+      };
+    });
+
+    /* approve a new address */
+    const inp = body.querySelector("#ppNew");
+    const add = body.querySelector("#ppAdd");
+    const submit = async () => {
+      const em = (inp.value || "").trim().toLowerCase();
+      if (!em) return;
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){
+        inp.focus(); alertNote("That doesn't look like an email address."); return;
+      }
+      add.disabled = true;
+      const {error} = await sb.from("allowed_emails").upsert({email: em});
+      add.disabled = false;
+      if (error){ alertNote(error.message); return; }
+      /* already has an account? promote them straight away */
+      const hit = profs.data.find(p => (p.email || "").toLowerCase() === em);
+      if (hit && !hit.is_admin)
+        await sb.from("profiles").update({is_admin: true}).eq("id", hit.id);
+      inp.value = "";
+      draw();
+    };
+    add.onclick = submit;
+    inp.onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); submit(); } };
+  };
+
+  draw();
+}
+/* a one-line message inside the open sheet, rather than a browser alert */
+function alertNote(msg){
+  const b = document.getElementById("ppBody");
+  if (!b) return;
+  let n = b.querySelector(".pp-note");
+  if (!n){
+    n = document.createElement("p");
+    n.className = "pp-none pp-note";
+    n.style.color = "var(--danger)";
+    b.insertBefore(n, b.firstChild);
+  }
+  n.textContent = msg;
 }
 
 const EYE_ON  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.6 8S3.9 3.9 8 3.9 14.4 8 14.4 8 12.1 12.1 8 12.1 1.6 8 1.6 8Z"/><circle cx="8" cy="8" r="2.1"/></svg>';
