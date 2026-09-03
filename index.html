@@ -2387,7 +2387,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v5 · 3 Sep";
+const APP_VERSION = "v6 · 3 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2586,6 +2586,8 @@ function listen(){
   LIVE = sb.channel("localpages")
     .on("postgres_changes", {event:"*", schema:"public"}, payload => {
       if (payload.table === "history") return;
+      /* somebody arrived or left: just repaint the faces, don't reload */
+      if (payload.table === "presence"){ readPresence(); return; }
       /* Somebody else moved something: glow it, so the change is seen
          rather than just silently appearing. Our own writes are skipped. */
       if (payload.table === "entries"){
@@ -2621,25 +2623,50 @@ function paintFlashes(){
   });
 }
 
-/* ---------- who else is here ---------- */
-function joinPresence(){
-  if (HERE) sb.removeChannel(HERE);
+/* ---------- who else is here ----------
+   Realtime's own presence feature is not switched on for this project:
+   a channel subscribes and track() reports "ok", but the roster never
+   comes back, so everyone would see an empty header for ever. This
+   keeps its own instead. Each browser stamps a row every HEARTBEAT_MS,
+   and anybody stamped inside PRESENCE_WINDOW_MS counts as here. It runs
+   on ordinary table reads and postgres_changes, which the rest of the
+   app already depends on and which is verified working. */
+const HEARTBEAT_MS = 20000;
+const PRESENCE_WINDOW_MS = 60000;
+let beatTimer = null;
+let presenceOff = false;   /* true once the table turns out to be missing */
+
+async function beat(){
+  if (!ME || presenceOff) return;
+  const {error} = await sb.from("presence").upsert({
+    user_id: ME.id, name: ME.name || "", seen_at: new Date().toISOString()
+  });
+  if (error && /does not exist|schema cache/i.test(error.message || "")) presenceOff = true;
+}
+async function readPresence(){
+  if (presenceOff) return;
+  const {data, error} = await sb.from("presence").select("*");
+  if (error){
+    if (/does not exist|schema cache/i.test(error.message || "")) presenceOff = true;
+    return;
+  }
+  const cutoff = Date.now() - PRESENCE_WINDOW_MS;
+  ONLINE = (data || [])
+    .filter(r => r.seen_at && new Date(r.seen_at).getTime() > cutoff)
+    .map(r => ({id:r.user_id, name:r.name || "", at:r.seen_at}));
+  paintPresence();
+}
+async function joinPresence(){
+  clearInterval(beatTimer);
   if (!ME) return;
-  HERE = sb.channel("who", {config:{presence:{key:ME.id}}});
-  HERE.on("presence", {event:"sync"}, () => {
-      const state = HERE.presenceState();
-      const seen = {};
-      Object.keys(state).forEach(id => {
-        const meta = (state[id] || [])[0];
-        if (meta && !seen[id]) seen[id] = {id, name:meta.name || "", at:meta.at};
-      });
-      ONLINE = Object.values(seen);
-      paintPresence();
-    })
-    .subscribe(async status => {
-      if (status === "SUBSCRIBED")
-        await HERE.track({name:ME.name || "", at:new Date().toISOString()});
-    });
+  await beat();
+  await readPresence();
+  beatTimer = setInterval(async () => { await beat(); await readPresence(); }, HEARTBEAT_MS);
+  /* leave the list promptly on close rather than lingering a minute */
+  window.addEventListener("beforeunload", () => {
+    if (presenceOff || !ME) return;
+    try { sb.from("presence").delete().eq("user_id", ME.id); } catch(e){}
+  });
 }
 function paintPresence(){
   const el = document.getElementById("presence");
@@ -2775,8 +2802,9 @@ function profileSheet(){
   };
 
   sheet.querySelector("#pfOut").onclick = async () => {
+    clearInterval(beatTimer);
+    if (!presenceOff && ME) await sb.from("presence").delete().eq("user_id", ME.id);
     if (LIVE) sb.removeChannel(LIVE);
-    if (HERE) sb.removeChannel(HERE);
     await sb.auth.signOut();
     location.reload();
   };
@@ -2799,7 +2827,7 @@ function profileSheet(){
     DB.peopleAvatars[nm.toLowerCase()] = pending;
     closeSheet();
     paintWhoami();
-    if (HERE) await HERE.track({name:nm, at:new Date().toISOString()});
+    beat();                      /* so the new name shows on my face right away */
     scheduleReload();
   };
 }

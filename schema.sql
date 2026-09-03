@@ -162,6 +162,16 @@ create table if not exists public.comments (
 );
 create index if not exists comments_place on public.comments (month_id, edition_id, step_id);
 
+
+-- Who currently has the app open. Realtime's own presence feature is not
+-- enabled on this project, so each browser stamps its row every ~20s and
+-- anyone stamped in the last minute counts as online.
+create table if not exists public.presence (
+  user_id uuid primary key references auth.users on delete cascade,
+  name    text not null default '',
+  seen_at timestamptz not null default now()
+);
+
 -- ---------- 4. the log ---------------------------------------
 
 create table if not exists public.history (
@@ -190,6 +200,13 @@ alter table public.steps          enable row level security;
 alter table public.entries        enable row level security;
 alter table public.comments       enable row level security;
 alter table public.history        enable row level security;
+alter table public.presence       enable row level security;
+
+drop policy if exists presence_read on public.presence;
+drop policy if exists presence_self on public.presence;
+create policy presence_read on public.presence for select to authenticated using (true);
+create policy presence_self on public.presence for all to authenticated
+  using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 -- Signed in → can read everything. Approved (is_admin) → can change anything.
 -- Not signed in → nothing at all.
@@ -236,7 +253,7 @@ do $$
 declare t text;
 begin
   foreach t in array array['folders','months','editions','month_editions',
-                           'phases','steps','entries','comments','history','profiles']
+                           'phases','steps','entries','comments','history','profiles','presence']
   loop
     begin
       execute format('alter publication supabase_realtime add table public.%I', t);
