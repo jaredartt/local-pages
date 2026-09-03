@@ -1,0 +1,14 @@
+{
+  "name": "Local Pages · Liahona",
+  "short_name": "Local Pages",
+  "description": "Production tracker for the Liahona Local Pages editions.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F3F8",
+  "theme_color": "#F4F3F8",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

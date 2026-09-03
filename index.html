@@ -1,0 +1,2595 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local Pages · Liahona</title>
+<meta name="description" content="Production tracker for the Liahona Local Pages editions.">
+<meta name="theme-color" content="#F4F3F8">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@200;300;400;500;700&display=swap">
+<style>
+
+:root{
+  --bg:#F4F3F8; --surface:#FFFFFF; --sunk:#EFEDF6;
+  --ink:#211E2E; --ink-2:#6E6A80; --ink-3:#A6A2B6;
+  --acc:#7C64E8; --acc-soft:#EDE9FC;
+  --danger:#E5757C; --danger-soft:#FBE7E8;
+  --track:#E7E4F1;
+  --f-prog:#E8951A; --f-done:#2FBB76;
+  --box:#FFFFFF; --line:#E9E6F1;
+  --box-shadow:inset 0 0 0 1px var(--line);
+  --shadow:0 10px 30px -22px rgba(33,30,46,.55);
+  --shadow-lift:0 22px 50px -28px rgba(33,30,46,.5);
+  --shadow-sheet:0 40px 90px -30px rgba(33,30,46,.45);
+  --focus:#7C64E8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131220; --surface:#1D1B2B; --sunk:#2B2840;
+    --ink:#F0EEF8; --ink-2:#A5A1B8; --ink-3:#726E85;
+    --acc:#A492FF; --acc-soft:#2A2450;
+    --danger:#FF949A; --danger-soft:#3B2024;
+    --track:#332F45;
+    --f-prog:#E8951A; --f-done:#2FBB76;
+    --box:#211E31; --line:#332F47;
+    --box-shadow:inset 0 0 0 1px var(--line);
+    --shadow:0 10px 30px -22px rgba(0,0,0,.9);
+    --shadow-lift:0 24px 54px -28px rgba(0,0,0,.95);
+    --shadow-sheet:0 40px 90px -30px rgba(0,0,0,.95);
+    --focus:#A492FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131220; --surface:#1D1B2B; --sunk:#2B2840;
+  --ink:#F0EEF8; --ink-2:#A5A1B8; --ink-3:#726E85;
+  --acc:#A492FF; --acc-soft:#2A2450;
+  --danger:#FF949A; --danger-soft:#3B2024;
+  --track:#332F45;
+  --f-prog:#E8951A; --f-done:#2FBB76;
+  --box:#211E31; --line:#332F47;
+  --box-shadow:inset 0 0 0 1px var(--line);
+  --shadow:0 10px 30px -22px rgba(0,0,0,.9);
+  --shadow-lift:0 24px 54px -28px rgba(0,0,0,.95);
+  --shadow-sheet:0 40px 90px -30px rgba(0,0,0,.95);
+  --focus:#A492FF;
+}
+
+*{box-sizing:border-box;border:0}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Lexend',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-weight:300;font-size:15px;line-height:1.6;letter-spacing:.014em;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.005em;text-wrap:balance;line-height:1.2}
+button{font:inherit;color:inherit;background:none;cursor:pointer;letter-spacing:inherit}
+input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:8px}
+
+.wrap{max-width:830px;margin:0 auto;padding:0 34px 120px}
+
+/* ---------- top ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--bg)}
+.topbar-in{max-width:830px;margin:0 auto;padding:26px 34px 20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.brand{margin-right:auto;display:flex;align-items:center;gap:13px}
+.mark{width:38px;height:38px;border-radius:13px;flex:none;background:var(--acc);display:grid;place-items:center;color:#fff}
+.mark svg{width:20px;height:20px}
+.brand h1{font-size:17px;letter-spacing:.01em}
+.brand p{margin:2px 0 0;font-size:11px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase;font-weight:400}
+
+.crumb{display:flex;align-items:center;gap:9px;padding:9px 16px 9px 14px;border-radius:999px;background:var(--surface);
+  box-shadow:var(--shadow);font-size:14px;transition:transform .2s ease,box-shadow .2s ease}
+.crumb:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+.cog{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);flex:none;transition:.2s ease}
+.cog:hover{background:var(--sunk);color:var(--ink)}
+.cog svg{width:16px;height:16px}
+.cdot{width:9px;height:9px;border-radius:50%;background:var(--track);flex:none;transition:background-color .3s ease}
+.cf{color:var(--ink-3);font-weight:400}
+.cs{color:var(--ink-3);opacity:.55}
+.cm{font-weight:500}
+.cc{color:var(--ink-3);display:grid;margin-left:1px}
+.cc svg{width:14px;height:14px}
+
+/* ---------- summary ---------- */
+.summary{padding:46px 0 20px;display:flex;flex-direction:column;gap:22px}
+.ring-block{display:flex;align-items:center;gap:30px;margin-bottom:12px}
+.ring{position:relative;width:152px;height:152px;flex:none}
+.ring svg{transform:rotate(-90deg);display:block}
+.ring .track{stroke:var(--track)}
+.ring .val{stroke-linecap:round;transition:stroke-dasharray .45s cubic-bezier(.4,0,.2,1),stroke .4s ease}
+.ring-label{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-label b{font-weight:700;font-size:33px;letter-spacing:-.035em;display:block;line-height:1}
+.ring.celebrate .ring-label b{animation:popNum .8s cubic-bezier(.34,1.4,.5,1)}
+.ring-side h2{font-size:30px}
+.ring-side p{margin:10px 0 0;color:var(--ink-3);font-size:14px;font-weight:300}
+
+.tile{background:var(--box);border-radius:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{padding:16px 18px}
+.stat b{display:block;font-weight:700;font-size:24px;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.25}
+.stat b i{font-style:normal;color:var(--ink-3);font-weight:400}
+.stat span{font-size:10.5px;color:var(--ink-3);letter-spacing:.15em;text-transform:uppercase;font-weight:400}
+
+.rail-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px}
+.rail-cell{padding:14px 16px 16px;display:flex;flex-direction:column;gap:11px}
+.rail-name{font-size:12.5px;font-weight:400;color:var(--ink-2);display:flex;gap:8px;align-items:baseline}
+.rail-name i{margin-left:auto;font-style:normal;font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:99px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1),background-color .4s ease}
+
+/* ---------- editions ---------- */
+.section-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--ink-3);margin:46px 0 20px}
+.grid{display:flex;flex-direction:column;gap:16px}
+
+.card{position:relative;background:var(--surface);border-radius:30px}
+.card::after{content:"";position:absolute;inset:-6px;border-radius:36px;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 35%, color-mix(in srgb,var(--f-done) 32%,transparent), transparent 68%)}
+.card.celebrate{animation:cardDone 1s cubic-bezier(.34,1.3,.5,1)}
+.card.celebrate::after{animation:glow 1.2s ease-out}
+
+.card-head{width:100%;text-align:left;padding:24px 26px 18px;display:flex;align-items:center;gap:18px;cursor:pointer}
+.markdone{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);
+  background:var(--sunk);flex:none;transition:.2s ease}
+.markdone:hover{background:var(--f-done);color:#fff}
+.markdone.on{background:var(--f-done);color:#fff}
+.markdone.on:hover{background:var(--danger);color:#fff}
+.markdone svg{width:16px;height:16px;pointer-events:none}
+.phase-head .markdone{width:26px;height:26px;background:none}
+.phase-head .markdone svg{width:15px;height:15px}
+.flagtile{width:40px;height:40px;border-radius:14px;background:var(--sunk);display:grid;place-items:center;flex:none}
+.flag{width:24px;height:17px;border-radius:4px;overflow:hidden;display:block}
+.flag svg{display:block;width:100%;height:100%}
+.flagtile.sec{background:var(--acc-soft)}
+.flagtile.sec svg{width:16px;height:16px;color:var(--acc)}
+.ed-title{min-width:0;flex:1}
+.ed-title h3{font-size:20px;letter-spacing:0}
+.ed-sub{display:block;margin-top:4px;font-size:12.5px;color:var(--ink-3);font-weight:300;font-variant-numeric:tabular-nums;letter-spacing:.03em}
+.mini-ring{position:relative;width:48px;height:48px;flex:none}
+.mini-ring svg{transform:rotate(-90deg);display:block}
+.mini-ring .track{stroke:var(--track)}
+.mini-ring .val{stroke-linecap:round;transition:stroke-dasharray .45s cubic-bezier(.4,0,.2,1),stroke .4s ease}
+.mini-ring b{position:absolute;inset:0;display:grid;place-content:center;font-size:12.5px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.mini-ring.ping b{animation:popNum .55s cubic-bezier(.34,1.4,.5,1)}
+.chev{flex:none;color:var(--ink-3);transition:transform .3s cubic-bezier(.34,1.2,.5,1);display:grid}
+.card.open .chev{transform:rotate(180deg)}
+
+.rail-mini{display:flex;gap:8px;padding:0 26px 22px}
+.rail-mini .bar{height:5px;flex:1}
+
+/* ---------- expanded ---------- */
+.body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s cubic-bezier(.4,0,.2,1)}
+.card.open .body{grid-template-rows:1fr}
+.body-in{overflow:hidden;min-height:0}
+.body-pad{padding:0 22px 24px;display:flex;flex-direction:column;gap:12px}
+
+.phase-box{background:var(--box);border-radius:24px;box-shadow:var(--box-shadow)}
+.phase-head{width:100%;text-align:left;display:flex;align-items:center;gap:11px;padding:16px 20px;cursor:pointer}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--phc)}
+.dot.pulse{animation:dotPulse .9s cubic-bezier(.34,1.4,.5,1)}
+.phase-head h4{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--ink-2)}
+.phase-cmt{display:grid;place-items:center;color:var(--acc);flex:none}
+.phase-cmt svg{width:14px;height:14px}
+.phase-cmt[hidden]{display:none}
+.phase-head .pc{margin-left:auto;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;font-weight:400}
+.pchev{flex:none;color:var(--ink-3);display:grid;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.pchev svg{width:15px;height:15px}
+.phase-box.shut .pchev{transform:rotate(-90deg)}
+.pbody{display:grid;grid-template-rows:1fr;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1)}
+.phase-box.shut .pbody{grid-template-rows:0fr}
+.pbody-in{overflow:hidden;min-height:0}
+.steps{display:flex;flex-direction:column;gap:2px;padding:0 20px 16px}
+.addstep{align-self:flex-start;margin-top:6px;font-size:12.5px;color:var(--ink-3);padding:6px 12px;border-radius:999px;transition:.18s ease}
+.addstep:hover{background:var(--sunk);color:var(--ink-2)}
+.addphase{align-self:center;font-size:12.5px;color:var(--ink-3);padding:9px 18px;border-radius:999px;transition:.18s ease}
+.addphase:hover{background:var(--sunk);color:var(--ink-2)}
+
+.step{display:grid;grid-template-columns:1fr auto;gap:0 20px;align-items:center;padding:7px 0}
+.step-label{font-size:14.5px;font-weight:300;color:var(--ink);min-width:0;transition:color .3s ease}
+.step.is-done .step-label{color:var(--ink-3)}
+.step.type-date .step-label{color:var(--ink-2);font-weight:200}
+
+.ctrls{display:flex;align-items:center;gap:10px}
+
+.state{font-size:10.5px;font-weight:500;letter-spacing:.03em;padding:5px 10px;border-radius:999px;
+  background:var(--sunk);color:var(--ink-3);min-width:84px;text-align:center;
+  transition:background-color .3s ease,color .3s ease;white-space:nowrap}
+.state[data-s="1"]{background:var(--f-prog);color:#fff}
+.state[data-s="2"]{background:var(--f-done);color:#fff}
+
+.rng{-webkit-appearance:none;appearance:none;width:148px;height:20px;background:none;cursor:pointer;flex:none}
+.rng::-webkit-slider-runnable-track{height:8px;border-radius:99px;
+  background:linear-gradient(to right, var(--fill) 0, var(--fill) var(--p), var(--sunk) var(--p), var(--sunk) 100%)}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--surface);
+  box-shadow:0 0 0 1.5px var(--line);margin-top:-5px;transition:transform .16s ease}
+.rng:hover::-webkit-slider-thumb{transform:scale(1.1)}
+.rng:active::-webkit-slider-thumb{transform:scale(1.22)}
+.rng::-moz-range-track{height:8px;border-radius:99px;
+  background:linear-gradient(to right, var(--fill) 0, var(--fill) var(--p), var(--sunk) var(--p), var(--sunk) 100%)}
+.rng::-moz-range-thumb{width:18px;height:18px;border:0;border-radius:50%;background:var(--surface);
+  box-shadow:0 0 0 1.5px var(--line);transition:transform .16s ease}
+.rng:active::-moz-range-thumb{transform:scale(1.22)}
+.rng:focus{outline:none}
+.rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--focus)}
+.rng:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--focus)}
+
+.pctlab{font-size:12px;font-weight:400;color:var(--ink-2);font-variant-numeric:tabular-nums;width:38px;text-align:right}
+
+.datebtn{background:var(--sunk);color:var(--ink-3);border-radius:999px;padding:6px 16px;font-size:11.5px;
+  font-weight:400;transition:.22s ease;white-space:nowrap;min-width:104px;text-align:center;letter-spacing:.02em}
+.datebtn.past{background:var(--f-done);color:#fff;font-weight:500}
+.datebtn.future{background:var(--f-prog);color:#fff;font-weight:500}
+.datebtn:hover,.datebtn.live{filter:brightness(1.04)}
+.datebtn.empty:hover,.datebtn.empty.live{background:var(--acc-soft);color:var(--ink-2)}
+
+.cmt{position:relative;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);background:var(--sunk);transition:.22s ease;flex:none;overflow:visible}
+.cmt:hover{color:var(--ink-2)}
+.cmt.has{color:var(--acc)}
+.cmt.on{background:var(--acc);color:#fff}
+.cmt svg{width:15px;height:15px}
+.cmt::after{content:"";position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;
+  background:var(--acc);box-shadow:0 0 0 2px var(--box);opacity:0;transform:scale(.4);
+  transition:opacity .2s ease,transform .28s cubic-bezier(.34,1.5,.5,1)}
+.cmt.has::after{opacity:1;transform:none}
+.cmt.on::after{opacity:0;transform:scale(.4)}
+
+.note-wrap{grid-column:1/-1;display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1)}
+.step.noting .note-wrap{grid-template-rows:1fr}
+.note-in{overflow:hidden;min-height:0}
+.note-wrap textarea{width:100%;margin-top:10px;background:var(--sunk);border-radius:18px;padding:12px 16px;
+  font-size:13px;font-weight:300;line-height:1.6;resize:vertical;min-height:54px;transition:background-color .22s ease}
+.note-wrap textarea:focus{outline:none;background:var(--acc-soft)}
+.note-wrap textarea::placeholder{color:var(--ink-3)}
+
+.cmt-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.cmt-item{background:var(--sunk);border-radius:16px;padding:10px 14px}
+.cmt-meta{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.cmt-meta b{font-size:12px;font-weight:500}
+.cmt-meta span{font-size:11px;color:var(--ink-3);font-weight:300}
+.cmt-del{margin-left:auto;width:20px;height:20px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);opacity:0;transition:.15s ease;flex:none}
+.cmt-item:hover .cmt-del{opacity:.55}
+.cmt-del:hover{opacity:1;background:var(--danger-soft);color:var(--danger)}
+.cmt-del svg{width:10px;height:10px}
+.cmt-item p{margin:0;font-size:13px;font-weight:300;line-height:1.55;white-space:pre-wrap}
+.cmt-new{display:flex;gap:8px;align-items:flex-end;margin-top:10px}
+.cmt-new textarea{flex:1;background:var(--sunk);border-radius:16px;padding:10px 14px;font-size:13px;font-weight:300;line-height:1.55;resize:vertical;min-height:42px;transition:background-color .2s ease}
+.cmt-new textarea:focus{outline:none;background:var(--acc-soft)}
+.cmt-new textarea::placeholder{color:var(--ink-3)}
+.cmt-post{background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 16px;font-size:12.5px;font-weight:500;flex:none;transition:.2s ease}
+.cmt-post:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+.pastebox{width:100%;background:var(--sunk);border-radius:16px;padding:12px 15px;font-size:12px;font-weight:300;
+  line-height:1.5;resize:vertical;min-height:150px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.filerow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.notes{background:var(--box);border-radius:24px;padding:18px 20px 20px}
+.notes label{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--ink-2);margin-bottom:12px}
+.notes textarea{width:100%;background:var(--sunk);border-radius:18px;padding:13px 17px;font-size:13.5px;font-weight:300;line-height:1.6;resize:vertical;min-height:64px;transition:background-color .22s ease}
+.notes textarea:focus{outline:none;background:var(--acc-soft)}
+.notes textarea::placeholder{color:var(--ink-3)}
+
+.grip{opacity:0;color:var(--ink-3);cursor:grab;display:grid;place-items:center;flex:none;padding:2px;
+  background:none;transition:opacity .18s ease}
+.grip svg{width:14px;height:14px;pointer-events:none}
+.grip:active{cursor:grabbing}
+.card:hover > .card-head > .grip{opacity:.5}
+.phase-box:hover > .phase-head > .grip{opacity:.5}
+.step:hover > .grip{opacity:.5}
+.grip:hover{opacity:1}
+.dragging{opacity:.4}
+.step{position:relative}
+.step > .grip{position:absolute;left:-17px;top:14px}
+.addbtn{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);flex:none;transition:.2s ease}
+.addbtn:hover{background:var(--acc-soft);color:var(--acc)}
+.addbtn svg{width:13px;height:13px}
+.grouplab{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--ink-3);margin:0 0 8px 10px}
+.grouplab.second{margin-top:18px}
+.err{color:var(--danger);font-size:12.5px;font-weight:400;margin:-4px 0 14px}
+.ghost{min-height:88px;border-radius:30px;color:var(--ink-3);display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:14px;font-weight:300;box-shadow:inset 0 0 0 2px var(--track);transition:.25s ease}
+.ghost:hover{color:var(--ink-2);background:var(--surface);box-shadow:var(--shadow)}
+.ghost span{width:20px;height:20px;display:grid;place-items:center}
+.empty-state{text-align:center;color:var(--ink-3);font-size:14px;padding:60px 0}
+
+/* ---------- calendar ---------- */
+.dp{position:fixed;z-index:120;width:278px;background:var(--surface);border-radius:26px;box-shadow:var(--shadow-sheet);padding:18px 18px 14px;animation:sheetIn .24s cubic-bezier(.34,1.3,.5,1)}
+.dp-head{display:flex;align-items:center;gap:4px;margin-bottom:14px}
+.dp-head b{font-weight:700;font-size:15px;letter-spacing:-.005em;flex:1;padding-left:6px}
+.dp-nav{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);transition:.2s ease;flex:none}
+.dp-nav:hover{background:var(--sunk);color:var(--ink)}
+.dp-nav svg{width:14px;height:14px;pointer-events:none}
+.dp-wd{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.dp-wd span{text-align:center;font-size:9.5px;letter-spacing:.12em;color:var(--ink-3);font-weight:400}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dp-grid button{height:32px;border-radius:999px;font-size:12.5px;font-weight:300;font-variant-numeric:tabular-nums;color:var(--ink);transition:background-color .16s ease,color .16s ease,transform .16s ease}
+.dp-grid button.out{color:var(--ink-3);opacity:.45}
+.dp-grid button:hover{background:var(--sunk)}
+.dp-grid button.today{color:var(--acc);font-weight:500}
+.dp-grid button.sel,.dp-grid button.sel:hover{background:var(--acc);color:#fff;font-weight:500}
+.dp-foot{display:flex;justify-content:space-between;margin-top:10px}
+.dp-foot button{font-size:12px;font-weight:400;color:var(--ink-3);padding:7px 12px;border-radius:999px;transition:.2s ease}
+.dp-foot button:hover{background:var(--sunk);color:var(--ink)}
+
+/* ---------- tree ---------- */
+.tree{position:fixed;z-index:118;width:320px;max-height:min(70vh,560px);overflow:auto;background:var(--surface);
+  border-radius:24px;box-shadow:var(--shadow-sheet);padding:10px;animation:sheetIn .2s cubic-bezier(.34,1.25,.5,1)}
+.trow{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:15px;width:100%;text-align:left;
+  font-size:13.5px;font-weight:300;transition:background-color .15s ease,color .15s ease}
+.trow:hover{background:var(--sunk)}
+.trow.folder{font-weight:500;font-size:13px}
+.trow.month{padding-left:32px}
+.trow.on{background:var(--acc-soft);color:var(--acc);font-weight:500}
+.tdot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--track)}
+.tname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tmeta{font-size:11.5px;color:var(--ink-3);font-weight:300;flex:none}
+.tchev{width:13px;height:13px;display:grid;place-items:center;color:var(--ink-3);flex:none;transition:transform .25s ease}
+.tchev svg{width:13px;height:13px}
+.trow.folder.shut .tchev{transform:rotate(-90deg)}
+.tempty{padding:6px 12px 8px 32px;font-size:12.5px;color:var(--ink-3);font-weight:300}
+.tree-foot{display:flex;gap:4px;padding-top:8px;margin-top:8px;position:relative}
+.tree-foot::before{content:"";position:absolute;top:0;left:12px;right:12px;height:1px;background:var(--line)}
+.tree-foot button{flex:1;padding:9px 10px;border-radius:14px;font-size:12.5px;font-weight:400;color:var(--ink-2);transition:.15s ease}
+.tree-foot button:hover{background:var(--sunk);color:var(--ink)}
+
+/* ---------- context menu ---------- */
+.ctx{position:fixed;z-index:130;min-width:212px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow-sheet);padding:8px;animation:sheetIn .18s cubic-bezier(.34,1.2,.5,1)}
+.ctx button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 13px;border-radius:14px;font-size:13.5px;font-weight:300;color:var(--ink);transition:.15s ease}
+.ctx .mi{display:grid;place-items:center;flex:none;color:var(--ink-3)}
+.ctx .mi svg{width:15px;height:15px;display:block}
+.ctx button.danger .mi{color:var(--danger)}
+.ctx button:hover{background:var(--sunk)}
+.ctx button.danger{color:var(--danger)}
+.ctx button.danger:hover{background:var(--danger-soft)}
+.ctx .sep{height:1px;background:var(--line);margin:6px 12px;border-radius:99px}
+.sw-row{display:flex;gap:7px;flex-wrap:wrap;padding:8px 13px 5px;max-width:212px}
+.sw-row button{width:20px;height:20px;border-radius:50%;padding:0;flex:none;transition:transform .15s ease}
+.sw-row button:hover{transform:scale(1.18);background:none}
+.sw-row button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--ink-3)}
+.sw-row button.nocol{box-shadow:inset 0 0 0 2px var(--track)}
+.sw-row button.nocol[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--track),0 0 0 2px var(--surface),0 0 0 3.5px var(--ink-3)}
+
+/* ---------- sheets ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,var(--ink) 26%,transparent);backdrop-filter:blur(6px);display:grid;place-items:center;padding:24px;animation:fadeIn .22s ease}
+#scrim2{z-index:100}
+.sheet{width:100%;max-width:440px;max-height:86vh;overflow:auto;background:var(--surface);border-radius:32px;box-shadow:var(--shadow-sheet);padding:32px;animation:sheetIn .34s cubic-bezier(.34,1.3,.5,1)}
+.sheet.narrow{max-width:380px}
+.sheet h3{font-size:22px;margin-bottom:8px}
+.sheet .hint{color:var(--ink-3);font-size:13px;margin:0 0 24px;line-height:1.6}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--ink-3);margin-bottom:8px}
+.field input[type="text"]{width:100%;background:var(--sunk);border-radius:16px;padding:12px 16px;font-size:14px;font-weight:300}
+.field input[type="text"]:focus{outline:none;background:var(--acc-soft)}
+.field .datebtn{width:100%;text-align:left;border-radius:16px;padding:12px 16px;font-size:14px;min-width:0}
+.sel{width:100%;background:var(--sunk);border-radius:16px;padding:12px 42px 12px 16px;font-size:14px;font-weight:300;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23A6A2B6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat:no-repeat;background-position:right 16px center;background-size:14px}
+.sel:focus{outline:none;background-color:var(--acc-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.colorpick{display:flex;gap:9px;flex-wrap:wrap;background:var(--sunk);border-radius:16px;padding:13px 15px}
+.colorpick button{width:24px;height:24px;border-radius:50%;padding:0;transition:transform .15s ease}
+.colorpick button:hover{transform:scale(1.15)}
+.colorpick button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
+.colorpick button.nocol{box-shadow:inset 0 0 0 2px var(--track)}
+.colorpick button.nocol[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--track),0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
+
+.flagpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px;max-height:164px;overflow:auto;background:var(--sunk);border-radius:20px;padding:12px}
+.flagpick button{border-radius:10px;padding:7px 4px;display:grid;place-items:center;transition:.2s ease}
+.flagpick button:hover{background:var(--surface)}
+.flagpick button[aria-pressed="true"]{background:var(--surface);box-shadow:0 0 0 2px var(--acc)}
+.flagpick .flag{width:26px;height:18px}
+.flagpick .none{font-size:10px;color:var(--ink-3)}
+
+.switch{width:38px;height:22px;border-radius:99px;background:var(--track);flex:none;position:relative;transition:background-color .28s ease}
+.switch i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .32s cubic-bezier(.34,1.45,.5,1)}
+[aria-pressed="true"] .switch{background:var(--acc)}
+[aria-pressed="true"] .switch i{transform:translateX(16px)}
+
+.rowlist{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
+.rowitem{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:18px;font-size:14px;font-weight:300;transition:background-color .2s ease}
+.rowitem:hover{background:var(--sunk)}
+.rowitem .flagtile{width:32px;height:32px;border-radius:11px}
+.rowitem .flagtile .flag{width:20px;height:14px}
+.rowitem .flagtile.sec svg{width:13px;height:13px}
+.rowitem .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rowitem em{font-style:normal;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.rowitem .sw{padding:4px;border-radius:999px;display:grid;place-items:center}
+.del{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);flex:none;transition:.2s ease}
+.del:hover{background:var(--danger-soft);color:var(--danger)}
+.del svg{width:12px;height:12px}
+
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:26px}
+.btn{padding:12px 24px;border-radius:999px;font-size:14px;font-weight:400;transition:.2s ease}
+.btn.ghostbtn{color:var(--ink-3)}
+.btn.ghostbtn:hover{background:var(--sunk);color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);font-weight:500}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+.btn.danger{background:var(--danger);color:#fff;font-weight:500}
+.btn.danger:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+.divider{height:1px;background:var(--line);margin:22px 0;border-radius:99px}
+
+.drag-ghost{position:fixed !important;z-index:200;pointer-events:none;margin:0 !important;
+  box-shadow:0 26px 64px -20px rgba(33,30,46,.5);opacity:.98;transform:scale(1.015);
+  transition:none !important;animation:none !important}
+.drag-src{opacity:.22}
+body.dragging-now{cursor:grabbing;-webkit-user-select:none;user-select:none}
+body.dragging-now *{cursor:grabbing !important}
+.footnote{margin:56px 0 0;font-size:12.5px;color:var(--ink-3);font-weight:300;max-width:62ch;line-height:1.8}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes popNum{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes dotPulse{0%{transform:scale(1)}35%{transform:scale(2.1)}100%{transform:scale(1)}}
+@keyframes cardDone{0%{transform:scale(1)}30%{transform:scale(1.012)}100%{transform:scale(1)}}
+@keyframes glow{0%{opacity:0}25%{opacity:.55}100%{opacity:0}}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card.fresh{animation:cardIn .45s cubic-bezier(.34,1.2,.5,1) both}
+
+@media (max-width:700px){
+  .stats{grid-template-columns:1fr 1fr}
+}
+@media (max-width:620px){
+  .wrap{padding:0 18px 90px}.topbar-in{padding:22px 18px 16px}
+  .ring{width:124px;height:124px}.ring-label b{font-size:28px}
+  .step{grid-template-columns:1fr}
+  .ctrls{justify-content:flex-start;flex-wrap:wrap;margin-top:8px}
+  .sheet{padding:26px}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important;animation-duration:.01ms !important}}
+
+/* ---------- sign in ---------- */
+#gate{position:fixed;inset:0;z-index:400;display:grid;place-items:center;background:var(--bg);padding:24px}
+.gate-card{width:100%;max-width:380px;text-align:center}
+.gate-mark{width:56px;height:56px;border-radius:19px;background:var(--acc);display:grid;place-items:center;color:#fff;margin:0 auto 22px}
+.gate-mark svg{width:29px;height:29px}
+.gate-card h2{font-size:26px;margin-bottom:8px}
+.gate-card .sub{color:var(--ink-3);font-size:13.5px;margin:0 0 28px;line-height:1.6}
+.gate-card input{width:100%;background:var(--sunk);border-radius:16px;padding:13px 17px;font-size:14px;font-weight:300;margin-bottom:10px;text-align:left}
+.gate-card input:focus{outline:none;background:var(--acc-soft)}
+.gate-card .btn.primary{width:100%;margin-top:8px;justify-content:center}
+.gate-alt{margin-top:18px;font-size:13px;color:var(--ink-3)}
+.gate-alt button{color:var(--acc);font-weight:400;padding:2px 4px;border-radius:6px}
+.gate-alt button:hover{text-decoration:underline}
+.gate-msg{margin:14px 0 0;font-size:13px;font-weight:400;min-height:20px}
+.gate-msg.bad{color:var(--danger)}
+.gate-msg.ok{color:var(--f-done)}
+.spin{display:inline-block;width:15px;height:15px;border-radius:50%;border:2px solid color-mix(in srgb,var(--bg) 40%,transparent);border-top-color:var(--bg);animation:spin .7s linear infinite;vertical-align:-3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- connection + read-only ---------- */
+.whoami{display:flex;align-items:center;gap:8px;padding:7px 8px 7px 13px;border-radius:999px;background:var(--surface);
+  box-shadow:var(--shadow);font-size:13px;font-weight:400;color:var(--ink-2);flex:none}
+.whoami .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10.5px;font-weight:500;flex:none}
+.live{width:7px;height:7px;border-radius:50%;background:var(--f-done);flex:none;transition:background-color .3s ease}
+.live.off{background:var(--danger)}
+.live.busy{background:var(--f-prog)}
+.readonly-note{display:flex;align-items:center;gap:9px;background:var(--p3-soft,#FAF0DE);color:var(--f-prog);
+  border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:400;margin:0 auto}
+body.readonly .grip,body.readonly .markdone,body.readonly .addstep,body.readonly .addphase,
+body.readonly .ghost,body.readonly .cmt-new,body.readonly .cmt-del,body.readonly #cog{display:none !important}
+body.readonly .rng{pointer-events:none;opacity:.75}
+body.readonly .datebtn{pointer-events:none}
+body.readonly .crumb{pointer-events:auto}
+
+/* ---------- history ---------- */
+.hist{display:flex;flex-direction:column;gap:2px;max-height:52vh;overflow:auto;margin-bottom:8px}
+.hist-row{display:flex;gap:11px;padding:9px 11px;border-radius:14px;font-size:13px;font-weight:300;align-items:baseline}
+.hist-row:hover{background:var(--sunk)}
+.hist-row b{font-weight:500;flex:none}
+.hist-row .w{flex:1;min-width:0;color:var(--ink-2)}
+.hist-row .t{font-size:11px;color:var(--ink-3);flex:none;font-variant-numeric:tabular-nums}
+.hist-empty{padding:26px 0;text-align:center;color:var(--ink-3);font-size:13px}
+
+</style>
+</head>
+<body>
+
+<div id="gate" hidden>
+  <div class="gate-card">
+    <div class="gate-mark" id="gateMark"></div>
+    <h2 id="gTitle">Local Pages</h2>
+    <p class="sub" id="gSub">Sign in to see and update this month.</p>
+    <input type="email" id="gEmail" placeholder="you@example.com" autocomplete="username">
+    <input type="password" id="gPass" placeholder="Password" autocomplete="current-password">
+    <button class="btn primary" id="gGo">Sign in</button>
+    <p class="gate-msg" id="gateMsg"></p>
+    <p class="gate-alt" id="gAlt"></p>
+  </div>
+</div>
+
+<div id="app" hidden>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="mark" id="mark"></div>
+      <div><h1>Local Pages</h1><p>Liahona</p></div>
+    </div>
+    <button class="crumb" id="crumb" aria-haspopup="true"></button>
+    <button class="cog" id="cog" aria-haspopup="true" aria-label="More options"></button>
+    <div class="whoami" id="whoami" role="button" tabindex="0"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="summary">
+    <div class="ring-block">
+      <div class="ring" id="bigRingWrap">
+        <svg width="152" height="152" viewBox="0 0 152 152" aria-hidden="true">
+          <circle class="track" cx="76" cy="76" r="67" fill="none" stroke-width="9"></circle>
+          <circle class="val" id="bigRing" cx="76" cy="76" r="67" fill="none" stroke-width="9" stroke-dasharray="0 421"></circle>
+        </svg>
+        <div class="ring-label"><b id="bigPct">0%</b></div>
+      </div>
+      <div class="ring-side">
+        <h2 id="issueTitle">—</h2>
+        <p id="issueSub"></p>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="rail-big" id="railBig"></div>
+  </section>
+
+  <p class="section-label">Editions</p>
+  <section class="grid" id="grid"></section>
+
+  <p class="footnote">
+    Prototype with sample data — everything is clickable and saves in this browser.
+    Click the breadcrumb for your folders. Right-click a folder, month, edition, phase or step for its actions.
+  </p>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="scrim" id="scrim2" hidden></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+
+
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const COLORS = [
+  {id:"",       v:""},
+  {id:"red",    v:"#E0413F"},
+  {id:"orange", v:"#EE8B22"},
+  {id:"yellow", v:"#E3B31E"},
+  {id:"green",  v:"#33A96B"},
+  {id:"teal",   v:"#1FA6A0"},
+  {id:"blue",   v:"#2F8FE0"},
+  {id:"purple", v:"#8158E0"},
+  {id:"pink",   v:"#E85B9E"},
+  {id:"grey",   v:"#8B86A8"}
+];
+/* one colour per person, handed out in the order they first appear */
+const PERSON_COLORS = ["#E0413F","#2F6FE0","#2FA05F","#D9A61B","#E85B9E",
+                       "#38AEE8","#EE7C22","#8158E0","#17A398","#7CA82B"];
+function personColor(name){
+  if (!name) return "";
+  const k = name.trim().toLowerCase();
+  if (DB.peopleColors && DB.peopleColors[k]) return DB.peopleColors[k];
+  if (!Array.isArray(DB.people)) return "";
+  const i = DB.people.findIndex(x => x.toLowerCase() === k);
+  return i < 0 ? "" : PERSON_COLORS[i % PERSON_COLORS.length];
+}
+function registerPeople(){
+  if (!Array.isArray(DB.people)) DB.people = [];
+  if (DB.peopleColors) return;                 /* the server owns the list */
+  const seen = new Map();
+  const scan = arr => (arr || []).forEach(n => {
+    const nm = (n.by || "").trim();
+    if (!nm) return;
+    const k = nm.toLowerCase(), t = n.at || "";
+    if (!seen.has(k) || t < seen.get(k).t) seen.set(k, {name:nm, t});
+  });
+  Object.keys(DB.data || {}).forEach(mid => Object.keys(DB.data[mid] || {}).forEach(eid => {
+    const c = DB.data[mid][eid];
+    if (!c) return;
+    Object.keys(c.notes || {}).forEach(k => scan(c.notes[k]));
+    scan(c.note);
+  }));
+  Array.from(seen.values())
+    .sort((x, y) => String(x.t).localeCompare(String(y.t)))
+    .forEach(pp => { if (!DB.people.some(x => x.toLowerCase() === pp.name.toLowerCase())) DB.people.push(pp.name); });
+  if (DB.me && DB.me.name && !DB.people.some(x => x.toLowerCase() === DB.me.name.trim().toLowerCase()))
+    DB.people.push(DB.me.name.trim());
+}
+function colorOf(id){ const c = COLORS.find(x => x.id === id); return c ? c.v : ""; }
+function phaseColor(ph){ return colorOf(ph.color) || cssVar("--ink-3"); }
+
+const SEED_PHASES = [
+  {id:"prep",  name:"Prep",  color:"yellow"},
+  {id:"dl",    name:"D&L",   color:"red"},
+  {id:"proof", name:"Proof", color:"purple"},
+  {id:"final", name:"Final", color:"pink"},
+  {id:"cc",    name:"CC",    color:"blue"}
+];
+const SEED_STEPS = [
+  {id:"reminder",  phase:"prep",  label:"Articles reminder",        type:"status", done:"Sent"},
+  {id:"remSent",   phase:"prep",  label:"Reminder sent",            type:"date"},
+  {id:"artIn",     phase:"prep",  label:"Articles coming in",       type:"date"},
+  {id:"sendTrans", phase:"prep",  label:"Sent for translation",     type:"status", done:"Sent"},
+  {id:"revIn",     phase:"prep",  label:"Review coming in",         type:"date"},
+  {id:"folder",    phase:"dl",    label:"Folder prep",              type:"status", done:"Done"},
+  {id:"ruis",      phase:"dl",    label:"RUIs",                     type:"status", done:"Done"},
+  {id:"dl",        phase:"dl",    label:"Design & layout",          type:"status", done:"Designed"},
+  {id:"trProof",   phase:"proof", label:"Translator proof",         type:"status", done:"Applied"},
+  {id:"trProofIn", phase:"proof", label:"TR proof coming in",       type:"date"},
+  {id:"edProof",   phase:"proof", label:"Editor proof",             type:"status", done:"Applied"},
+  {id:"edProofIn", phase:"proof", label:"Editor proof coming in",   type:"date"},
+  {id:"finalPrep", phase:"final", label:"Final prep",               type:"status", done:"Exported"},
+  {id:"screenSh",  phase:"final", label:"Export in Screen Sharing", type:"status", done:"Exported"},
+  {id:"finalSent", phase:"final", label:"Final proof to editors",   type:"status", done:"Sent"},
+  {id:"words",     phase:"cc",    label:"Update words",             type:"status", done:"Updated"},
+  {id:"upload",    phase:"cc",    label:"Upload to CC",             type:"status", done:"Uploaded"}
+];
+
+function statusSteps(){ return DB.steps.filter(s => s.type === "status"); }
+function dateSteps(){ return DB.steps.filter(s => s.type === "date"); }
+function order(){ return statusSteps().map(s => s.id); }
+function stepsOf(pid){ return DB.steps.filter(s => s.phase === pid); }
+
+/* ============ flags ============ */
+const FLAG_DEFS = {
+  es:{n:"Spain",       h:[["#AA151B",1],["#F1BF00",2],["#AA151B",1]]},
+  de:{n:"Germany",     h:[["#000000",1],["#DD0000",1],["#FFCE00",1]]},
+  fr:{n:"France",      v:[["#002395",1],["#F2F2F5",1],["#ED2939",1]]},
+  nl:{n:"Netherlands", h:[["#AE1C28",1],["#F2F2F5",1],["#21468B",1]]},
+  cz:{n:"Czechia",     special:"cz"},
+  bg:{n:"Bulgaria",    h:[["#F2F2F5",1],["#00966E",1],["#D62612",1]]},
+  pt:{n:"Portugal",    v:[["#046A38",2],["#DA291C",3]]},
+  it:{n:"Italy",       v:[["#008C45",1],["#F4F5F0",1],["#CD212A",1]]},
+  pl:{n:"Poland",      h:[["#F2F2F5",1],["#DC143C",1]]},
+  ro:{n:"Romania",     v:[["#002B7F",1],["#FCD116",1],["#CE1126",1]]},
+  hu:{n:"Hungary",     h:[["#CE2939",1],["#F2F2F5",1],["#477050",1]]},
+  ua:{n:"Ukraine",     h:[["#0057B7",1],["#FFD700",1]]},
+  at:{n:"Austria",     h:[["#ED2939",1],["#F2F2F5",1],["#ED2939",1]]},
+  be:{n:"Belgium",     v:[["#000000",1],["#FAE042",1],["#ED2939",1]]},
+  ie:{n:"Ireland",     v:[["#169B62",1],["#F2F2F5",1],["#FF883E",1]]},
+  ee:{n:"Estonia",     h:[["#0072CE",1],["#000000",1],["#F2F2F5",1]]},
+  lv:{n:"Latvia",      h:[["#9E3039",2],["#F2F2F5",1],["#9E3039",2]]},
+  lt:{n:"Lithuania",   h:[["#FDB913",1],["#006A44",1],["#C1272D",1]]},
+  sk:{n:"Slovakia",    h:[["#F2F2F5",1],["#0B4EA2",1],["#EE1C25",1]]},
+  si:{n:"Slovenia",    h:[["#F2F2F5",1],["#0000C8",1],["#DE2918",1]]},
+  hr:{n:"Croatia",     h:[["#FF0000",1],["#F2F2F5",1],["#171796",1]]},
+  dk:{n:"Denmark",     cross:["#C8102E","#F2F2F5"]},
+  se:{n:"Sweden",      cross:["#006AA7","#FECC00"]},
+  no:{n:"Norway",      cross:["#BA0C2F","#F2F2F5","#00205B"]},
+  fi:{n:"Finland",     cross:["#F2F2F5","#003580"]}
+};
+const LANG_INFO = {
+  es:{name:"Spanish",    code:"178"},
+  de:{name:"German",     code:"150"},
+  fr:{name:"French",     code:"140"},
+  nl:{name:"Dutch",      code:"120"},
+  cz:{name:"Czech",      code:"121"},
+  bg:{name:"Bulgarian",  code:"112"},
+  pt:{name:"Portuguese", code:""},
+  it:{name:"Italian",    code:""},
+  pl:{name:"Polish",     code:""},
+  ro:{name:"Romanian",   code:""},
+  hu:{name:"Hungarian",  code:""},
+  ua:{name:"Ukrainian",  code:""},
+  ee:{name:"Estonian",   code:""},
+  lv:{name:"Latvian",    code:""},
+  lt:{name:"Lithuanian", code:""},
+  sk:{name:"Slovak",     code:""},
+  si:{name:"Slovenian",  code:""},
+  hr:{name:"Croatian",   code:""},
+  dk:{name:"Danish",     code:""},
+  se:{name:"Swedish",    code:""},
+  no:{name:"Norwegian",  code:""},
+  fi:{name:"Finnish",    code:""}
+};
+/* the six that go into every new month by default */
+const STD_IDS = ["es","de","fr","nl","alm","wel"];
+
+function buildFlag(code){
+  const d = FLAG_DEFS[code];
+  if (!d) return "";
+  let inner = "";
+  if (d.special === "cz"){
+    inner = '<rect width="20" height="7" fill="#F2F2F5"/><rect y="7" width="20" height="7" fill="#D7141A"/><path d="M0 0 L9 7 L0 14 Z" fill="#11457E"/>';
+  } else if (d.cross){
+    const [bg, c1, c2] = d.cross;
+    inner = '<rect width="20" height="14" fill="' + bg + '"/><rect x="5" width="4" height="14" fill="' + c1 + '"/><rect y="5" width="20" height="4" fill="' + c1 + '"/>';
+    if (c2) inner += '<rect x="6" width="2" height="14" fill="' + c2 + '"/><rect y="6" width="20" height="2" fill="' + c2 + '"/>';
+  } else {
+    const bands = d.h || d.v, horiz = !!d.h;
+    const total = bands.reduce((a, b) => a + b[1], 0);
+    let off = 0;
+    bands.forEach(([col, w]) => {
+      const size = (horiz ? 14 : 20) * w / total;
+      inner += horiz ? '<rect y="' + off + '" width="20" height="' + size + '" fill="' + col + '"/>'
+                     : '<rect x="' + off + '" width="' + size + '" height="14" fill="' + col + '"/>';
+      off += size;
+    });
+  }
+  return '<svg viewBox="0 0 20 14">' + inner + "</svg>";
+}
+const SECTION_GLYPH = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2h6l3 3v9H4z"/><path d="M9.5 2v3.5H13"/></svg>';
+const LOGO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+  '<path d="M13.2 3H6.4A1.4 1.4 0 0 0 5 4.4v15.2A1.4 1.4 0 0 0 6.4 21h6.1"/>' +
+  '<path d="M13.2 3 19 8.8v2.4"/><path d="M13.2 3v5.8H19"/>' +
+  '<path d="M8.4 12.2h4.2M8.4 15.6h3"/>' +
+  '<path d="M20.3 13.6a1.45 1.45 0 0 1 2.05 2.05L17 21l-2.7.65.65-2.7z"/></svg>';
+const CHEV  = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>';
+const PLUS  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>';
+const XMARK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
+const ARR_L = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
+const ARR_R = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>';
+const DOTS = '<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3.2" r="1.45"/><circle cx="8" cy="8" r="1.45"/><circle cx="8" cy="12.8" r="1.45"/></svg>';
+const I_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.1"/><path d="M5.4 8.2l1.9 1.9 3.4-4"/></svg>';
+const I_UNDO  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 1 1.6 3.7"/><path d="M2.4 4.6v3.1h3.1"/></svg>';
+const I_LIST  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 4.2h7M6 8h7M6 11.8h7"/><circle cx="3.1" cy="4.2" r=".9" fill="currentColor" stroke="none"/><circle cx="3.1" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="3.1" cy="11.8" r=".9" fill="currentColor" stroke="none"/></svg>';
+const I_DROP  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2s3.6 4 3.6 6.3a3.6 3.6 0 0 1-7.2 0C4.4 6.2 8 2.2 8 2.2Z"/></svg>';
+const I_GRID  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="2.4" y="2.4" width="4.6" height="4.6" rx="1.3"/><rect x="9" y="2.4" width="4.6" height="4.6" rx="1.3"/><rect x="2.4" y="9" width="4.6" height="4.6" rx="1.3"/><rect x="9" y="9" width="4.6" height="4.6" rx="1.3"/></svg>';
+const I_CLOCK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.1"/><path d="M8 4.6V8l2.4 1.5"/></svg>';
+const I_USER = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"/><path d="M2.9 13.4a5.2 5.2 0 0 1 10.2 0"/></svg>';
+const I_DOWN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6v7.6"/><path d="M5 7.4 8 10.4l3-3"/><path d="M2.8 12.8h10.4"/></svg>';
+const I_UP   = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10.4V2.8"/><path d="M5 5.8 8 2.8l3 3"/><path d="M2.8 12.8h10.4"/></svg>';
+const I_TABLE= '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2.3" y="3" width="11.4" height="10" rx="1.6"/><path d="M2.3 6.6h11.4M6.4 6.6V13"/></svg>';
+const GRIP = '<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="6" cy="4" r="1.25"/><circle cx="10" cy="4" r="1.25"/><circle cx="6" cy="8" r="1.25"/><circle cx="10" cy="8" r="1.25"/><circle cx="6" cy="12" r="1.25"/><circle cx="10" cy="12" r="1.25"/></svg>';
+const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.1"/><path d="M5.4 8.2l1.9 1.9 3.4-4"/></svg>';
+const CMT   = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 8c0 2.5-2.5 4.6-5.6 4.6-.7 0-1.4-.1-2-.3L2.8 13.4l1-2.4C3 10.2 2.4 9.2 2.4 8c0-2.5 2.5-4.6 5.6-4.6S13.6 5.5 13.6 8Z"/></svg>';
+const CMT_FILL = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.6 8c0 2.5-2.5 4.6-5.6 4.6-.7 0-1.4-.1-2-.3L2.8 13.4l1-2.4C3 10.2 2.4 9.2 2.4 8c0-2.5 2.5-4.6 5.6-4.6S13.6 5.5 13.6 8Z"/></svg>';
+
+/* ============ data ============ */
+let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
+          me:{name:""}, people:[], peopleColors:{}};
+let current = null;
+let open = new Set();
+const openPhase = new Set();
+const treeShut = new Set();
+
+function isoOf(d){ return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function todayISO(){ return isoOf(new Date()); }
+function shiftFromToday(days){ const d = new Date(); d.setDate(d.getDate() + days); return isoOf(d); }
+
+function blank(){
+  const o = {status:{}, dates:{}, notes:{}, note:""};
+  statusSteps().forEach(s => { o.status[s.id] = 0; });
+  dateSteps().forEach(s => { o.dates[s.id] = ""; });
+  return o;
+}
+
+function seedDB(){
+  const db = {
+    folders:[{id:"y2026", name:"2026", color:""}],
+    phases:SEED_PHASES.map(o => Object.assign({}, o)),
+    steps:SEED_STEPS.map(o => Object.assign({}, o)),
+    editions:SEED_EDITIONS.map(o => Object.assign({}, o)),
+    issues:SEED_ISSUES.map(o => Object.assign({}, o)),
+    data:{}
+  };
+  DB = db;
+  const ord = order();
+  const past = {remSent:-78, artIn:-72, revIn:-68, trProofIn:-60, edProofIn:-55};
+  const decD = {remSent:-16, artIn:-10, revIn:-4, trProofIn:3, edProofIn:9};
+  db.issues[0].submitted = shiftFromToday(-98);
+  db.issues[1].submitted = shiftFromToday(-66);
+  db.issues[2].submitted = shiftFromToday(-6);
+  db.issues.forEach(iss => {
+    db.data[iss.id] = {};
+    iss.editions.forEach(edId => {
+      const c = blank();
+      if (iss.id !== "dec"){
+        ord.forEach(id => { c.status[id] = 100; });
+        dateSteps().forEach(s => { c.dates[s.id] = shiftFromToday(past[s.id] || -70); });
+      } else {
+        const [done, part] = DEC_PROGRESS[edId];
+        ord.forEach((id, i) => {
+          if (i < done) c.status[id] = 100;
+          else if (i === done) c.status[id] = part;
+        });
+        dateSteps().forEach(s => { c.dates[s.id] = decD[s.id] === undefined ? "" : shiftFromToday(decD[s.id]); });
+      }
+      db.data[iss.id][edId] = c;
+    });
+  });
+  db.data.dec.de.note = "Translators had to re-send two articles — chase them earlier next month.";
+  db.data.dec.de.notes.sendTrans = "Two files came back corrupted, had to re-export and resend.";
+  db.data.dec.alm.note = "We had to remind them twice.";
+  return db;
+}
+/* every structural change is pushed to the database, debounced */
+function save(){ queueStructurePush(); }
+
+function ensureCells(){
+  if (!DB.folders || !DB.folders.length) DB.folders = [{id:"y" + new Date().getFullYear(), name:String(new Date().getFullYear()), color:""}];
+  if (!DB.phases) DB.phases = SEED_PHASES.map(o => Object.assign({}, o));
+  if (!DB.steps) DB.steps = SEED_STEPS.map(o => Object.assign({}, o));
+  DB.steps = DB.steps.filter(s => DB.phases.some(p => p.id === s.phase));
+  DB.phases.forEach(p => { if (p.id === "final" && p.name === "Final steps") p.name = "Final"; });
+  DB.editions.forEach(e => { if (typeof e.std !== "boolean") e.std = STD_IDS.indexOf(e.id) >= 0; });
+  if (!DB.me || typeof DB.me !== "object") DB.me = {name:""};
+  DB.editions.forEach(e => {
+    if (e.id === "alm" && e.place === "Section") e.place = "Area Leadership Message";
+    if (e.id === "wel" && e.place === "Section") e.place = "Welfare article";
+  });
+  DB.issues.forEach(iss => {
+    if (!iss.folder || !DB.folders.some(f => f.id === iss.folder)) iss.folder = DB.folders[0].id;
+    if (typeof iss.color !== "string") iss.color = "";
+    if (!DB.data[iss.id]) DB.data[iss.id] = {};
+    iss.editions = iss.editions.filter(id => DB.editions.some(e => e.id === id));
+    iss.editions.forEach(id => {
+      if (!DB.data[iss.id][id]) DB.data[iss.id][id] = blank();
+      const c = DB.data[iss.id][id];
+      if (!c.notes) c.notes = {};
+      if (!c.status) c.status = {};
+      if (!c.dates) c.dates = {};
+      /* comments used to be one shared string per step; they are now a list
+         of entries, each with a name and a time */
+      Object.keys(c.notes).forEach(k => {
+        if (typeof c.notes[k] === "string"){
+          const t = c.notes[k].trim();
+          c.notes[k] = t ? [{id:slug("c"), by:"", at:"", text:t}] : [];
+        } else if (!Array.isArray(c.notes[k])) c.notes[k] = [];
+      });
+      if (typeof c.note === "string"){
+        const t = c.note.trim();
+        c.note = t ? [{id:slug("c"), by:"", at:"", text:t}] : [];
+      } else if (!Array.isArray(c.note)) c.note = [];
+      DB.steps.forEach(st => { if (!Array.isArray(c.notes[st.id])) c.notes[st.id] = []; });
+      statusSteps().forEach(s => {
+        let v = c.status[s.id];
+        if (typeof v !== "number") v = 0;
+        c.status[s.id] = Math.max(0, Math.min(100, Math.round(v)));
+      });
+      dateSteps().forEach(s => { if (typeof c.dates[s.id] !== "string") c.dates[s.id] = ""; });
+    });
+  });
+  registerPeople();
+  if (current && !DB.issues.some(i => i.id === current)) current = DB.issues.length ? DB.issues[0].id : null;
+}
+function issueById(id){ return DB.issues.find(i => i.id === id); }
+function folderById(id){ return DB.folders.find(f => f.id === id); }
+function edById(id){ return DB.editions.find(e => e.id === id); }
+function phaseById(id){ return DB.phases.find(p => p.id === id); }
+function monthsIn(fid){ return DB.issues.filter(i => i.folder === fid); }
+function currentEditions(){ const i = issueById(current); return i ? i.editions.map(edById).filter(Boolean) : []; }
+function cell(edId){ return DB.data[current][edId]; }
+
+function pct(ed){ const c = cell(ed), o = order(); return o.length ? o.reduce((a, id) => a + (c.status[id] || 0), 0) / (o.length * 100) : 0; }
+function phasePct(ed, ph){
+  const ids = statusSteps().filter(s => s.phase === ph).map(s => s.id), c = cell(ed);
+  return ids.length ? ids.reduce((a, id) => a + (c.status[id] || 0), 0) / (ids.length * 100) : 0;
+}
+function monthPct(mid){
+  const iss = issueById(mid); if (!iss || !iss.editions.length) return 0;
+  const d = DB.data[mid] || {}, o = order();
+  if (!o.length) return 0;
+  let t = 0, n = 0;
+  iss.editions.forEach(e => {
+    const c = d[e]; if (!c) return;
+    t += o.reduce((a, id) => a + (c.status[id] || 0), 0) / (o.length * 100); n++;
+  });
+  return n ? t / n : 0;
+}
+function phaseHasNote(ed, ph){
+  const c = cell(ed);
+  return DB.steps.some(s => s.phase === ph && (c.notes[s.id] || []).length > 0);
+}
+/* never round up into 100 or down into 0 — 100% must mean everything is
+   finished, and anything started must read at least 1% */
+function showPct(v){
+  if (v >= 1) return 100;
+  if (v <= 0) return 0;
+  return Math.min(99, Math.max(1, Math.floor(v * 100)));
+}
+function stateOf(v){ return v >= 100 ? 2 : v > 0 ? 1 : 0; }
+function stateWord(step, v){ return v >= 100 ? (step.done || "Done") : v > 0 ? "In process" : "Not started"; }
+
+function fullDate(iso){ if (!iso) return ""; return new Date(iso + "T12:00:00").toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", year:"numeric"}); }
+function shortDate(iso){ if (!iso) return "—"; return new Date(iso + "T12:00:00").toLocaleDateString("en-GB", {day:"numeric", month:"short"}); }
+function dayDiff(iso){ const d = new Date(iso + "T12:00:00"), t = new Date(); t.setHours(12, 0, 0, 0); return Math.round((d - t) / 86400000); }
+function relDate(iso){
+  if (!iso) return "Set date";
+  const n = dayDiff(iso), a = Math.abs(n);
+  if (n === 0) return "Today";
+  if (n === 1) return "Tomorrow";
+  if (n === -1) return "Yesterday";
+  if (a <= 13) return n > 0 ? "In " + a + " days" : a + " days ago";
+  if (a <= 70){ const w = Math.round(a / 7); return n > 0 ? "In " + w + " weeks" : w + " weeks ago"; }
+  return shortDate(iso);
+}
+function relTime(iso){
+  if (!iso) return "";
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return "";
+  const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + " min ago";
+  const h = Math.round(m / 60);
+  if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+  const dd = Math.round(h / 24);
+  if (dd < 7) return dd + (dd === 1 ? " day ago" : " days ago");
+  return new Date(t).toLocaleDateString("en-GB", {day:"numeric", month:"short"});
+}
+function cssVar(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function slug(s){ return (String(s).toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 10) || "x") + "-" + Math.random().toString(36).slice(2, 6); }
+function anim(el, cls){ if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+  el.addEventListener("animationend", () => el.classList.remove(cls), {once:true}); }
+function flagTile(ed, cls){
+  return '<span class="flagtile' + (ed.flag ? "" : " sec") + (cls ? " " + cls : "") + '">' +
+    (ed.flag ? '<span class="flag">' + buildFlag(ed.flag) + "</span>" : SECTION_GLYPH) + "</span>";
+}
+function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+/* ============ drag to reorder ============ */
+/* Pointer-driven rather than HTML5 drag-and-drop: the browser's own drag
+   image kept snapshotting a whole region of the list instead of the one card,
+   so we draw the floating copy ourselves and keep full control of it. */
+let dragCtx = null;
+function makeSortable(list, sel, onDone){ list._sortable = {sel, onDone}; }
+
+function siblingsOf(list, sel, skip){
+  return Array.from(list.querySelectorAll(sel)).filter(x => x.parentElement === list && x !== skip);
+}
+function beginDrag(item, ev){
+  if (ev.button !== undefined && ev.button !== 0) return;
+  const list = item.parentElement;
+  const conf = list && list._sortable;
+  if (!conf || dragCtx) return;
+  ev.preventDefault();
+  const rect = item.getBoundingClientRect();
+  const ghost = item.cloneNode(true);
+  ghost.classList.add("drag-ghost");
+  ghost.classList.remove("open");
+  ghost.classList.add("shut");
+  ghost.removeAttribute("id");
+  ghost.style.width = rect.width + "px";
+  ghost.style.left = rect.left + "px";
+  ghost.style.top = rect.top + "px";
+  document.body.appendChild(ghost);
+  item.classList.add("drag-src");
+  document.body.classList.add("dragging-now");
+  dragCtx = {item, list, conf, ghost, offY:(ev.clientY || 0) - rect.top};
+  window.addEventListener("pointermove", onDragMove);
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
+}
+function onDragMove(e){
+  if (!dragCtx) return;
+  const {item, list, conf, ghost} = dragCtx;
+  ghost.style.top = (e.clientY - dragCtx.offY) + "px";
+  if (e.clientY < 90) window.scrollBy(0, -16);
+  else if (e.clientY > window.innerHeight - 90) window.scrollBy(0, 16);
+
+  const sibs = siblingsOf(list, conf.sel, item);
+  let target = null;
+  for (let i = 0; i < sibs.length; i++){
+    const r = sibs[i].getBoundingClientRect();
+    if (e.clientY < r.top + r.height / 2){ target = sibs[i]; break; }
+  }
+  if (target){
+    if (item.nextSibling !== target && item !== target) list.insertBefore(item, target);
+  } else if (sibs.length){
+    const last = sibs[sibs.length - 1];
+    if (last.nextSibling !== item) list.insertBefore(item, last.nextSibling);
+  }
+}
+function endDrag(){
+  if (!dragCtx) return;
+  const {item, list, conf, ghost} = dragCtx;
+  ghost.remove();
+  item.classList.remove("drag-src");
+  document.body.classList.remove("dragging-now");
+  window.removeEventListener("pointermove", onDragMove);
+  window.removeEventListener("pointerup", endDrag);
+  window.removeEventListener("pointercancel", endDrag);
+  dragCtx = null;
+  conf.onDone(Array.from(list.querySelectorAll(conf.sel))
+    .filter(x => x.parentElement === list).map(x => x.dataset.id));
+}
+function gripFor(item){
+  const g = document.createElement("button");
+  g.type = "button"; g.className = "grip"; g.innerHTML = GRIP;
+  g.title = "Drag to reorder"; g.setAttribute("aria-label", "Drag to reorder");
+  g.addEventListener("pointerdown", e => { if (!CAN_EDIT) return; e.stopPropagation(); beginDrag(item, e); });
+  g.addEventListener("mousedown", e => { e.preventDefault(); e.stopPropagation(); });
+  g.addEventListener("click", e => { e.stopPropagation(); e.preventDefault(); });
+  return g;
+}
+function applyEditionOrder(ids){
+  const iss = issueById(current);
+  iss.editions = ids.filter(id => edById(id));
+  const rank = {};
+  ids.forEach((id, i) => { rank[id] = i; });
+  DB.editions.sort((a, b) => {
+    const ra = rank[a.id], rb = rank[b.id];
+    if (ra === undefined && rb === undefined) return 0;
+    if (ra === undefined) return 1;
+    if (rb === undefined) return -1;
+    return ra - rb;
+  });
+  save(); renderGrid();
+}
+function applyPhaseOrder(ids){
+  const map = {};
+  DB.phases.forEach(p => { map[p.id] = p; });
+  DB.phases = ids.map(id => map[id]).filter(Boolean);
+  save(); renderAll();
+}
+function applyStepOrder(phaseId, ids){
+  const slots = [], map = {};
+  DB.steps.forEach((st, i) => { if (st.phase === phaseId){ slots.push(i); map[st.id] = st; } });
+  ids.forEach((id, k) => { if (map[id] && slots[k] !== undefined) DB.steps[slots[k]] = map[id]; });
+  save(); renderGrid();
+}
+
+/* ============ calendar ============ */
+const dp = document.createElement("div");
+dp.className = "dp"; dp.hidden = true;
+dp.setAttribute("role", "dialog"); dp.setAttribute("aria-label", "Choose a date");
+document.body.appendChild(dp);
+let dpCtx = null;
+
+function closeDP(){
+  if (dp.hidden) return;
+  if (dpCtx && dpCtx.anchor) dpCtx.anchor.classList.remove("live");
+  dp.hidden = true; dpCtx = null;
+}
+function openDP(anchor, iso, onPick){
+  const sel = iso ? new Date(iso + "T12:00:00") : null;
+  const base = sel || new Date();
+  dpCtx = {anchor, sel, view:new Date(base.getFullYear(), base.getMonth(), 1), onPick};
+  anchor.classList.add("live");
+  drawDP();
+  dp.hidden = false;
+  const r = anchor.getBoundingClientRect(), W = 278, H = dp.offsetHeight;
+  const left = Math.max(14, Math.min(r.left, window.innerWidth - W - 14));
+  let top = r.bottom + 8;
+  if (top + H > window.innerHeight - 14) top = Math.max(14, r.top - H - 8);
+  dp.style.left = left + "px"; dp.style.top = top + "px";
+}
+function drawDP(){
+  const v = dpCtx.view;
+  const start = (new Date(v.getFullYear(), v.getMonth(), 1).getDay() + 6) % 7;
+  const days = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate();
+  const prev = new Date(v.getFullYear(), v.getMonth(), 0).getDate();
+  const tISO = todayISO();
+  const selISO = dpCtx.sel ? isoOf(dpCtx.sel) : "";
+  let cells = "";
+  for (let i = 0; i < 42; i++){
+    let num, off;
+    if (i < start){ num = prev - start + 1 + i; off = -1; }
+    else if (i < start + days){ num = i - start + 1; off = 0; }
+    else { num = i - start - days + 1; off = 1; }
+    const iso = isoOf(new Date(v.getFullYear(), v.getMonth() + off, num));
+    const cls = [off ? "out" : "", iso === selISO ? "sel" : "", iso === tISO ? "today" : ""].filter(Boolean).join(" ");
+    cells += '<button type="button" class="day ' + cls + '" data-iso="' + iso + '">' + num + "</button>";
+  }
+  dp.innerHTML =
+    '<div class="dp-head"><b>' + v.toLocaleDateString("en-GB", {month:"long"}) + " " + v.getFullYear() + "</b>" +
+      '<button type="button" class="dp-nav" data-mv="-1" aria-label="Previous month">' + ARR_L + "</button>" +
+      '<button type="button" class="dp-nav" data-mv="1" aria-label="Next month">' + ARR_R + "</button></div>" +
+    '<div class="dp-wd">' + ["M","T","W","T","F","S","S"].map(x => "<span>" + x + "</span>").join("") + "</div>" +
+    '<div class="dp-grid">' + cells + "</div>" +
+    '<div class="dp-foot"><button type="button" data-act="clear">Clear</button><button type="button" data-act="today">Today</button></div>';
+}
+/* one delegated handler — re-rendering the grid mid-click used to detach the
+   target and trip the outside-click closer, which is why the arrows did nothing */
+dp.addEventListener("click", e => {
+  e.stopPropagation();
+  if (!dpCtx) return;
+  const nav = e.target.closest(".dp-nav");
+  if (nav){ dpCtx.view = new Date(dpCtx.view.getFullYear(), dpCtx.view.getMonth() + Number(nav.dataset.mv), 1); drawDP(); return; }
+  const day = e.target.closest("button.day");
+  if (day){ const fn = dpCtx.onPick, iso = day.dataset.iso; closeDP(); fn(iso); return; }
+  const act = e.target.closest("[data-act]");
+  if (act){ const fn = dpCtx.onPick, iso = act.dataset.act === "today" ? todayISO() : ""; closeDP(); fn(iso); }
+});
+document.addEventListener("click", e => { if (!dp.hidden && !dp.contains(e.target)) closeDP(); });
+window.addEventListener("scroll", closeDP, true);
+window.addEventListener("resize", closeDP);
+
+function dateButton(getIso, setIso){
+  const b = document.createElement("button");
+  b.type = "button";
+  const paint = () => {
+    const v = getIso();
+    b.textContent = relDate(v);
+    b.title = v ? fullDate(v) : "";
+    b.className = "datebtn" + (!v ? " empty" : dayDiff(v) < 0 ? " past" : " future");
+  };
+  paint();
+  b.onclick = e => { e.stopPropagation(); openDP(b, getIso(), iso => { setIso(iso); paint(); }); };
+  return b;
+}
+
+/* ============ folder tree ============ */
+const treeEl = document.createElement("div");
+treeEl.className = "tree"; treeEl.hidden = true;
+treeEl.setAttribute("role", "dialog"); treeEl.setAttribute("aria-label", "Folders");
+document.body.appendChild(treeEl);
+
+function closeTree(){ if (!treeEl.hidden){ treeEl.hidden = true; treeEl.innerHTML = ""; } }
+function openTree(){
+  drawTree();
+  treeEl.hidden = false;
+  const r = document.getElementById("crumb").getBoundingClientRect();
+  const W = 320, H = treeEl.offsetHeight;
+  treeEl.style.left = Math.max(14, Math.min(r.left, window.innerWidth - W - 14)) + "px";
+  let top = r.bottom + 8;
+  if (top + H > window.innerHeight - 14) top = Math.max(14, window.innerHeight - H - 14);
+  treeEl.style.top = top + "px";
+}
+function drawTree(){
+  let html = "";
+  DB.folders.forEach(f => {
+    const shutF = treeShut.has(f.id);
+    const ms = monthsIn(f.id);
+    html += '<button type="button" class="trow folder' + (shutF ? " shut" : "") + '" data-f="' + f.id + '">' +
+      '<span class="tchev">' + CHEV + "</span>" +
+      '<span class="tdot" style="' + (colorOf(f.color) ? "background:" + colorOf(f.color) : "") + '"></span>' +
+      '<span class="tname">' + esc(f.name) + "</span>" +
+      '<span class="tmeta">' + ms.length + "</span></button>";
+    if (!shutF){
+      if (!ms.length) html += '<div class="tempty">No months yet — right-click the folder to add one.</div>';
+      ms.forEach(m => {
+        html += '<button type="button" class="trow month' + (m.id === current ? " on" : "") + '" data-m="' + m.id + '">' +
+          '<span class="tdot" style="' + (colorOf(m.color) ? "background:" + colorOf(m.color) : "") + '"></span>' +
+          '<span class="tname">' + esc(m.label) + "</span>" +
+          '<span class="tmeta">' + showPct(monthPct(m.id)) + "%</span></button>";
+      });
+    }
+  });
+  treeEl.innerHTML = html +
+    '<div class="tree-foot"><button type="button" data-new="folder">New folder</button><button type="button" data-new="month">New month</button></div>';
+}
+treeEl.addEventListener("click", e => {
+  e.stopPropagation();
+  const f = e.target.closest(".trow.folder");
+  if (f){ const id = f.dataset.f; treeShut.has(id) ? treeShut.delete(id) : treeShut.add(id); drawTree(); return; }
+  const m = e.target.closest(".trow.month");
+  if (m){ const id = m.dataset.m; closeTree(); selectMonth(id); return; }
+  const nb = e.target.closest("[data-new]");
+  if (nb){
+    closeTree();
+    if (nb.dataset.new === "folder") newFolder();
+    else monthSheet(current ? issueById(current).folder : DB.folders[0].id, null);
+  }
+});
+treeEl.addEventListener("contextmenu", e => {
+  if (!CAN_EDIT) return;
+  const f = e.target.closest(".trow.folder");
+  const m = e.target.closest(".trow.month");
+  if (!f && !m) return;
+  e.preventDefault(); e.stopPropagation();
+  if (m) monthMenu(issueById(m.dataset.m), e.clientX, e.clientY);
+  else folderMenu(folderById(f.dataset.f), e.clientX, e.clientY);
+});
+
+function selectMonth(id){
+  if (current === id) return;
+  current = id; lastIssuePct = -1;
+  ensureCells();
+  open = new Set();
+  renderAll();
+}
+
+function folderMenu(f, x, y){
+  closeCtx();
+  openCtx(x, y, [
+    {label:"New month in " + f.name, fn:() => monthSheet(f.id, null)},
+    {label:"Rename folder", fn:() => promptSheet("Rename folder", "", [{key:"name", label:"Name", value:f.name}], "Save",
+      o => { f.name = o.name; save(); renderCrumb(); },
+      o => DB.folders.some(x => x.id !== f.id && x.name.toLowerCase() === o.name.toLowerCase())
+        ? "You already have a folder called " + o.name + "." : null)},
+    {swatches:true, value:f.color, fn:c => { f.color = c; save(); renderCrumb(); if (!treeEl.hidden) drawTree(); }},
+    {sep:true},
+    {label:"Delete folder", danger:true, fn:() => {
+      if (DB.folders.length <= 1){ confirmAsk("Can't delete " + f.name, "This is your only folder — create another one first.", "OK", () => {}); return; }
+      const n = monthsIn(f.id).length;
+      confirmAsk("Delete " + f.name + "?",
+        n ? "This folder holds " + n + " month" + (n > 1 ? "s" : "") + ". They and everything logged in them will be deleted. This can't be undone."
+          : "The folder is empty. This can't be undone.",
+        "Delete folder", () => {
+          monthsIn(f.id).forEach(m => { delete DB.data[m.id]; });
+          DB.issues = DB.issues.filter(i => i.folder !== f.id);
+          DB.folders = DB.folders.filter(x => x.id !== f.id);
+          if (!DB.issues.some(i => i.id === current)) current = DB.issues.length ? DB.issues[0].id : null;
+          lastIssuePct = -1; save(); renderAll();
+        });
+    }}
+  ]);
+}
+function monthMenu(m, x, y){
+  closeCtx();
+  openCtx(x, y, [
+    {label:"Edit month", fn:() => monthSheet(m.folder, m)},
+    {label:"Change submission date", fn:() => {
+      openDP(document.getElementById("crumb"), m.submitted, iso => { m.submitted = iso; save(); renderCrumb(); renderSummary(); });
+    }},
+    {swatches:true, value:m.color, fn:c => { m.color = c; save(); renderCrumb(); if (!treeEl.hidden) drawTree(); }},
+    {sep:true},
+    {label:"Delete month", danger:true, fn:() => removeMonth(m)}
+  ]);
+}
+function newFolder(){
+  promptSheet("New folder", "Folders group your months — a year, a series, whatever you like.",
+    [{key:"name", label:"Name", value:"", placeholder:String(new Date().getFullYear() + 1)}], "Create folder",
+    o => { DB.folders.push({id:slug(o.name), name:o.name, color:""}); save(); renderCrumb(); },
+    o => DB.folders.some(x => x.name.toLowerCase() === o.name.toLowerCase())
+      ? "You already have a folder called " + o.name + "." : null);
+}
+
+function monthSheet(folderId, existing){
+  const opts = MONTH_NAMES.map(n =>
+    '<option value="' + n + '"' + (existing && existing.label === n ? " selected" : "") + ">" + n + "</option>").join("");
+  const fopts = DB.folders.map(f =>
+    '<option value="' + f.id + '"' + (f.id === folderId ? " selected" : "") + ">" + esc(f.name) + "</option>").join("");
+  const swatches = COLORS.map(c =>
+    '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
+    ((existing ? existing.color : "") === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
+    ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
+
+  const sheet = openSheet(
+    "<h3>" + (existing ? "Edit month" : "New month") + "</h3>" +
+    "<p class='hint'>" + (existing ? "Rename it, move it, or recolour it." : "Pick the month and when the articles are due.") + "</p>" +
+    '<div class="two"><div class="field"><label for="msMonth">Month</label><select class="sel" id="msMonth">' + opts + "</select></div>" +
+    '<div class="field"><label for="msFolder">Folder</label><select class="sel" id="msFolder">' + fopts + "</select></div></div>" +
+    '<div class="field"><label>Submission</label><span id="msDate"></span></div>' +
+    '<div class="field"><label>Colour</label><div class="colorpick" id="msCol">' + swatches + "</div></div>" +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
+      (existing ? "Save" : "Create month") + "</button></div>");
+
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  let date = existing ? existing.submitted : "";
+  let col = existing ? existing.color : "";
+  sheet.querySelector("#msDate").appendChild(dateButton(() => date, iso => { date = iso; }));
+  sheet.querySelectorAll("#msCol button").forEach(b => {
+    b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#msCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); };
+  });
+  sheet.querySelector("[data-save]").onclick = () => {
+    const label = sheet.querySelector("#msMonth").value;
+    const folder = sheet.querySelector("#msFolder").value;
+    if (DB.issues.some(i => i !== existing && i.folder === folder && i.label === label)){
+      showErr(sheet, label + " already exists in " + folderById(folder).name + ".");
+      return;
+    }
+    closeSheet();
+    if (existing){
+      existing.label = label; existing.folder = folder; existing.submitted = date; existing.color = col;
+      save(); renderAll();
+    } else {
+      const std = DB.editions.filter(e => e.std).sort(byCode).map(e => e.id);
+      const m = {id:slug(label), label, submitted:date, color:col, folder,
+                 editions:std.length ? std : DB.editions.map(e => e.id)};
+      DB.issues.push(m);
+      current = m.id; lastIssuePct = -1;
+      ensureCells();
+      open = new Set();
+      save(); renderAll();
+    }
+  };
+}
+
+/* ============ phases & steps ============ */
+function phaseMenu(ph, x, y, ed){
+  closeCtx();
+  const done = ed ? phasePct(ed.id, ph.id) >= 1 : false;
+  openCtx(x, y, (ed ? [
+    {label:done ? "Clear " + ph.name + " back to zero" : "Mark " + ph.name + " finished",
+     fn:() => markPhase(ed, ph, done ? 0 : 100)},
+    {sep:true}
+  ] : []).concat([
+    {label:"Add step to " + ph.name, fn:() => stepSheet(ph.id, null)},
+    {label:"Rename or recolour phase", fn:() => phaseSheet(ph)},
+    {swatches:true, value:ph.color, fn:c => { ph.color = c; save(); renderAll(); }},
+    {label:"Add phase after this", fn:() => phaseSheet(null, DB.phases.indexOf(ph) + 1)},
+    {sep:true},
+    {label:"Delete phase", danger:true, fn:() => {
+      if (DB.phases.length <= 1){ confirmAsk("Can't delete " + ph.name, "This is your only phase — create another one first.", "OK", () => {}); return; }
+      const n = stepsOf(ph.id).length;
+      confirmAsk("Delete " + ph.name + "?",
+        n ? "Its " + n + " step" + (n > 1 ? "s" : "") + " go with it, in every month and every edition. This can't be undone."
+          : "The phase is empty. This can't be undone.",
+        "Delete phase", () => {
+          DB.steps = DB.steps.filter(s => s.phase !== ph.id);
+          DB.phases = DB.phases.filter(p => p.id !== ph.id);
+          save(); renderAll();
+        });
+    }}
+  ]));
+}
+function stepMenu(st, x, y){
+  closeCtx();
+  openCtx(x, y, [
+    {label:"Edit step", fn:() => stepSheet(st.phase, st)},
+    {label:"Add step below", fn:() => stepSheet(st.phase, null, DB.steps.indexOf(st) + 1)},
+    {sep:true},
+    {label:"Delete step", danger:true, fn:() => {
+      confirmAsk("Delete " + st.label + "?", "This step disappears from every month and every edition, along with anything logged on it. This can't be undone.", "Delete step", () => {
+        DB.steps = DB.steps.filter(s => s.id !== st.id);
+        Object.keys(DB.data).forEach(mid => Object.keys(DB.data[mid]).forEach(eid => {
+          const c = DB.data[mid][eid];
+          delete c.status[st.id]; delete c.dates[st.id]; delete c.notes[st.id];
+        }));
+        save(); renderAll();
+      });
+    }}
+  ]);
+}
+function phaseSheet(existing, at){
+  const start = existing ? existing.color : COLORS[(DB.phases.length % (COLORS.length - 1)) + 1].id;
+  const swatches = COLORS.map(c =>
+    '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
+    (start === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
+    ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
+
+  const sheet = openSheet(
+    "<h3>" + (existing ? "Edit phase" : "New phase") + "</h3>" +
+    "<p class='hint'>Phases group your steps, and their colour runs through the bars and dots. Shared by every edition and every month.</p>" +
+    '<div class="field"><label for="phName">Name</label><input type="text" id="phName" value="' +
+      esc(existing ? existing.name : "") + '" placeholder="Archive"></div>' +
+    '<div class="field"><label>Colour</label><div class="colorpick" id="phCol">' + swatches + "</div></div>" +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
+      (existing ? "Save" : "Create phase") + "</button></div>");
+
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  let col = start;
+  sheet.querySelectorAll("#phCol button").forEach(b => {
+    b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#phCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); };
+  });
+  const commit = () => {
+    const name = sheet.querySelector("#phName").value.trim();
+    if (!name){ sheet.querySelector("#phName").focus(); return; }
+    closeSheet();
+    if (existing){ existing.name = name; existing.color = col; }
+    else DB.phases.splice(typeof at === "number" ? at : DB.phases.length, 0, {id:slug(name), name, color:col});
+    save(); renderAll();
+  };
+  sheet.querySelector("[data-save]").onclick = commit;
+  sheet.querySelector("#phName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
+  sheet.querySelector("#phName").focus();
+  sheet.querySelector("#phName").select();
+}
+function stepSheet(phaseId, existing, at){
+  const isDate = existing ? existing.type === "date" : false;
+  const sheet = openSheet(
+    "<h3>" + (existing ? "Edit step" : "New step") + "</h3>" +
+    "<p class='hint'>Steps are shared by every edition and every month.</p>" +
+    '<div class="field"><label for="stName">Name</label><input type="text" id="stName" value="' +
+      esc(existing ? existing.label : "") + '" placeholder="Send to printer"></div>' +
+    '<div class="field"><label for="stType">Type</label><select class="sel" id="stType">' +
+      '<option value="status"' + (isDate ? "" : " selected") + '>Progress slider</option>' +
+      '<option value="date"' + (isDate ? " selected" : "") + ">Date</option></select></div>" +
+    '<div class="field" id="stDoneWrap"><label for="stDone">Word when finished</label><input type="text" id="stDone" value="' +
+      esc(existing ? (existing.done || "Done") : "Done") + '" placeholder="Done"></div>' +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
+      (existing ? "Save" : "Create step") + "</button></div>");
+
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  const typeSel = sheet.querySelector("#stType"), doneWrap = sheet.querySelector("#stDoneWrap");
+  const syncType = () => { doneWrap.style.display = typeSel.value === "date" ? "none" : ""; };
+  typeSel.onchange = syncType; syncType();
+
+  const commit = () => {
+    const label = sheet.querySelector("#stName").value.trim();
+    if (!label){ sheet.querySelector("#stName").focus(); return; }
+    const type = typeSel.value;
+    const done = sheet.querySelector("#stDone").value.trim() || "Done";
+    closeSheet();
+    if (existing){
+      existing.label = label; existing.type = type; existing.done = done;
+    } else {
+      const s = {id:slug(label), phase:phaseId, label, type, done};
+      let idx = typeof at === "number" ? at : -1;
+      if (idx < 0){
+        const list = stepsOf(phaseId);
+        idx = list.length ? DB.steps.indexOf(list[list.length - 1]) + 1 : DB.steps.length;
+      }
+      DB.steps.splice(idx, 0, s);
+      openPhase.add(currentEditions().length ? currentEditions()[0].id + ":" + phaseId : "");
+    }
+    save(); renderAll();
+  };
+  sheet.querySelector("[data-save]").onclick = commit;
+  sheet.querySelector("#stName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
+  sheet.querySelector("#stName").focus();
+}
+
+/* ============ comments ============ */
+function ensureName(cb){
+  if (DB.me.name || (ME && ME.name)){ DB.me.name = DB.me.name || ME.name; cb(); return; }
+  promptSheet("What's your name?",
+    "It goes on the comments you write, so your colleague knows who said what. You can change it later from the \u22ee menu.",
+    [{key:"name", label:"Name", value:"", placeholder:"Jared"}], "Save", o => {
+      DB.me.name = o.name; save(); cb();
+    });
+}
+function newId(){
+  try { return crypto.randomUUID(); }
+  catch(e){ return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); }); }
+}
+function commentBox(getArr, placeholder, onChange, ctx){
+  const wrap = document.createElement("div");
+  const list = document.createElement("div");
+  list.className = "cmt-list";
+  const composer = document.createElement("div");
+  composer.className = "cmt-new";
+  const ta = document.createElement("textarea");
+  ta.rows = 1; ta.placeholder = placeholder || "Add a comment\u2026";
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "cmt-post"; btn.textContent = "Post";
+  composer.appendChild(ta); composer.appendChild(btn);
+
+  const paint = () => {
+    const arr = getArr() || [];
+    list.innerHTML = "";
+    list.style.display = arr.length ? "" : "none";
+    arr.forEach(n => {
+      const it = document.createElement("div");
+      it.className = "cmt-item";
+      const col = personColor(n.by);
+      it.innerHTML = '<div class="cmt-meta"><b' + (col ? ' style="color:' + col + '"' : "") + ">" +
+        esc(n.by || "Someone") + "</b><span>" + esc(relTime(n.at)) +
+        '</span><button type="button" class="cmt-del" aria-label="Delete comment">' + XMARK + "</button></div><p></p>";
+      it.querySelector("p").textContent = n.text;
+      it.querySelector(".cmt-del").onclick = () => {
+        const preview = n.text.length > 110 ? n.text.slice(0, 110) + "\u2026" : n.text;
+        confirmAsk("Delete this comment?",
+          "\u201c" + esc(preview) + "\u201d \u2014 " + esc(n.by || "someone") + ". This can't be undone.",
+          "Delete comment", () => {
+            const a2 = getArr();
+            const i = a2.findIndex(x => x.id === n.id);
+            if (i >= 0) a2.splice(i, 1);
+            dropComment(n.id);
+            if (ctx) logHistory("Deleted a comment on " + (ctx.stepLabel || ctx.edName), ctx);
+            paint(); if (onChange) onChange();
+          });
+      };
+      list.appendChild(it);
+    });
+  };
+  const post = () => {
+    const txt = ta.value.trim();
+    if (!txt) return;
+    ensureName(() => {
+      const arr = getArr();
+      if (!Array.isArray(arr)) return;
+      const entry = {id:newId(), by:DB.me.name, at:new Date().toISOString(), text:txt};
+      arr.push(entry);
+      if (ctx){
+        pushComment(entry, ctx.month, ctx.edition, ctx.step);
+        logHistory("Commented on " + (ctx.stepLabel || ctx.edName), ctx);
+      }
+      ta.value = ""; paint(); if (onChange) onChange();
+    });
+  };
+  btn.onclick = post;
+  ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); post(); } };
+
+  wrap.appendChild(list); wrap.appendChild(composer);
+  paint();
+  return {el:wrap, paint};
+}
+
+/* ============ crumb ============ */
+function renderCrumb(){
+  const el = document.getElementById("crumb");
+  const iss = current ? issueById(current) : null;
+  const f = iss ? folderById(iss.folder) : DB.folders[0];
+  const c = iss ? colorOf(iss.color) || colorOf(f.color) : "";
+  el.innerHTML =
+    '<span class="cdot"' + (c ? ' style="background:' + c + '"' : "") + "></span>" +
+    '<span class="cf">' + esc(f ? f.name : "") + '</span><span class="cs">/</span>' +
+    '<span class="cm">' + esc(iss ? iss.label : "No months") + '</span><span class="cc">' + CHEV + "</span>";
+  el.onclick = e => { e.stopPropagation(); treeEl.hidden ? openTree() : closeTree(); };
+  el.oncontextmenu = e => { e.preventDefault(); if (iss && CAN_EDIT) monthMenu(iss, e.clientX, e.clientY); };
+}
+
+/* ============ summary ============ */
+let railRefs = [];
+function buildRailBig(){
+  const host = document.getElementById("railBig");
+  host.innerHTML = ""; railRefs = [];
+  DB.phases.forEach(p => {
+    const c = document.createElement("div");
+    c.className = "rail-cell tile";
+    c.innerHTML = '<div class="rail-name">' + esc(p.name) + "<i>0%</i></div>" +
+      '<div class="bar"><i style="background:' + phaseColor(p) + '"></i></div>';
+    host.appendChild(c);
+    railRefs.push({pct:c.querySelector(".rail-name i"), bar:c.querySelector(".bar i")});
+  });
+}
+let lastIssuePct = -1;
+function renderSummary(){
+  const iss = current ? issueById(current) : null;
+  const eds = currentEditions(), o = order();
+  const avg = eds.length ? eds.reduce((a, e) => a + pct(e.id), 0) / eds.length : 0;
+
+  document.getElementById("issueTitle").textContent = iss ? iss.label : "No months yet";
+  document.getElementById("issueSub").textContent = iss
+    ? (avg >= 1 ? "Completed · articles due " : "In production · articles due ") + (iss.submitted ? relDate(iss.submitted).toLowerCase() : "no date set")
+    : "Create a folder and a month to begin.";
+
+  const C = 2 * Math.PI * 67, ring = document.getElementById("bigRing");
+  ring.setAttribute("stroke-dasharray", (avg * C).toFixed(1) + " " + C.toFixed(1));
+  ring.style.stroke = cssVar(avg >= 1 ? "--f-done" : "--acc");
+  ring.style.strokeLinecap = avg > 0 ? "round" : "butt";
+  document.getElementById("bigPct").textContent = showPct(avg) + "%";
+  if (avg >= 1 && lastIssuePct < 1 && lastIssuePct >= 0) anim(document.getElementById("bigRingWrap"), "celebrate");
+  lastIssuePct = avg;
+
+  let done = 0, going = 0;
+  eds.forEach(e => o.forEach(id => {
+    const v = cell(e.id).status[id] || 0;
+    if (v >= 100) done++; else if (v > 0) going++;
+  }));
+  const finished = eds.filter(e => pct(e.id) >= 1).length;
+  document.getElementById("stats").innerHTML = [
+    ["Steps done", done, eds.length * o.length],
+    ["In process", going, null],
+    ["Editions completed", finished, eds.length]
+  ].map(([l, a, b]) => '<div class="stat tile"><b>' + a + (b === null ? "" : ' <i>/ ' + b + "</i>") +
+    "</b><span>" + l + "</span></div>").join("");
+
+  DB.phases.forEach((p, i) => {
+    const v = eds.length ? eds.reduce((a, e) => a + phasePct(e.id, p.id), 0) / eds.length : 0;
+    if (!railRefs[i]) return;
+    railRefs[i].pct.textContent = showPct(v) + "%";
+    railRefs[i].bar.style.width = (v * 100) + "%";
+  });
+}
+
+/* ============ cards ============ */
+const refs = {};
+function renderGrid(fresh){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  Object.keys(refs).forEach(k => delete refs[k]);
+  if (!current){
+    grid.innerHTML = '<p class="empty-state">No month selected. Open the breadcrumb above to create one.</p>';
+    return;
+  }
+  currentEditions().forEach(ed => grid.appendChild(buildCard(ed, fresh === ed.id)));
+  makeSortable(grid, ".card", applyEditionOrder);
+  const ghost = document.createElement("button");
+  ghost.className = "ghost";
+  ghost.innerHTML = "<span>" + PLUS + "</span>Choose editions for " + esc(issueById(current).label);
+  ghost.onclick = openEditionSheet;
+  grid.appendChild(ghost);
+}
+
+function buildCard(ed, isFresh){
+  const el = document.createElement("article");
+  const p = pct(ed.id);
+  el.className = "card" + (open.has(ed.id) ? " open" : "") + (isFresh ? " fresh" : "");
+  const C = 2 * Math.PI * 21;
+
+  el.dataset.id = ed.id;
+  const head = document.createElement("div");
+  head.className = "card-head";
+  head.setAttribute("role", "button");
+  head.tabIndex = 0;
+  head.setAttribute("aria-expanded", String(open.has(ed.id)));
+  head.innerHTML =
+    '<span class="grip-slot"></span>' + flagTile(ed) +
+    '<span class="ed-title"><h3>' + esc(ed.name) + '</h3><span class="ed-sub"></span></span>' +
+    '<button type="button" class="markdone" title="Mark this edition finished">' + CHECK + "</button>" +
+    '<span class="mini-ring"><svg width="48" height="48" viewBox="0 0 48 48">' +
+      '<circle class="track" cx="24" cy="24" r="21" fill="none" stroke-width="3.5"></circle>' +
+      '<circle class="val" cx="24" cy="24" r="21" fill="none" stroke-width="3.5" stroke-dasharray="0 ' + C.toFixed(1) + '"></circle>' +
+    "</svg><b></b></span>" +
+    '<span class="chev">' + CHEV + "</span>";
+  const toggleCard = () => {
+    const willOpen = !open.has(ed.id);
+    willOpen ? open.add(ed.id) : open.delete(ed.id);
+    el.classList.toggle("open", willOpen);
+    head.setAttribute("aria-expanded", String(willOpen));
+    if (!willOpen) R.boxes.forEach(b => {
+      openPhase.delete(b.key); b.box.classList.add("shut"); b.btn.setAttribute("aria-expanded", "false");
+    });
+  };
+  head.onclick = toggleCard;
+  head.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggleCard(); } };
+  head.querySelector(".markdone").onclick = e => { e.stopPropagation(); toggleEdition(ed); };
+  head.querySelector(".grip-slot").replaceWith(gripFor(el));
+  el.appendChild(head);
+
+  head.addEventListener("contextmenu", e => {
+    if (!CAN_EDIT) return;
+    e.preventDefault(); closeCtx();
+    const done = pct(ed.id) >= 1;
+    openCtx(e.clientX, e.clientY, [
+      {label:done ? "Clear " + ed.name + " back to zero" : "Mark " + ed.name + " finished",
+       fn:() => toggleEdition(ed)},
+      {sep:true},
+      {label:"Rename edition", fn:() => promptSheet("Edit edition", "", [
+        {key:"name", label:"Name", value:ed.name},
+        {key:"code", label:"Code", value:ed.code, required:false}
+      ], "Save", o => { ed.name = o.name; ed.code = o.code; save(); renderGrid(); })},
+      {label:ed.std ? "Stop adding to new months" : "Add to new months automatically",
+       fn:() => { ed.std = !ed.std; save(); }},
+      {sep:true},
+      {label:"Remove from " + issueById(current).label, danger:true, fn:() => dropFromMonth(ed)}
+    ]);
+  });
+
+  const rail = document.createElement("div");
+  rail.className = "rail-mini";
+  rail.innerHTML = DB.phases.map(ph => '<div class="bar"><i style="background:' + phaseColor(ph) + '"></i></div>').join("");
+  el.appendChild(rail);
+
+  const body = document.createElement("div"); body.className = "body";
+  const inner = document.createElement("div"); inner.className = "body-in";
+  const pad = document.createElement("div"); pad.className = "body-pad";
+
+  const R = {el, sub:head.querySelector(".ed-sub"), ringWrap:head.querySelector(".mini-ring"),
+             ring:head.querySelector(".mini-ring .val"), ringNum:head.querySelector(".mini-ring b"),
+             railBars:Array.from(rail.querySelectorAll(".bar i")), phases:{}, rows:{}, was:{}, boxes:[]};
+
+  DB.phases.forEach(ph => {
+    const key = ed.id + ":" + ph.id;
+    const box = document.createElement("section");
+    box.className = "phase-box" + (openPhase.has(key) ? "" : " shut");
+    box.dataset.id = ph.id;
+    box.style.setProperty("--phc", phaseColor(ph));
+
+    const phead = document.createElement("div");
+    phead.className = "phase-head";
+    phead.setAttribute("role", "button");
+    phead.tabIndex = 0;
+    phead.setAttribute("aria-expanded", String(openPhase.has(key)));
+    phead.innerHTML = '<span class="grip-slot"></span><span class="dot"></span><h4>' + esc(ph.name) + "</h4>" +
+      '<span class="phase-cmt" title="Has comments" hidden>' + CMT_FILL + "</span>" +
+      '<span class="pc"></span>' +
+      '<button type="button" class="markdone" title="Mark this phase finished">' + CHECK + "</button>" +
+      '<span class="pchev">' + CHEV + "</span>";
+    const togglePhase = () => {
+      const willOpen = box.classList.contains("shut");
+      box.classList.toggle("shut", !willOpen);
+      phead.setAttribute("aria-expanded", String(willOpen));
+      willOpen ? openPhase.add(key) : openPhase.delete(key);
+    };
+    phead.onclick = togglePhase;
+    phead.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); togglePhase(); } };
+    phead.querySelector(".markdone").onclick = e => {
+      e.stopPropagation();
+      markPhase(ed, ph, phasePct(ed.id, ph.id) >= 1 ? 0 : 100);
+    };
+    phead.oncontextmenu = e => { if (!CAN_EDIT) return; e.preventDefault(); e.stopPropagation(); phaseMenu(ph, e.clientX, e.clientY, ed); };
+    phead.querySelector(".grip-slot").replaceWith(gripFor(box));
+    box.appendChild(phead);
+    R.boxes.push({box, btn:phead, key});
+    R.phases[ph.id] = {pc:phead.querySelector(".pc"), dot:phead.querySelector(".dot"),
+                       cmt:phead.querySelector(".phase-cmt"), mark:phead.querySelector(".markdone")};
+    R.was[ph.id] = phasePct(ed.id, ph.id) >= 1;
+
+    const pbody = document.createElement("div"); pbody.className = "pbody";
+    const pin = document.createElement("div"); pin.className = "pbody-in";
+    const list = document.createElement("div"); list.className = "steps";
+
+    stepsOf(ph.id).forEach(s => {
+      const c = cell(ed.id);
+      const row = document.createElement("div");
+      row.className = "step type-" + s.type;
+      row.dataset.id = s.id;
+      row.innerHTML = '<span class="step-label">' + esc(s.label) + "</span>";
+      row.appendChild(gripFor(row));
+      row.oncontextmenu = e => {
+        if (e.target.closest("input,textarea") || !CAN_EDIT) return;
+        e.preventDefault(); e.stopPropagation(); stepMenu(s, e.clientX, e.clientY);
+      };
+      const ctrls = document.createElement("div"); ctrls.className = "ctrls";
+
+      if (s.type === "status"){
+        const stateEl = document.createElement("span");
+        stateEl.className = "state";
+        const rng = document.createElement("input");
+        rng.type = "range"; rng.className = "rng";
+        rng.min = "0"; rng.max = "100"; rng.step = "5";
+        rng.value = String(c.status[s.id] || 0);
+        rng.setAttribute("aria-label", s.label + " progress");
+        const pctEl = document.createElement("span");
+        pctEl.className = "pctlab";
+        const paint = v => {
+          const st = stateOf(v);
+          stateEl.textContent = stateWord(s, v);
+          stateEl.dataset.s = st;
+          pctEl.textContent = v + "%";
+          rng.style.setProperty("--p", v + "%");
+          rng.style.setProperty("--fill", st === 2 ? "var(--f-done)" : "var(--f-prog)");
+          rng.setAttribute("aria-valuetext", v + "% — " + stateWord(s, v));
+          row.classList.toggle("is-done", v >= 100);
+        };
+        paint(c.status[s.id] || 0);
+        rng.oninput = () => {
+          const v = Number(rng.value);
+          cell(ed.id).status[s.id] = v;
+          paint(v); refreshEdition(ed, true); renderSummary();
+        };
+        let dragFrom = c.status[s.id] || 0;
+        rng.onpointerdown = () => { dragFrom = cell(ed.id).status[s.id] || 0; };
+        rng.onchange = () => {
+          const v = Number(rng.value);
+          pushEntry(current, ed.id, s.id, {progress:v});
+          if (v !== dragFrom)
+            logHistory(ed.name + " · " + s.label + " · " + dragFrom + "% \u2192 " + v + "%",
+              {month:current, edition:ed.id, step:s.id, edName:ed.name, stepLabel:s.label});
+          dragFrom = v;
+          refreshEdition(ed); renderSummary();
+        };
+        ctrls.appendChild(stateEl); ctrls.appendChild(rng); ctrls.appendChild(pctEl);
+        R.rows[s.id] = {row, paint, setVal:v => { rng.value = String(v); cell(ed.id).status[s.id] = v; paint(v); }};
+      } else {
+        const d = dateButton(() => cell(ed.id).dates[s.id] || "", iso => {
+          const was = cell(ed.id).dates[s.id] || "";
+          cell(ed.id).dates[s.id] = iso;
+          pushEntry(current, ed.id, s.id, {on_date:iso || null});
+          if (iso !== was)
+            logHistory(ed.name + " \u00b7 " + s.label + " \u00b7 " + (iso ? shortDate(iso) : "cleared"),
+              {month:current, edition:ed.id, step:s.id, edName:ed.name, stepLabel:s.label});
+        });
+        d.setAttribute("aria-label", s.label);
+        ctrls.appendChild(d);
+      }
+
+      const cb = document.createElement("button");
+      cb.type = "button"; cb.className = "cmt"; cb.innerHTML = CMT;
+      cb.setAttribute("aria-label", "Comment on " + s.label);
+      ctrls.appendChild(cb);
+      row.appendChild(ctrls);
+
+      const nw = document.createElement("div");
+      nw.className = "note-wrap";
+      const nin = document.createElement("div");
+      nin.className = "note-in";
+      nin.appendChild(commentBox(() => cell(ed.id).notes[s.id], "What happened on this step?", () => {
+        cb.classList.toggle("has", (cell(ed.id).notes[s.id] || []).length > 0);
+        R.phases[ph.id].cmt.hidden = !phaseHasNote(ed.id, ph.id);
+      }, {month:current, edition:ed.id, step:s.id, edName:ed.name, stepLabel:ed.name + " \u00b7 " + s.label}).el);
+      nw.appendChild(nin);
+      row.appendChild(nw);
+      cb.classList.toggle("has", (c.notes[s.id] || []).length > 0);
+      cb.onclick = () => {
+        const on = row.classList.toggle("noting");
+        cb.classList.toggle("on", on);
+        if (on) setTimeout(() => { const t = nin.querySelector("textarea"); if (t) t.focus(); }, 120);
+      };
+      list.appendChild(row);
+    });
+
+    const addS = document.createElement("button");
+    addS.type = "button"; addS.className = "addstep";
+    addS.textContent = "+ Add step";
+    addS.onclick = () => stepSheet(ph.id, null);
+    list.appendChild(addS);
+
+    makeSortable(list, ".step", ids => applyStepOrder(ph.id, ids));
+    pin.appendChild(list); pbody.appendChild(pin); box.appendChild(pbody);
+    pad.appendChild(box);
+  });
+
+  makeSortable(pad, ".phase-box", applyPhaseOrder);
+  const addP = document.createElement("button");
+  addP.type = "button"; addP.className = "addphase";
+  addP.textContent = "+ Add phase";
+  addP.onclick = () => phaseSheet(null);
+  pad.appendChild(addP);
+
+  const notes = document.createElement("div");
+  notes.className = "notes";
+  notes.innerHTML = "<label>Notes for this edition</label>";
+  notes.appendChild(commentBox(() => cell(ed.id).note, "Anything worth remembering next month\u2026", null,
+    {month:current, edition:ed.id, step:null, edName:ed.name, stepLabel:ed.name + " notes"}).el);
+  pad.appendChild(notes);
+
+  inner.appendChild(pad); body.appendChild(inner); el.appendChild(body);
+  refs[ed.id] = R;
+  R.wasDone = p >= 1;
+  refreshEdition(ed, true);
+  return el;
+}
+
+function setSteps(ed, list, v, what){
+  const R = refs[ed.id];
+  list.forEach(s => {
+    if (R && R.rows[s.id]) R.rows[s.id].setVal(v);
+    else cell(ed.id).status[s.id] = v;
+    pushEntry(current, ed.id, s.id, {progress:v});
+  });
+  if (what) logHistory(ed.name + " \u00b7 " + what + " \u00b7 " + (v >= 100 ? "marked finished" : "cleared"),
+    {month:current, edition:ed.id, edName:ed.name});
+  refreshEdition(ed);
+  renderSummary();
+}
+function markPhase(ed, ph, v){ setSteps(ed, statusSteps().filter(s => s.phase === ph.id), v, ph.name); }
+function markEdition(ed, v){ setSteps(ed, statusSteps(), v, "every step"); }
+/* Confirm only when there's part-finished work to overwrite. Untouched (0%)
+   and already-finished (100%) both act straight away. Phases never ask. */
+function toggleEdition(ed){
+  const p = pct(ed.id);
+  if (p >= 1){ markEdition(ed, 0); return; }
+  if (p <= 0){ markEdition(ed, 100); return; }
+  confirmAsk("Mark " + ed.name + " finished?",
+    "It's at " + showPct(p) + "% — every unfinished slider jumps to 100% and you lose where each one had got to. Dates and comments are untouched.",
+    "Mark it finished", () => markEdition(ed, 100));
+}
+
+function refreshEdition(ed, silent){
+  const R = refs[ed.id];
+  if (!R) return;
+  const p = pct(ed.id), C = 2 * Math.PI * 21;
+  R.ring.setAttribute("stroke-dasharray", (p * C).toFixed(1) + " " + C.toFixed(1));
+  R.ring.style.stroke = cssVar(p >= 1 ? "--f-done" : p > 0 ? "--acc" : "--ink-3");
+  R.ring.style.strokeLinecap = p > 0 ? "round" : "butt";
+  R.ringNum.textContent = showPct(p);
+  R.sub.textContent = [ed.code, ed.place].filter(Boolean).join(" · ") || "—";
+  const cm = R.el.querySelector(".card-head .markdone");
+  if (cm){
+    cm.classList.toggle("on", p >= 1);
+    cm.title = p >= 1 ? "Clear this edition back to zero" : "Mark this edition finished";
+  }
+
+  DB.phases.forEach((ph, i) => {
+    const v = phasePct(ed.id, ph.id);
+    if (R.railBars[i]) R.railBars[i].style.width = (v * 100) + "%";
+    const pr = R.phases[ph.id];
+    if (!pr) return;
+    pr.pc.textContent = showPct(v) + "%";
+    pr.cmt.hidden = !phaseHasNote(ed.id, ph.id);
+    if (pr.mark){
+      pr.mark.classList.toggle("on", v >= 1);
+      pr.mark.title = v >= 1 ? "Clear this phase back to zero" : "Mark this phase finished";
+    }
+    const full = v >= 1;
+    if (!silent && full && !R.was[ph.id]) anim(pr.dot, "pulse");
+    R.was[ph.id] = full;
+  });
+  if (!silent){
+    anim(R.ringWrap, "ping");
+    if (p >= 1 && !R.wasDone) anim(R.el, "celebrate");
+  }
+  R.wasDone = p >= 1;
+}
+
+/* ============ sheets / menus ============ */
+const scrim = document.getElementById("scrim");
+const scrim2 = document.getElementById("scrim2");
+function closeSheet(){ scrim.hidden = true; scrim.innerHTML = ""; }
+function closeConfirm(){ scrim2.hidden = true; scrim2.innerHTML = ""; }
+scrim.addEventListener("click", e => { if (e.target === scrim) closeSheet(); });
+scrim2.addEventListener("click", e => { if (e.target === scrim2) closeConfirm(); });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  closeDP(); closeCtx(); closeTree();
+  if (!scrim2.hidden) closeConfirm();
+  else if (!scrim.hidden) closeSheet();
+});
+function showErr(sheet, msg){
+  let e = sheet.querySelector(".err");
+  if (!e){ e = document.createElement("p"); e.className = "err"; sheet.querySelector(".actions").before(e); }
+  e.textContent = msg;
+}
+function openSheet(html){
+  scrim.innerHTML = '<div class="sheet" role="dialog" aria-modal="true">' + html + "</div>";
+  scrim.hidden = false;
+  return scrim.querySelector(".sheet");
+}
+
+const ctxEl = document.createElement("div");
+ctxEl.className = "ctx"; ctxEl.hidden = true;
+ctxEl.setAttribute("role", "menu");
+document.body.appendChild(ctxEl);
+function closeCtx(){ if (!ctxEl.hidden){ ctxEl.hidden = true; ctxEl.innerHTML = ""; } }
+function openCtx(x, y, items){
+  ctxEl.innerHTML = items.map((it, i) => {
+    if (it.sep) return '<div class="sep"></div>';
+    if (it.swatches) return '<div class="sw-row" data-i="' + i + '">' + COLORS.map(c =>
+      '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
+      (it.value === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
+      ' aria-label="' + (c.id || "no colour") + '"></button>').join("") + "</div>";
+    return '<button type="button" role="menuitem" data-i="' + i + '" class="' + (it.danger ? "danger" : "") + '">' +
+      (it.icon ? '<span class="mi"' + (it.dot ? ' style="color:' + it.dot + '"' : "") + ">" + it.icon + "</span>" : "") +
+      "<span>" + esc(it.label) + "</span></button>";
+  }).join("");
+  ctxEl.hidden = false;
+  const W = ctxEl.offsetWidth, H = ctxEl.offsetHeight;
+  ctxEl.style.left = Math.max(10, Math.min(x, window.innerWidth - W - 10)) + "px";
+  ctxEl.style.top  = Math.max(10, Math.min(y, window.innerHeight - H - 10)) + "px";
+  ctxEl.querySelectorAll("button[data-i]").forEach(b => {
+    b.onclick = e => { e.stopPropagation(); const fn = items[+b.dataset.i].fn; closeCtx(); if (fn) requestAnimationFrame(fn); };
+  });
+  ctxEl.querySelectorAll(".sw-row").forEach(row => {
+    const it = items[+row.dataset.i];
+    row.querySelectorAll("button").forEach(b => {
+      b.onclick = e => { e.stopPropagation(); closeCtx(); it.fn(b.dataset.c); };
+    });
+  });
+}
+document.addEventListener("click", e => {
+  if (!ctxEl.hidden && !ctxEl.contains(e.target)) closeCtx();
+  if (!treeEl.hidden && !treeEl.contains(e.target) && !e.target.closest("#crumb")) closeTree();
+});
+window.addEventListener("scroll", () => { closeCtx(); closeTree(); }, true);
+window.addEventListener("resize", () => { closeCtx(); closeTree(); });
+
+function promptSheet(title, hint, fields, action, onSave, validate){
+  const body = fields.map((f, i) =>
+    '<div class="field"><label for="pf' + i + '">' + f.label + '</label><input type="text" id="pf' + i +
+    '" value="' + esc(f.value || "") + '" placeholder="' + esc(f.placeholder || "") + '"></div>').join("");
+  const sheet = openSheet("<h3>" + title + "</h3>" + (hint ? "<p class='hint'>" + hint + "</p>" : "<div style='height:14px'></div>") + body +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' + action + "</button></div>");
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  const inputs = Array.from(sheet.querySelectorAll("input"));
+  const commit = () => {
+    const out = {};
+    fields.forEach((f, i) => { out[f.key] = inputs[i].value.trim(); });
+    if (fields[0].required !== false && !out[fields[0].key]){ inputs[0].focus(); return; }
+    const bad = validate && validate(out);
+    if (bad){ showErr(sheet, bad); inputs[0].focus(); inputs[0].select(); return; }
+    closeSheet(); onSave(out);
+  };
+  sheet.querySelector("[data-save]").onclick = commit;
+  inputs.forEach(i => { i.onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } }; });
+  inputs[0].focus(); inputs[0].select();
+}
+
+function confirmAsk(title, msg, label, onYes){
+  scrim2.innerHTML = '<div class="sheet narrow" role="dialog" aria-modal="true"><h3>' + esc(title) + "</h3>" +
+    '<p class="hint">' + msg + "</p>" +
+    '<div class="actions"><button class="btn ghostbtn" data-no>Cancel</button><button class="btn danger" data-yes>' + label + "</button></div></div>";
+  scrim2.hidden = false;
+  scrim2.querySelector("[data-no]").onclick = closeConfirm;
+  scrim2.querySelector("[data-yes]").onclick = () => { closeConfirm(); onYes(); };
+  scrim2.querySelector("[data-yes]").focus();
+}
+
+function removeMonth(iss){
+  confirmAsk("Delete " + iss.label + "?", "Everything logged for this month — progress, dates and comments — will be deleted. This can't be undone.", "Delete month", () => {
+    DB.issues = DB.issues.filter(i => i.id !== iss.id);
+    delete DB.data[iss.id];
+    if (current === iss.id){ current = DB.issues.length ? DB.issues[DB.issues.length - 1].id : null; open = new Set(); }
+    lastIssuePct = -1; save(); closeSheet(); renderAll();
+  });
+}
+function deleteEdition(ed){
+  confirmAsk("Delete " + ed.name + "?", "This removes " + ed.name + " from every month, along with all its progress and comments. This can't be undone.", "Delete everywhere", () => {
+    DB.editions = DB.editions.filter(e => e.id !== ed.id);
+    DB.issues.forEach(i => { i.editions = i.editions.filter(x => x !== ed.id); });
+    Object.keys(DB.data).forEach(k => { delete DB.data[k][ed.id]; });
+    open.delete(ed.id);
+    save(); closeSheet(); renderAll();
+  });
+}
+function dropFromMonth(ed){
+  const iss = issueById(current);
+  confirmAsk("Take " + ed.name + " out of " + iss.label + "?", "It stays in your other months and nothing already logged is lost — it just won't appear in " + iss.label + ".", "Remove from " + iss.label, () => {
+    iss.editions = iss.editions.filter(x => x !== ed.id);
+    open.delete(ed.id);
+    save(); renderSummary(); renderGrid();
+  });
+}
+
+function openEditionSheet(){
+  const iss = issueById(current);
+  const inMonth = iss.editions.map(edById).filter(Boolean);
+  const avail = DB.editions.filter(e => iss.editions.indexOf(e.id) < 0);
+
+  const row = (e, kind) => '<div class="rowitem">' + flagTile(e) +
+    '<span class="nm">' + esc(e.name) + '</span><em>' + (e.code || "—") + "</em>" +
+    '<button class="' + (kind === "in" ? "del" : "addbtn") + '" data-' + kind + '="' + e.id +
+    '" aria-label="' + (kind === "in" ? "Remove " + esc(e.name) + " from " + esc(iss.label)
+                                      : "Add " + esc(e.name) + " to " + esc(iss.label)) + '">' +
+    (kind === "in" ? XMARK : PLUS) + "</button></div>";
+
+  const picks = ['<button type="button" data-flag="" aria-pressed="true"><span class="none">none</span></button>'].concat(
+    Object.keys(FLAG_DEFS).map(k =>
+      '<button type="button" data-flag="' + k + '" title="' + FLAG_DEFS[k].n + '" aria-pressed="false"><span class="flag">' +
+      buildFlag(k) + "</span></button>")).join("");
+
+  const sheet = openSheet(
+    "<h3>Editions</h3><p class='hint'>Which editions " + esc(iss.label) +
+    " has. Removing one only takes it out of this month — it stays in your other months and keeps everything logged there.</p>" +
+    '<p class="grouplab">In ' + esc(iss.label) + "</p>" +
+    '<div class="rowlist">' + (inMonth.map(e => row(e, "in")).join("") || '<p class="tempty">None yet.</p>') + "</div>" +
+    (avail.length ? '<p class="grouplab second">Not in this month</p><div class="rowlist">' +
+      avail.map(e => row(e, "add")).join("") + "</div>" : "") +
+    '<div class="divider"></div>' +
+    '<div class="two"><div class="field"><label for="eName">Name</label><input type="text" id="eName" placeholder="Portuguese"></div>' +
+    '<div class="field"><label for="eCode">Code</label><input type="text" id="eCode" placeholder="128"></div></div>' +
+    '<div class="field"><label>Flag</label><div class="flagpick" id="ePick">' + picks + "</div></div>" +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Done</button><button class="btn primary" id="eSave">Add edition</button></div>');
+
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+
+  sheet.querySelectorAll("[data-in]").forEach(b => {
+    b.onclick = () => {
+      iss.editions = iss.editions.filter(x => x !== b.dataset.in);
+      open.delete(b.dataset.in);
+      save(); renderSummary(); renderGrid(); openEditionSheet();
+    };
+  });
+  sheet.querySelectorAll("[data-add]").forEach(b => {
+    b.onclick = () => {
+      if (iss.editions.indexOf(b.dataset.add) < 0) iss.editions.push(b.dataset.add);
+      iss.editions.sort((a, c) => DB.editions.findIndex(e => e.id === a) - DB.editions.findIndex(e => e.id === c));
+      ensureCells(); save(); renderSummary(); renderGrid(); openEditionSheet();
+    };
+  });
+
+  let chosen = "";
+  const nameIn = sheet.querySelector("#eName"), codeIn = sheet.querySelector("#eCode");
+  sheet.querySelectorAll("#ePick button").forEach(b => {
+    b.onclick = () => {
+      chosen = b.dataset.flag;
+      sheet.querySelectorAll("#ePick button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      const info = LANG_INFO[chosen];
+      if (chosen && !nameIn.value.trim()) nameIn.value = info ? info.name : FLAG_DEFS[chosen].n;
+      if (chosen && !codeIn.value.trim() && info && info.code) codeIn.value = info.code;
+    };
+  });
+
+  sheet.querySelector("#eSave").onclick = () => {
+    const name = nameIn.value.trim();
+    if (!name){ nameIn.focus(); return; }
+    if (DB.editions.some(e => e.name.toLowerCase() === name.toLowerCase())){
+      showErr(sheet, "You already have an edition called " + name + ".");
+      nameIn.focus(); nameIn.select(); return;
+    }
+    const ed = {id:slug(name), name, code:codeIn.value.trim(),
+                place:chosen ? FLAG_DEFS[chosen].n : "", flag:chosen || null, std:false};
+    DB.editions.push(ed);
+    iss.editions.push(ed.id);
+    ensureCells(); save(); closeSheet();
+    renderSummary(); renderGrid(ed.id);
+    const node = refs[ed.id] && refs[ed.id].el;
+    if (node && node.scrollIntoView) node.scrollIntoView({behavior:"smooth", block:"center"});
+  };
+}
+
+/* ============ reset to the standard set-up ============ */
+function resetStructure(){
+  confirmAsk("Reset phases and steps?",
+    "Prep, D&L, Proof, Final and CC come back with their standard steps, in their standard order and colours. " +
+    "Any phase or step you added yourself is removed, along with what was logged on it. " +
+    "Everything logged on the standard steps is kept.",
+    "Reset the structure", () => {
+      DB.phases = SEED_PHASES.map(o => Object.assign({}, o));
+      DB.steps  = SEED_STEPS.map(o => Object.assign({}, o));
+      save(); renderAll();
+    });
+}
+function resetColors(){
+  confirmAsk("Reset the colours?",
+    "Prep goes back to yellow, D&L to red, Proof to purple, Final to pink and CC to blue. " +
+    "Phases you added yourself keep the colour you gave them, and nothing else changes.",
+    "Reset the colours", () => {
+      SEED_PHASES.forEach(sp => { const p = phaseById(sp.id); if (p) p.color = sp.color; });
+      save(); renderAll();
+    });
+}
+
+/* re-create any of the standard editions that were removed from the library,
+   and put the standard ones back at the front in their usual order */
+/* language code first (112, 120, 121, 140, 150, 178...), then the ones
+   without a code, alphabetically */
+function byCode(a, b){
+  const na = parseInt(a.code, 10), nb = parseInt(b.code, 10);
+  const ha = !isNaN(na), hb = !isNaN(nb);
+  if (ha && hb) return na - nb;
+  if (ha) return -1;
+  if (hb) return 1;
+  return a.name.localeCompare(b.name);
+}
+function restoreStandardEditions(){
+  SEED_EDITIONS.forEach(se => {
+    if (!DB.editions.some(e => e.id === se.id)){
+      const copy = Object.assign({}, se);
+      copy.std = STD_IDS.indexOf(se.id) >= 0;
+      DB.editions.push(copy);
+    }
+  });
+  DB.editions.sort(byCode);
+  return DB.editions.filter(e => SEED_EDITIONS.some(x => x.id === e.id)).map(e => e.id);
+}
+function resetMonthEditions(){
+  const iss = issueById(current);
+  confirmAsk("Reset " + iss.label + "'s editions?",
+    "This month gets the full standard line-up back, ordered by language code: " +
+    SEED_EDITIONS.slice().sort(byCode).map(e => e.name).join(", ") +
+    ". Any that were deleted are re-created, anything else you added is taken out of this month only, " +
+    "and nothing logged anywhere is deleted.",
+    "Reset the editions", () => {
+      const ids = restoreStandardEditions();
+      iss.editions = ids.slice();
+      ensureCells(); save();
+      open = new Set();
+      renderSummary(); renderGrid();
+    });
+}
+
+function markAllEditions(v){
+  currentEditions().forEach(ed => {
+    statusSteps().forEach(s => {
+      const R = refs[ed.id];
+      if (R && R.rows[s.id]) R.rows[s.id].setVal(v);
+      else cell(ed.id).status[s.id] = v;
+      pushEntry(current, ed.id, s.id, {progress:v});
+    });
+  });
+  logHistory(issueById(current).label + " \u00b7 every edition " + (v >= 100 ? "marked finished" : "cleared"),
+    {month:current});
+  currentEditions().forEach(ed => refreshEdition(ed, true));
+  renderSummary();
+}
+function toggleAllEditions(){
+  const eds = currentEditions();
+  if (!eds.length) return;
+  if (eds.every(e => pct(e.id) >= 1)){ markAllEditions(0); return; }
+  const partial = eds.filter(e => pct(e.id) > 0 && pct(e.id) < 1);
+  if (!partial.length){ markAllEditions(100); return; }
+  confirmAsk("Mark every edition finished?",
+    partial.length + (partial.length > 1 ? " editions are" : " edition is") + " part-way through (" +
+    partial.map(e => e.name + " " + showPct(pct(e.id)) + "%").join(", ") +
+    "). Every unfinished slider in " + issueById(current).label +
+    " jumps to 100% and you lose where each one had got to. Dates and comments are untouched.",
+    "Mark them all finished", () => markAllEditions(100));
+}
+
+/* ============ backup: JSON in/out, CSV out ============ */
+function stamp(){
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+async function saveFile(filename, data){
+  let dl = null;
+  try { dl = (window.claude && window.claude.use) ? await window.claude.use("downloads") : null; } catch(_){}
+  if (dl){
+    try { await dl.save({filename, data}); return "saved"; }
+    catch(err){ if (err && err.code === "declined") return "declined"; }
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([data], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  } catch(_){}
+  return "fallback";
+}
+function copySheet(title, hint, text){
+  const sheet = openSheet("<h3>" + esc(title) + "</h3><p class='hint'>" + hint + "</p>" +
+    '<textarea class="pastebox" id="copyBox" readonly></textarea>' +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Close</button><button class="btn primary" data-copy>Copy</button></div>');
+  const box = sheet.querySelector("#copyBox");
+  box.value = text;
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  sheet.querySelector("[data-copy]").onclick = () => {
+    box.select();
+    try { navigator.clipboard.writeText(text); } catch(_){ try { document.execCommand("copy"); } catch(_2){} }
+    sheet.querySelector("[data-copy]").textContent = "Copied";
+  };
+}
+async function exportJSON(){
+  const text = JSON.stringify(DB, null, 2);
+  const name = "local-pages-backup-" + stamp() + ".json";
+  const r = await saveFile(name, text);
+  if (r === "fallback") copySheet("Backup", "If the download didn't start, copy this and save it as a <b>.json</b> file. Restoring it puts everything back exactly as it is now.", text);
+}
+function csvCell(v){
+  v = v == null ? "" : String(v);
+  return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+function buildCSV(){
+  const rows = [["Folder","Month","Submission","Code","Edition","Phase","Step","Type","Progress %","Date","Comments"]];
+  DB.folders.forEach(f => monthsIn(f.id).forEach(m => {
+    (m.editions || []).forEach(eid => {
+      const ed = edById(eid); if (!ed) return;
+      const c = (DB.data[m.id] || {})[eid]; if (!c) return;
+      DB.phases.forEach(ph => stepsOf(ph.id).forEach(st => {
+        const notes = (c.notes[st.id] || []).map(n => (n.by ? n.by + ": " : "") + n.text).join("  |  ");
+        rows.push([f.name, m.label, m.submitted || "", ed.code || "", ed.name, ph.name, st.label,
+          st.type === "status" ? "progress" : "date",
+          st.type === "status" ? (c.status[st.id] || 0) : "",
+          st.type === "date" ? (c.dates[st.id] || "") : "",
+          notes]);
+      }));
+      const en = (c.note || []).map(n => (n.by ? n.by + ": " : "") + n.text).join("  |  ");
+      if (en) rows.push([f.name, m.label, m.submitted || "", ed.code || "", ed.name, "", "Notes for this edition", "note", "", "", en]);
+    });
+  }));
+  return "\uFEFF" + rows.map(r => r.map(csvCell).join(",")).join("\r\n");
+}
+async function exportCSV(){
+  const text = buildCSV();
+  const name = "local-pages-" + stamp() + ".csv";
+  const r = await saveFile(name, text);
+  if (r === "fallback") copySheet("Spreadsheet export", "If the download didn't start, copy this and save it as a <b>.csv</b> file, then open it in Excel.", text);
+}
+function applyImport(text){
+  let incoming;
+  try { incoming = JSON.parse(text); }
+  catch(e){ return "That isn't valid JSON — make sure you copied the whole file."; }
+  if (!incoming || !Array.isArray(incoming.issues) || !Array.isArray(incoming.editions) || !incoming.data)
+    return "That JSON isn't a Local Pages backup.";
+  const months = incoming.issues.length, eds = incoming.editions.length;
+  confirmAsk("Restore this backup?",
+    "It holds " + months + " month" + (months === 1 ? "" : "s") + " and " + eds + " edition" + (eds === 1 ? "" : "s") +
+    ". Everything currently in this browser is replaced by it. This can't be undone — take a backup of what's here first if you're not sure.",
+    "Replace everything", () => {
+      DB = incoming;
+      current = DB.issues.length ? DB.issues[DB.issues.length - 1].id : null;
+      open = new Set(); openPhase.clear(); lastIssuePct = -1;
+      ensureCells(); save(); closeSheet(); renderAll();
+    });
+  return null;
+}
+function importSheet(){
+  const sheet = openSheet("<h3>Restore from backup</h3>" +
+    "<p class='hint'>Pick a backup file, or paste its contents below. Everything currently in this browser is replaced.</p>" +
+    '<div class="filerow"><input type="file" id="impFile" accept=".json,application/json"></div>' +
+    '<textarea class="pastebox" id="impBox" placeholder=\'{ "folders": [ ... ] }\'></textarea>' +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-go>Restore</button></div>');
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  const box = sheet.querySelector("#impBox");
+  const file = sheet.querySelector("#impFile");
+  file.onchange = () => {
+    const f = file.files && file.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { box.value = String(r.result || ""); };
+    r.readAsText(f);
+  };
+  sheet.querySelector("[data-go]").onclick = () => {
+    const err = applyImport(box.value.trim());
+    if (err) showErr(sheet, err);
+  };
+}
+
+async function historySheet(){
+  const sheet = openSheet("<h3>History</h3><p class='hint'>Every change anyone has made, newest first.</p>" +
+    '<div class="hist" id="histList"><p class="hist-empty">Loading\u2026</p></div>' +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Close</button></div>');
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  const list = sheet.querySelector("#histList");
+  const {data, error} = await sb.from("history").select("*").order("at", {ascending:false}).limit(300);
+  if (error){ list.innerHTML = '<p class="hist-empty">Could not load the history.</p>'; return; }
+  if (!data.length){ list.innerHTML = '<p class="hist-empty">Nothing has changed yet.</p>'; return; }
+  list.innerHTML = data.map(r => {
+    const col = personColor(r.actor_name);
+    return '<div class="hist-row"><b' + (col ? ' style="color:' + col + '"' : "") + ">" +
+      esc(r.actor_name || "Someone") + '</b><span class="w">' + esc(r.what) +
+      '</span><span class="t">' + esc(relTime(r.at)) + "</span></div>";
+  }).join("");
+}
+function openCog(){
+  const r = document.getElementById("cog").getBoundingClientRect();
+  const eds = currentEditions();
+  const allDone = eds.length > 0 && eds.every(e => pct(e.id) >= 1);
+  closeCtx();
+  const items = [];
+  if (CAN_EDIT){
+    items.push({icon:allDone ? I_UNDO : I_CHECK,
+      label:allDone ? "Clear every edition" : "Mark every edition finished",
+      fn:toggleAllEditions});
+    items.push({sep:true});
+  }
+  items.push({icon:I_CLOCK, label:"History", fn:historySheet});
+  items.push({icon:I_DOWN,  label:"Download backup (.json)", fn:exportJSON});
+  items.push({icon:I_TABLE, label:"Download for Excel (.csv)", fn:exportCSV});
+  if (CAN_EDIT){
+    items.push({sep:true});
+    items.push({icon:I_LIST, label:"Reset this month's editions", fn:resetMonthEditions});
+    items.push({icon:I_DROP, label:"Reset phase colours", fn:resetColors});
+    items.push({icon:I_GRID, label:"Reset phases and steps", fn:resetStructure});
+  }
+  openCtx(r.right - 250, r.bottom + 8, items);
+}
+
+/* ============ boot ============ */
+function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); }
+
+
+/* ============================================================
+   Supabase: sign-in, loading, saving, live updates, history
+   ============================================================ */
+const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
+const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
+
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {
+  auth: {persistSession: true, autoRefreshToken: true}
+});
+
+let ME = null;          // row from profiles
+let CAN_EDIT = false;   // is_admin
+let LIVE = null;        // realtime channel
+let booted = false;
+
+function setLive(state){
+  const d = document.getElementById("liveDot");
+  if (d) d.className = "live" + (state === "off" ? " off" : state === "busy" ? " busy" : "");
+}
+function gateMsg(text, kind){
+  const m = document.getElementById("gateMsg");
+  if (!m) return;
+  m.textContent = text || "";
+  m.className = "gate-msg" + (kind ? " " + kind : "");
+}
+
+/* ---------- reading ---------- */
+async function loadAll(){
+  setLive("busy");
+  const q = t => sb.from(t).select("*");
+  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles] =
+    await Promise.all(["folders","months","editions","month_editions","phases","steps",
+                       "entries","comments","profiles"].map(q));
+  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles]
+    .find(r => r.error);
+  if (bad){ setLive("off"); throw bad.error; }
+
+  const bySort = (a, b) => (a.sort || 0) - (b.sort || 0);
+  const db = {
+    folders: folders.data.sort(bySort).map(f => ({id:f.id, name:f.name, color:f.color || ""})),
+    editions: editions.data.sort(bySort).map(e => ({
+      id:e.id, name:e.name, code:e.code || "", place:e.place || "",
+      flag:e.flag || null, std:!!e.std
+    })),
+    phases: phases.data.sort(bySort).map(p => ({id:p.id, name:p.name, color:p.color || ""})),
+    steps: steps.data.sort(bySort).map(s => ({
+      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done"
+    })),
+    issues: [], data: {},
+    me: {name:(ME && ME.name) || ""},
+    people: [], peopleColors: {}
+  };
+
+  profiles.data.sort((a, b) => (a.color_index || 0) - (b.color_index || 0)).forEach(p => {
+    const nm = (p.name || p.email || "").trim();
+    if (!nm) return;
+    db.people.push(nm);
+    db.peopleColors[nm.toLowerCase()] = PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length];
+  });
+
+  const edsFor = {};
+  monthEds.data.sort(bySort).forEach(r => { (edsFor[r.month_id] = edsFor[r.month_id] || []).push(r.edition_id); });
+  db.issues = months.data.sort(bySort).map(m => ({
+    id:m.id, folder:m.folder_id, label:m.label, submitted:m.submitted || "",
+    color:m.color || "", editions:(edsFor[m.id] || []).slice()
+  }));
+  db.issues.forEach(m => { db.data[m.id] = {}; });
+
+  const blankCell = () => {
+    const c = {status:{}, dates:{}, notes:{}, note:[]};
+    db.steps.forEach(s => { if (s.type === "status") c.status[s.id] = 0; else c.dates[s.id] = ""; c.notes[s.id] = []; });
+    return c;
+  };
+  db.issues.forEach(m => (edsFor[m.id] || []).forEach(eid => { db.data[m.id][eid] = blankCell(); }));
+
+  entries.data.forEach(r => {
+    const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
+    if (!cell) return;
+    if (r.progress !== null && r.progress !== undefined) cell.status[r.step_id] = r.progress;
+    if (r.on_date) cell.dates[r.step_id] = r.on_date;
+  });
+  comments.data.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(r => {
+    const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
+    if (!cell) return;
+    const entry = {id:r.id, by:r.author_name || "", at:r.created_at, text:r.body};
+    if (r.step_id){ (cell.notes[r.step_id] = cell.notes[r.step_id] || []).push(entry); }
+    else cell.note.push(entry);
+  });
+
+  DB = db;
+  if (!current || !DB.issues.some(i => i.id === current))
+    current = DB.issues.length ? DB.issues[DB.issues.length - 1].id : null;
+  setLive("");
+}
+
+/* ---------- writing ---------- */
+let pushTimer = null, pushing = false;
+function queueStructurePush(){
+  if (!CAN_EDIT) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => { pushStructure(); }, 400);
+}
+async function pushStructure(){
+  if (!CAN_EDIT || pushing) return;
+  pushing = true; setLive("busy");
+  try {
+    const idx = (arr, extra) => arr.map((o, i) => Object.assign({sort:i}, extra ? extra(o) : o));
+    await sb.from("folders").upsert(DB.folders.map((f, i) => ({id:f.id, name:f.name, color:f.color || "", sort:i})));
+    await sb.from("editions").upsert(DB.editions.map((e, i) => ({
+      id:e.id, name:e.name, code:e.code || "", place:e.place || "",
+      flag:e.flag || null, std:!!e.std, sort:i})));
+    await sb.from("phases").upsert(DB.phases.map((p, i) => ({id:p.id, name:p.name, color:p.color || "", sort:i})));
+    await sb.from("steps").upsert(DB.steps.map((s, i) => ({
+      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", sort:i})));
+    await sb.from("months").upsert(DB.issues.map((m, i) => ({
+      id:m.id, folder_id:m.folder, label:m.label, submitted:m.submitted || null,
+      color:m.color || "", sort:i})));
+
+    const wanted = [];
+    DB.issues.forEach(m => m.editions.forEach((eid, i) => wanted.push({month_id:m.id, edition_id:eid, sort:i})));
+    await sb.from("month_editions").upsert(wanted);
+
+    /* remove anything that is no longer here */
+    const keep = (t, ids) => ids.length
+      ? sb.from(t).delete().not("id", "in", "(" + ids.map(x => JSON.stringify(x)).join(",") + ")")
+      : Promise.resolve();
+    await keep("folders",  DB.folders.map(f => f.id));
+    await keep("months",   DB.issues.map(m => m.id));
+    await keep("editions", DB.editions.map(e => e.id));
+    await keep("phases",   DB.phases.map(p => p.id));
+    await keep("steps",    DB.steps.map(s => s.id));
+
+    const all = await sb.from("month_editions").select("month_id,edition_id");
+    if (!all.error){
+      const want = new Set(wanted.map(w => w.month_id + "|" + w.edition_id));
+      for (const r of all.data){
+        if (!want.has(r.month_id + "|" + r.edition_id))
+          await sb.from("month_editions").delete().eq("month_id", r.month_id).eq("edition_id", r.edition_id);
+      }
+    }
+    setLive("");
+  } catch(err){
+    console.error("push failed", err);
+    setLive("off");
+  } finally { pushing = false; }
+}
+
+async function pushEntry(monthId, edId, stepId, patch){
+  if (!CAN_EDIT) return;
+  const row = Object.assign({month_id:monthId, edition_id:edId, step_id:stepId,
+                             updated_at:new Date().toISOString(), updated_by:ME && ME.id}, patch);
+  const {error} = await sb.from("entries").upsert(row, {onConflict:"month_id,edition_id,step_id"});
+  if (error){ console.error(error); setLive("off"); }
+}
+async function pushComment(entry, monthId, edId, stepId){
+  if (!CAN_EDIT) return;
+  const {error} = await sb.from("comments").insert({
+    id:entry.id, month_id:monthId, edition_id:edId, step_id:stepId || null,
+    body:entry.text, author:ME && ME.id, author_name:entry.by, created_at:entry.at});
+  if (error){ console.error(error); setLive("off"); }
+}
+async function dropComment(id){
+  if (!CAN_EDIT) return;
+  const {error} = await sb.from("comments").delete().eq("id", id);
+  if (error) console.error(error);
+}
+async function logHistory(what, ids, detail){
+  if (!CAN_EDIT) return;
+  await sb.from("history").insert({
+    actor:ME && ME.id, actor_name:(ME && ME.name) || "",
+    month_id:(ids && ids.month) || null, edition_id:(ids && ids.edition) || null,
+    step_id:(ids && ids.step) || null, what, detail:detail || null});
+}
+
+/* ---------- live ---------- */
+let reloadTimer = null;
+function scheduleReload(){
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(async () => {
+    if (dragCtx || !document.getElementById("scrim").hidden || !document.getElementById("scrim2").hidden ||
+        (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName))){
+      scheduleReload();
+      return;
+    }
+    const keepOpen = new Set(open), keepPhase = new Set(openPhase), y = window.scrollY;
+    try { await loadAll(); } catch(e){ setLive("off"); return; }
+    open = keepOpen; openPhase.clear(); keepPhase.forEach(k => openPhase.add(k));
+    renderAll();
+    window.scrollTo(0, y);
+  }, 500);
+}
+function listen(){
+  if (LIVE) sb.removeChannel(LIVE);
+  LIVE = sb.channel("localpages")
+    .on("postgres_changes", {event:"*", schema:"public"}, payload => {
+      if (payload.table === "history") return;
+      scheduleReload();
+    })
+    .subscribe(status => { setLive(status === "SUBSCRIBED" ? "" : "busy"); });
+}
+
+/* ---------- sign in ---------- */
+async function afterSignIn(session){
+  const {data, error} = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+  if (error){ gateMsg(error.message, "bad"); return; }
+  ME = data || {id:session.user.id, name:session.user.email.split("@")[0], is_admin:false, color_index:0};
+  CAN_EDIT = !!ME.is_admin;
+  document.body.classList.toggle("readonly", !CAN_EDIT);
+
+  await loadAll();
+  document.getElementById("gate").hidden = true;
+  document.getElementById("app").hidden = false;
+  paintWhoami();
+  if (!booted){ booted = true; }
+  open = new Set(); openPhase.clear();
+  renderAll();
+  listen();
+}
+function paintWhoami(){
+  const el = document.getElementById("whoami");
+  if (!el || !ME) return;
+  const col = personColor(ME.name) || PERSON_COLORS[(ME.color_index || 0) % PERSON_COLORS.length];
+  el.innerHTML = '<span class="live" id="liveDot"></span>' +
+    "<span>" + esc(ME.name) + (CAN_EDIT ? "" : " · read only") + "</span>" +
+    '<span class="av" style="background:' + col + '">' + esc((ME.name || "?").slice(0, 1).toUpperCase()) + "</span>";
+  el.onclick = () => {
+    closeCtx();
+    const r = el.getBoundingClientRect();
+    openCtx(r.right - 220, r.bottom + 8, [
+      {icon:I_USER, label:"Rename yourself", dot:col, fn:() => promptSheet("Your name",
+        "This is the name on your comments and in the history.",
+        [{key:"name", label:"Name", value:ME.name}], "Save", async o => {
+          const {error} = await sb.from("profiles").update({name:o.name}).eq("id", ME.id);
+          if (!error){ ME.name = o.name; DB.me.name = o.name; paintWhoami(); scheduleReload(); }
+        })},
+      {sep:true},
+      {icon:I_UNDO, label:"Sign out", danger:true, fn:async () => {
+        if (LIVE) sb.removeChannel(LIVE);
+        await sb.auth.signOut();
+        location.reload();
+      }}
+    ]);
+  };
+}
+
+function wireGate(){
+  const email = document.getElementById("gEmail");
+  const pass  = document.getElementById("gPass");
+  const go    = document.getElementById("gGo");
+  const alt   = document.getElementById("gAlt");
+  let mode = "in";
+
+  const setMode = m => {
+    mode = m;
+    document.getElementById("gTitle").textContent = m === "in" ? "Local Pages" : "Create your account";
+    document.getElementById("gSub").textContent = m === "in"
+      ? "Sign in to see and update this month."
+      : "Use your work address. Approved addresses can edit; anyone else can look but not touch.";
+    go.textContent = m === "in" ? "Sign in" : "Create account";
+    alt.innerHTML = m === "in"
+      ? 'No account yet? <button type="button" id="gSwap">Create one</button>'
+      : 'Already have one? <button type="button" id="gSwap">Sign in</button>';
+    document.getElementById("gSwap").onclick = () => setMode(m === "in" ? "up" : "in");
+    gateMsg("");
+  };
+  setMode("in");
+
+  const submit = async () => {
+    const e = email.value.trim(), p = pass.value;
+    if (!e || !p){ gateMsg("Email and password, please.", "bad"); return; }
+    go.disabled = true;
+    const label = go.textContent;
+    go.innerHTML = '<span class="spin"></span>';
+    try {
+      const fn = mode === "in" ? sb.auth.signInWithPassword({email:e, password:p})
+                               : sb.auth.signUp({email:e, password:p});
+      const {data, error} = await fn;
+      if (error){ gateMsg(error.message, "bad"); return; }
+      if (!data.session){ gateMsg("Account created. Now sign in.", "ok"); setMode("in"); return; }
+      await afterSignIn(data.session);
+    } catch(err){
+      gateMsg(String(err.message || err), "bad");
+    } finally {
+      go.disabled = false; go.textContent = label;
+    }
+  };
+  go.onclick = submit;
+  [email, pass].forEach(i => { i.onkeydown = ev => { if (ev.key === "Enter") submit(); }; });
+}
+
+/* ---------- start ---------- */
+(async function start(){
+  document.getElementById("mark").innerHTML = LOGO;
+  document.getElementById("gateMark").innerHTML = LOGO;
+  document.getElementById("cog").innerHTML = DOTS;
+  document.getElementById("cog").onclick = e => { e.stopPropagation(); openCog(); };
+  buildRailBig();
+  wireGate();
+  const {data} = await sb.auth.getSession();
+  if (data && data.session) await afterSignIn(data.session);
+  else document.getElementById("gate").hidden = false;
+})();
+
+</script>
+</body>
+</html>
