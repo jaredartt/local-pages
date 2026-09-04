@@ -475,7 +475,9 @@ body.dragging-now *{cursor:grabbing !important}
 
 /* ---------- connection + read-only ---------- */
 .whoami{display:flex;align-items:center;gap:8px;padding:7px 8px 7px 13px;border-radius:999px;background:var(--surface);
-  box-shadow:var(--shadow);font-size:13px;font-weight:400;color:var(--ink-2);flex:none}
+  box-shadow:var(--shadow);font-size:13px;font-weight:400;color:var(--ink-2);flex:none;
+  cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+.whoami:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
 .whoami .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10.5px;font-weight:500;flex:none}
 
 /* a face, wherever one is needed */
@@ -654,6 +656,26 @@ function personColor(name){
 function personAvatar(name){
   if (!name || !DB.peopleAvatars) return "";
   return DB.peopleAvatars[name.trim().toLowerCase()] || "";
+}
+/* Resolve a comment's author to how they look *now*. Going through the
+   account id means changing your name or picture updates everything you
+   have ever written, rather than only what you write next. Comments from
+   before accounts existed fall back to the name stored on the row. */
+function whoIs(id, fallbackName){
+  const p = id && PROFILES.find(x => x.id === id);
+  if (!p) return {name:fallbackName || "", avatar:personAvatar(fallbackName),
+                  color:personColor(fallbackName)};
+  const nm = (p.name || p.email || "").trim();
+  return {name:nm, avatar:p.avatar || "",
+          color:PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length]};
+}
+/* Same as avatarHTML, but from an already-resolved person. */
+function avatarOf(who, size){
+  const style = "width:" + size + "px;height:" + size + "px;" +
+    (who.avatar ? "" : "background:" + (who.color || PERSON_COLORS[0]) + ";");
+  return '<span class="av" style="' + style + '" title="' + esc(who.name || "") + '">' +
+    (who.avatar ? '<img src="' + esc(who.avatar) + '" alt="">'
+                : esc((who.name || "?").trim().slice(0, 1).toUpperCase())) + "</span>";
 }
 /* One face. `size` is the pixel box; the picture wins, otherwise the
    first letter of the name on that person's colour. */
@@ -1519,16 +1541,17 @@ function commentBox(getArr, placeholder, onChange, ctx){
     arr.forEach(n => {
       const it = document.createElement("div");
       it.className = "cmt-item";
-      const col = personColor(n.by);
-      it.innerHTML = '<div class="cmt-meta">' + avatarHTML(n.by, 20) +
+      const who = whoIs(n.byId, n.by);
+      const col = who.color;
+      it.innerHTML = '<div class="cmt-meta">' + avatarOf(who, 20) +
         "<b" + (col ? ' style="color:' + col + '"' : "") + ">" +
-        esc(n.by || "Someone") + "</b><span>" + esc(relTime(n.at)) +
+        esc(who.name || "Someone") + "</b><span>" + esc(relTime(n.at)) +
         '</span><button type="button" class="cmt-del" aria-label="Delete comment">' + XMARK + "</button></div><p></p>";
       it.querySelector("p").textContent = n.text;
       it.querySelector(".cmt-del").onclick = () => {
         const preview = n.text.length > 110 ? n.text.slice(0, 110) + "\u2026" : n.text;
         confirmAsk("Delete this comment?",
-          "\u201c" + esc(preview) + "\u201d \u2014 " + esc(n.by || "someone") + ". This can't be undone.",
+          "\u201c" + esc(preview) + "\u201d \u2014 " + esc(who.name || "someone") + ". This can't be undone.",
           "Delete comment", () => {
             const a2 = getArr();
             const i = a2.findIndex(x => x.id === n.id);
@@ -1547,7 +1570,8 @@ function commentBox(getArr, placeholder, onChange, ctx){
     ensureName(() => {
       const arr = getArr();
       if (!Array.isArray(arr)) return;
-      const entry = {id:newId(), by:DB.me.name, at:new Date().toISOString(), text:txt};
+      const entry = {id:newId(), by:DB.me.name, byId:(ME && ME.id) || "",
+                     at:new Date().toISOString(), text:txt};
       arr.push(entry);
       if (ctx){
         pushComment(entry, ctx.month, ctx.edition, ctx.step);
@@ -2280,14 +2304,16 @@ function buildCSV(){
       const ed = edById(eid); if (!ed) return;
       const c = (DB.data[m.id] || {})[eid]; if (!c) return;
       DB.phases.forEach(ph => stepsOf(ph.id).forEach(st => {
-        const notes = (c.notes[st.id] || []).map(n => (n.by ? n.by + ": " : "") + n.text).join("  |  ");
+        const notes = (c.notes[st.id] || []).map(n => { const w = whoIs(n.byId, n.by);
+          return (w.name ? w.name + ": " : "") + n.text; }).join("  |  ");
         rows.push([f.name, m.label, m.submitted || "", ed.code || "", ed.name, ph.name, st.label,
           st.type === "status" ? "progress" : "date",
           st.type === "status" ? (c.status[st.id] || 0) : "",
           st.type === "date" ? (c.dates[st.id] || "") : "",
           notes]);
       }));
-      const en = (c.note || []).map(n => (n.by ? n.by + ": " : "") + n.text).join("  |  ");
+      const en = (c.note || []).map(n => { const w = whoIs(n.byId, n.by);
+        return (w.name ? w.name + ": " : "") + n.text; }).join("  |  ");
       if (en) rows.push([f.name, m.label, m.submitted || "", ed.code || "", ed.name, "", "Notes for this edition", "note", "", "", en]);
     });
   }));
@@ -2387,7 +2413,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v6 · 3 Sep";
+const APP_VERSION = "v7 · 3 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2474,7 +2500,11 @@ async function loadAll(){
   comments.data.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(r => {
     const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
     if (!cell) return;
-    const entry = {id:r.id, by:r.author_name || "", at:r.created_at, text:r.body};
+    /* byId is the account. The name is kept too, but only as a fallback for
+       rows written before accounts existed -- otherwise renaming yourself
+       would leave your old comments signed with the old name for ever. */
+    const entry = {id:r.id, by:r.author_name || "", byId:r.author || "",
+                   at:r.created_at, text:r.body};
     if (r.step_id){ (cell.notes[r.step_id] = cell.notes[r.step_id] || []).push(entry); }
     else cell.note.push(entry);
   });
