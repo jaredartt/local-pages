@@ -69,7 +69,7 @@ body{
 h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.005em;text-wrap:balance;line-height:1.2}
 button{font:inherit;color:inherit;background:none;cursor:pointer;letter-spacing:inherit}
 input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
-:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:8px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
 
 .wrap{max-width:830px;margin:0 auto;padding:0 34px 120px}
 
@@ -272,8 +272,11 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
   font-weight:400;transition:.22s ease;white-space:nowrap;min-width:104px;text-align:center;letter-spacing:.02em}
 .datebtn.past{background:var(--f-done);color:#fff;font-weight:500}
 .datebtn.future{background:var(--f-prog);color:#fff;font-weight:500}
-.datebtn:hover,.datebtn.live{filter:brightness(1.04)}
-.datebtn.empty:hover,.datebtn.empty.live{background:var(--acc-soft);color:var(--ink-2)}
+.datebtn:hover,.datebtn.picking{filter:brightness(1.04)}
+/* while its own picker is open the picker is the affordance; a focus
+   ring around a wide pill just reads as a stray ellipse */
+.datebtn.picking:focus-visible,.datebtn.picking:focus{outline:none}
+.datebtn.empty:hover,.datebtn.empty.picking{background:var(--acc-soft);color:var(--ink-2)}
 
 .cmt{position:relative;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);background:var(--sunk);transition:.22s ease;flex:none;overflow:visible}
 .cmt:hover{color:var(--ink-2)}
@@ -352,11 +355,16 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .dp-wd{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
 .dp-wd span{text-align:center;font-size:9.5px;letter-spacing:.12em;color:var(--ink-3);font-weight:400}
 .dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.dp-grid button{height:32px;border-radius:999px;font-size:12.5px;font-weight:300;font-variant-numeric:tabular-nums;color:var(--ink);transition:background-color .16s ease,color .16s ease,transform .16s ease}
+/* A fixed square centred in its column, so the selected day is a circle
+   rather than an ellipse stretched to whatever width the column got. */
+.dp-grid button{width:32px;height:32px;margin:0 auto;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:12.5px;font-weight:300;font-variant-numeric:tabular-nums;color:var(--ink);
+  transition:background-color .16s ease,color .16s ease,transform .16s ease}
 .dp-grid button.out{color:var(--ink-3);opacity:.45}
 .dp-grid button:hover{background:var(--sunk)}
 .dp-grid button.today{color:var(--acc);font-weight:500}
-.dp-grid button.sel,.dp-grid button.sel:hover{background:var(--acc);color:#fff;font-weight:500}
+.dp-grid button.on,.dp-grid button.on:hover{background:var(--acc);color:#fff;font-weight:500}
 .dp-foot{display:flex;justify-content:space-between;margin-top:10px}
 .dp-foot button{font-size:12px;font-weight:400;color:var(--ink-3);padding:7px 12px;border-radius:999px;transition:.2s ease}
 .dp-foot button:hover{background:var(--sunk);color:var(--ink)}
@@ -1199,14 +1207,14 @@ let dpCtx = null;
 
 function closeDP(){
   if (dp.hidden) return;
-  if (dpCtx && dpCtx.anchor) dpCtx.anchor.classList.remove("live");
+  if (dpCtx && dpCtx.anchor) dpCtx.anchor.classList.remove("picking");
   dp.hidden = true; dpCtx = null;
 }
 function openDP(anchor, iso, onPick){
   const sel = iso ? new Date(iso + "T12:00:00") : null;
   const base = sel || new Date();
   dpCtx = {anchor, sel, view:new Date(base.getFullYear(), base.getMonth(), 1), onPick};
-  anchor.classList.add("live");
+  anchor.classList.add("picking");   /* not "live" -- that is the connection dot */
   drawDP();
   dp.hidden = false;
   const r = anchor.getBoundingClientRect(), W = 278, H = dp.offsetHeight;
@@ -1229,7 +1237,9 @@ function drawDP(){
     else if (i < start + days){ num = i - start + 1; off = 0; }
     else { num = i - start - days + 1; off = 1; }
     const iso = isoOf(new Date(v.getFullYear(), v.getMonth() + off, num));
-    const cls = [off ? "out" : "", iso === selISO ? "sel" : "", iso === tISO ? "today" : ""].filter(Boolean).join(" ");
+    /* "on", not "sel": .sel is the styled <select> class and its
+       width/padding was stretching the chosen day into an ellipse */
+    const cls = [off ? "out" : "", iso === selISO ? "on" : "", iso === tISO ? "today" : ""].filter(Boolean).join(" ");
     cells += '<button type="button" class="day ' + cls + '" data-iso="' + iso + '">' + num + "</button>";
   }
   dp.innerHTML =
@@ -2569,7 +2579,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v9 · 4 Sep";
+const APP_VERSION = "v10 · 4 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
