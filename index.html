@@ -82,12 +82,61 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .brand h1{font-size:17px;letter-spacing:.01em}
 .brand p{margin:2px 0 0;font-size:11px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase;font-weight:400}
 
-.crumb{display:flex;align-items:center;gap:9px;padding:9px 16px 9px 14px;border-radius:999px;background:var(--surface);
+.crumb{display:flex;align-items:center;gap:9px;padding:9px 16px 9px 14px;border-radius:999px;background:var(--surface);margin-left:auto;
   box-shadow:var(--shadow);font-size:14px;transition:transform .2s ease,box-shadow .2s ease}
 .crumb:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
-.cog{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);flex:none;transition:.2s ease}
+.cog{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;color:var(--ink-3);flex:none;transition:.2s ease;position:relative}
 .cog:hover{background:var(--sunk);color:var(--ink)}
 .cog svg{width:16px;height:16px}
+
+/* everything that lives in the top-right corner, in one group */
+.topright{display:flex;align-items:center;gap:8px;margin-left:auto}
+.topright .presence{margin-right:2px}
+
+/* the unread mark on the bell */
+.bell-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;
+  background:var(--danger);box-shadow:0 0 0 2.5px var(--bg);pointer-events:none}
+
+/* the notification list */
+.nt-empty{font-size:12.5px;color:var(--ink-3);font-weight:300;padding:18px 4px;text-align:center}
+.nt-item{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border-radius:16px;
+  transition:background .15s ease;cursor:pointer;text-align:left;width:100%}
+.nt-item:hover{background:var(--sunk)}
+.nt-item.unread{background:var(--acc-soft)}
+.nt-item.unread:hover{filter:brightness(.98)}
+.nt-body{min-width:0;flex:1}
+.nt-who{font-size:12.5px;font-weight:400;line-height:1.4}
+.nt-txt{font-size:12.5px;font-weight:300;color:var(--ink-2);line-height:1.5;margin-top:1px;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nt-where{font-size:11px;color:var(--ink-3);font-weight:300;margin-top:3px}
+.nt-when{font-size:11px;color:var(--ink-3);font-weight:300;flex:none;padding-top:2px}
+.nt-head{display:flex;align-items:center;margin-bottom:4px}
+.nt-clear{margin-left:auto;font-size:11.5px;color:var(--acc);font-weight:400}
+.nt-clear:hover{text-decoration:underline}
+
+/* replies */
+.cmt-item.reply{margin-left:26px;background:transparent;padding-left:12px;
+  border-left:2px solid var(--track)}
+.cmt-reply{margin-left:auto;font-size:11px;color:var(--ink-3);font-weight:300;
+  opacity:0;transition:.15s ease;padding:2px 8px;border-radius:999px}
+.cmt-item:hover .cmt-reply{opacity:.7}
+.cmt-reply:hover{opacity:1!important;background:var(--acc-soft);color:var(--acc)}
+.cmt-meta .cmt-del{margin-left:0}
+.reply-to{font-size:11px;color:var(--ink-3);font-weight:300;padding:2px 0 6px 2px}
+.reply-to b{font-weight:400;color:var(--acc)}
+.reply-to button{color:var(--ink-3);margin-left:6px}
+.reply-to button:hover{color:var(--danger)}
+
+/* the undo bar */
+.undobar{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
+  background:var(--ink);color:#fff;border-radius:999px;padding:11px 12px 11px 20px;
+  display:flex;align-items:center;gap:14px;font-size:13px;font-weight:300;
+  box-shadow:0 12px 32px rgba(20,18,40,.28);z-index:500;
+  opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease}
+.undobar.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.undobar button{background:rgba(255,255,255,.14);color:#fff;border-radius:999px;
+  padding:6px 15px;font-size:12.5px;font-weight:400;transition:.15s ease}
+.undobar button:hover{background:rgba(255,255,255,.26)}
 .cdot{width:9px;height:9px;border-radius:50%;background:var(--track);flex:none;transition:background-color .3s ease}
 .cf{color:var(--ink-3);font-weight:400}
 .cs{color:var(--ink-3);opacity:.55}
@@ -537,7 +586,7 @@ body.dragging-now *{cursor:grabbing !important}
 .readonly-note{display:flex;align-items:center;gap:9px;background:var(--p3-soft,#FAF0DE);color:var(--f-prog);
   border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:400;margin:0 auto}
 body.readonly .grip,body.readonly .markdone,body.readonly .addstep,body.readonly .addphase,
-body.readonly .ghost,body.readonly .cmt-new,body.readonly .cmt-del,body.readonly #cog{display:none !important}
+body.readonly .ghost,body.readonly .cmt-new,body.readonly .cmt-del,body.readonly .cmt-reply{display:none !important}
 body.readonly .rng{pointer-events:none;opacity:.75}
 body.readonly .datebtn{pointer-events:none}
 body.readonly .crumb{pointer-events:auto}
@@ -584,9 +633,13 @@ body.readonly .crumb{pointer-events:auto}
       <div><h1>Local Pages</h1><p>Liahona</p></div>
     </div>
     <button class="crumb" id="crumb" aria-haspopup="true"></button>
-    <button class="cog" id="cog" aria-haspopup="true" aria-label="More options"></button>
-    <div class="presence" id="presence" aria-label="Who else is here"></div>
-    <div class="whoami" id="whoami" role="button" tabindex="0"></div>
+    <div class="topright">
+      <div class="presence" id="presence" aria-label="Who else is here"></div>
+      <button class="cog" id="bell" aria-haspopup="true" aria-label="Notifications">
+        <span class="bell-dot" id="bellDot" hidden></span></button>
+      <button class="cog" id="cog" aria-haspopup="true" aria-label="Settings"></button>
+      <div class="whoami" id="whoami" role="button" tabindex="0"></div>
+    </div>
   </div>
 </header>
 
@@ -836,6 +889,8 @@ const XMARK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke
 const ARR_L = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
 const ARR_R = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>';
 const DOTS = '<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3.2" r="1.45"/><circle cx="8" cy="8" r="1.45"/><circle cx="8" cy="12.8" r="1.45"/></svg>';
+const GEAR = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.3"/><path d="M12.9 9.9a1.1 1.1 0 0 0 .22 1.21l.04.04a1.33 1.33 0 1 1-1.88 1.88l-.04-.04a1.1 1.1 0 0 0-1.21-.22 1.1 1.1 0 0 0-.67 1v.11a1.33 1.33 0 0 1-2.67 0v-.06a1.1 1.1 0 0 0-.72-1 1.1 1.1 0 0 0-1.21.22l-.04.04a1.33 1.33 0 1 1-1.88-1.88l.04-.04a1.1 1.1 0 0 0 .22-1.21 1.1 1.1 0 0 0-1-.67h-.11a1.33 1.33 0 0 1 0-2.67h.06a1.1 1.1 0 0 0 1-.72 1.1 1.1 0 0 0-.22-1.21l-.04-.04A1.33 1.33 0 1 1 4.65 2.8l.04.04a1.1 1.1 0 0 0 1.21.22h.05a1.1 1.1 0 0 0 .67-1v-.11a1.33 1.33 0 0 1 2.67 0v.06a1.1 1.1 0 0 0 .67 1 1.1 1.1 0 0 0 1.21-.22l.04-.04a1.33 1.33 0 1 1 1.88 1.88l-.04.04a1.1 1.1 0 0 0-.22 1.21v.05a1.1 1.1 0 0 0 1 .67h.11a1.33 1.33 0 0 1 0 2.67h-.06a1.1 1.1 0 0 0-1 .67Z"/></svg>';
+const BELL = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.1 6.5a4.1 4.1 0 1 0-8.2 0c0 4.1-1.5 5.2-1.5 5.2h11.2s-1.5-1.1-1.5-5.2Z"/><path d="M9.2 13.9a1.4 1.4 0 0 1-2.4 0"/></svg>';
 const I_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.1"/><path d="M5.4 8.2l1.9 1.9 3.4-4"/></svg>';
 const I_UNDO  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 1 1.6 3.7"/><path d="M2.4 4.6v3.1h3.1"/></svg>';
 const I_LIST  = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 4.2h7M6 8h7M6 11.8h7"/><circle cx="3.1" cy="4.2" r=".9" fill="currentColor" stroke="none"/><circle cx="3.1" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="3.1" cy="11.8" r=".9" fill="currentColor" stroke="none"/></svg>';
@@ -1300,14 +1355,16 @@ function folderMenu(f, x, y){
       if (DB.folders.length <= 1){ confirmAsk("Can't delete " + f.name, "This is your only folder — create another one first.", "OK", () => {}); return; }
       const n = monthsIn(f.id).length;
       confirmAsk("Delete " + f.name + "?",
-        n ? "This folder holds " + n + " month" + (n > 1 ? "s" : "") + ". They and everything logged in them will be deleted. This can't be undone."
-          : "The folder is empty. This can't be undone.",
+        n ? "This folder holds " + n + " month" + (n > 1 ? "s" : "") + ". They and everything logged in them go too. You'll get a moment to undo."
+          : "The folder is empty. You'll get a moment to undo.",
         "Delete folder", () => {
-          monthsIn(f.id).forEach(m => { delete DB.data[m.id]; });
-          DB.issues = DB.issues.filter(i => i.folder !== f.id);
-          DB.folders = DB.folders.filter(x => x.id !== f.id);
-          if (!DB.issues.some(i => i.id === current)) current = DB.issues.length ? DB.issues[0].id : null;
-          lastIssuePct = -1; save(); renderAll();
+          undoable(f.name + " deleted", () => {
+            monthsIn(f.id).forEach(m => { delete DB.data[m.id]; });
+            DB.issues = DB.issues.filter(i => i.folder !== f.id);
+            DB.folders = DB.folders.filter(x => x.id !== f.id);
+            if (!DB.issues.some(i => i.id === current)) current = DB.issues.length ? DB.issues[0].id : null;
+            lastIssuePct = -1; save(); renderAll();
+          });
         });
     }}
   ]);
@@ -1401,12 +1458,14 @@ function phaseMenu(ph, x, y, ed){
       if (DB.phases.length <= 1){ confirmAsk("Can't delete " + ph.name, "This is your only phase — create another one first.", "OK", () => {}); return; }
       const n = stepsOf(ph.id).length;
       confirmAsk("Delete " + ph.name + "?",
-        n ? "Its " + n + " step" + (n > 1 ? "s" : "") + " go with it, in every month and every edition. This can't be undone."
-          : "The phase is empty. This can't be undone.",
+        n ? "Its " + n + " step" + (n > 1 ? "s" : "") + " go with it, in every month and every edition. You'll get a moment to undo."
+          : "The phase is empty. You'll get a moment to undo.",
         "Delete phase", () => {
-          DB.steps = DB.steps.filter(s => s.phase !== ph.id);
-          DB.phases = DB.phases.filter(p => p.id !== ph.id);
-          save(); renderAll();
+          undoable(ph.name + " deleted", () => {
+            DB.steps = DB.steps.filter(s => s.phase !== ph.id);
+            DB.phases = DB.phases.filter(p => p.id !== ph.id);
+            save(); renderAll();
+          });
         });
     }}
   ]));
@@ -1418,13 +1477,15 @@ function stepMenu(st, x, y){
     {label:"Add step below", fn:() => stepSheet(st.phase, null, DB.steps.indexOf(st) + 1)},
     {sep:true},
     {label:"Delete step", danger:true, fn:() => {
-      confirmAsk("Delete " + st.label + "?", "This step disappears from every month and every edition, along with anything logged on it. This can't be undone.", "Delete step", () => {
-        DB.steps = DB.steps.filter(s => s.id !== st.id);
-        Object.keys(DB.data).forEach(mid => Object.keys(DB.data[mid]).forEach(eid => {
-          const c = DB.data[mid][eid];
-          delete c.status[st.id]; delete c.dates[st.id]; delete c.notes[st.id];
-        }));
-        save(); renderAll();
+      confirmAsk("Delete " + st.label + "?", "This step disappears from every month and every edition, along with anything logged on it. You'll get a moment to undo.", "Delete step", () => {
+        undoable(st.label + " deleted", () => {
+          DB.steps = DB.steps.filter(s => s.id !== st.id);
+          Object.keys(DB.data).forEach(mid => Object.keys(DB.data[mid]).forEach(eid => {
+            const c = DB.data[mid][eid];
+            delete c.status[st.id]; delete c.dates[st.id]; delete c.notes[st.id];
+          }));
+          save(); renderAll();
+        });
       });
     }}
   ]);
@@ -1534,56 +1595,117 @@ function commentBox(getArr, placeholder, onChange, ctx){
   btn.type = "button"; btn.className = "cmt-post"; btn.textContent = "Post";
   composer.appendChild(ta); composer.appendChild(btn);
 
+  /* which comment the composer is currently answering, if any */
+  let replyTo = null;
+  const banner = document.createElement("div");
+  banner.className = "reply-to"; banner.hidden = true;
+  const paintBanner = () => {
+    banner.hidden = !replyTo;
+    if (!replyTo) return;
+    const w = whoIs(replyTo.byId, replyTo.by);
+    banner.innerHTML = "Replying to <b>" + esc(w.name || "someone") +
+      '</b><button type="button" aria-label="Cancel reply">' + XMARK + "</button>";
+    banner.querySelector("button").onclick = () => { replyTo = null; paintBanner(); };
+    ta.placeholder = "Reply to " + (w.name || "them") + "\u2026";
+  };
+
   const paint = () => {
     const arr = getArr() || [];
     list.innerHTML = "";
     list.style.display = arr.length ? "" : "none";
-    arr.forEach(n => {
-      const it = document.createElement("div");
-      it.className = "cmt-item";
-      const who = whoIs(n.byId, n.by);
-      const col = who.color;
-      it.innerHTML = '<div class="cmt-meta">' + avatarOf(who, 20) +
-        "<b" + (col ? ' style="color:' + col + '"' : "") + ">" +
-        esc(who.name || "Someone") + "</b><span>" + esc(relTime(n.at)) +
-        '</span><button type="button" class="cmt-del" aria-label="Delete comment">' + XMARK + "</button></div><p></p>";
-      it.querySelector("p").textContent = n.text;
-      it.querySelector(".cmt-del").onclick = () => {
-        const preview = n.text.length > 110 ? n.text.slice(0, 110) + "\u2026" : n.text;
-        confirmAsk("Delete this comment?",
-          "\u201c" + esc(preview) + "\u201d \u2014 " + esc(who.name || "someone") + ". This can't be undone.",
-          "Delete comment", () => {
-            const a2 = getArr();
-            const i = a2.findIndex(x => x.id === n.id);
-            if (i >= 0) a2.splice(i, 1);
-            dropComment(n.id);
-            if (ctx) logHistory("Deleted a comment on " + (ctx.stepLabel || ctx.edName), ctx);
-            paint(); if (onChange) onChange();
-          });
-      };
-      list.appendChild(it);
+    const tops = arr.filter(n => !n.parent);
+    tops.forEach(n => {
+      list.appendChild(cmtRow(n, false));
+      arr.filter(r => r.parent === n.id)
+         .sort((a, b) => String(a.at).localeCompare(String(b.at)))
+         .forEach(r => list.appendChild(cmtRow(r, true)));
     });
+    /* a reply whose parent has been deleted is still shown, never swallowed */
+    arr.filter(n => n.parent && !tops.some(t => t.id === n.parent))
+       .forEach(n => list.appendChild(cmtRow(n, false)));
+    paintBanner();
   };
+
+  /* one comment. `isReply` only changes how it looks and where a reply
+     to it is filed -- threads stay one level deep, like a PDF comment. */
+  function cmtRow(n, isReply){
+    const it = document.createElement("div");
+    it.className = "cmt-item" + (isReply ? " reply" : "");
+    it.dataset.cid = n.id;
+    const who = whoIs(n.byId, n.by);
+    const col = who.color;
+    it.innerHTML = '<div class="cmt-meta">' + avatarOf(who, 20) +
+      "<b" + (col ? ' style="color:' + col + '"' : "") + ">" +
+      esc(who.name || "Someone") + "</b><span>" + esc(relTime(n.at)) + "</span>" +
+      '<button type="button" class="cmt-reply">Reply</button>' +
+      '<button type="button" class="cmt-del" aria-label="Delete comment">' + XMARK +
+      "</button></div><p></p>";
+    it.querySelector("p").textContent = n.text;
+
+    it.querySelector(".cmt-reply").onclick = () => {
+      const arr = getArr() || [];
+      replyTo = isReply ? (arr.find(x => x.id === n.parent) || n) : n;
+      paintBanner();
+      ta.focus();
+    };
+    it.querySelector(".cmt-del").onclick = () => {
+      const preview = n.text.length > 110 ? n.text.slice(0, 110) + "\u2026" : n.text;
+      const arr = getArr() || [];
+      const kids = arr.filter(x => x.parent === n.id).length;
+      confirmAsk("Delete this comment?",
+        "\u201c" + esc(preview) + "\u201d \u2014 " + esc(who.name || "someone") +
+        (kids ? ". Its " + kids + (kids === 1 ? " reply goes too." : " replies go too.") : "."),
+        "Delete comment", () => {
+          const a2 = getArr();
+          const gone = a2.filter(x => x.id === n.id || x.parent === n.id);
+          undoable(kids ? "Comment and its replies deleted" : "Comment deleted",
+            () => {
+              gone.forEach(g => {
+                const i = a2.findIndex(x => x.id === g.id);
+                if (i >= 0) a2.splice(i, 1);
+                dropComment(g.id);
+              });
+            },
+            () => {
+              gone.forEach(g => {
+                a2.push(g);
+                if (ctx) pushComment(g, ctx.month, ctx.edition, ctx.step);
+              });
+              a2.sort((x, y) => String(x.at).localeCompare(String(y.at)));
+              paint(); if (onChange) onChange();
+            });
+          if (ctx) logHistory("Deleted a comment on " + (ctx.stepLabel || ctx.edName), ctx);
+          if (replyTo && gone.some(g => g.id === replyTo.id)){ replyTo = null; }
+          paint(); if (onChange) onChange();
+        });
+    };
+    return it;
+  }
+
   const post = () => {
     const txt = ta.value.trim();
     if (!txt) return;
     ensureName(() => {
       const arr = getArr();
       if (!Array.isArray(arr)) return;
+      const parent = replyTo;
       const entry = {id:newId(), by:DB.me.name, byId:(ME && ME.id) || "",
-                     at:new Date().toISOString(), text:txt};
+                     at:new Date().toISOString(), text:txt,
+                     parent:(parent && parent.id) || null};
       arr.push(entry);
       if (ctx){
         pushComment(entry, ctx.month, ctx.edition, ctx.step);
-        logHistory("Commented on " + (ctx.stepLabel || ctx.edName), ctx);
+        logHistory((parent ? "Replied on " : "Commented on ") + (ctx.stepLabel || ctx.edName), ctx);
+        if (parent) notifyReply(parent, entry, ctx);
       }
+      replyTo = null;
       ta.value = ""; paint(); if (onChange) onChange();
     });
   };
   btn.onclick = post;
   ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); post(); } };
 
-  wrap.appendChild(list); wrap.appendChild(composer);
+  wrap.appendChild(list); wrap.appendChild(banner); wrap.appendChild(composer);
   paint();
   return {el:wrap, paint};
 }
@@ -1679,6 +1801,7 @@ function buildCard(ed, isFresh){
   const el = document.createElement("article");
   const p = pct(ed.id);
   el.className = "card" + (open.has(ed.id) ? " open" : "") + (isFresh ? " fresh" : "");
+  el.dataset.ed = ed.id;
   const C = 2 * Math.PI * 21;
 
   el.dataset.id = ed.id;
@@ -1925,11 +2048,12 @@ function markEdition(ed, v){ setSteps(ed, statusSteps(), v, "every step"); }
    and already-finished (100%) both act straight away. Phases never ask. */
 function toggleEdition(ed){
   const p = pct(ed.id);
-  if (p >= 1){ markEdition(ed, 0); return; }
-  if (p <= 0){ markEdition(ed, 100); return; }
+  if (p >= 1){ undoable(ed.name + " cleared", () => markEdition(ed, 0)); return; }
+  if (p <= 0){ undoable(ed.name + " marked finished", () => markEdition(ed, 100)); return; }
   confirmAsk("Mark " + ed.name + " finished?",
     "It's at " + showPct(p) + "% — every unfinished slider jumps to 100% and you lose where each one had got to. Dates and comments are untouched.",
-    "Mark it finished", () => markEdition(ed, 100));
+    "Mark it finished",
+    () => undoable(ed.name + " marked finished", () => markEdition(ed, 100)));
 }
 
 function refreshEdition(ed, silent){
@@ -2062,28 +2186,34 @@ function confirmAsk(title, msg, label, onYes){
 }
 
 function removeMonth(iss){
-  confirmAsk("Delete " + iss.label + "?", "Everything logged for this month — progress, dates and comments — will be deleted. This can't be undone.", "Delete month", () => {
-    DB.issues = DB.issues.filter(i => i.id !== iss.id);
-    delete DB.data[iss.id];
-    if (current === iss.id){ current = DB.issues.length ? DB.issues[DB.issues.length - 1].id : null; open = new Set(); }
-    lastIssuePct = -1; save(); closeSheet(); renderAll();
+  confirmAsk("Delete " + iss.label + "?", "Everything logged for this month — progress, dates and comments — goes with it. You'll get a moment to undo.", "Delete month", () => {
+    undoable(iss.label + " deleted", () => {
+      DB.issues = DB.issues.filter(i => i.id !== iss.id);
+      delete DB.data[iss.id];
+      if (current === iss.id){ current = DB.issues.length ? DB.issues[DB.issues.length - 1].id : null; open = new Set(); }
+      lastIssuePct = -1; save(); closeSheet(); renderAll();
+    });
   });
 }
 function deleteEdition(ed){
-  confirmAsk("Delete " + ed.name + "?", "This removes " + ed.name + " from every month, along with all its progress and comments. This can't be undone.", "Delete everywhere", () => {
-    DB.editions = DB.editions.filter(e => e.id !== ed.id);
-    DB.issues.forEach(i => { i.editions = i.editions.filter(x => x !== ed.id); });
-    Object.keys(DB.data).forEach(k => { delete DB.data[k][ed.id]; });
-    open.delete(ed.id);
-    save(); closeSheet(); renderAll();
+  confirmAsk("Delete " + ed.name + "?", "This removes " + ed.name + " from every month, along with all its progress and comments. You'll get a moment to undo.", "Delete everywhere", () => {
+    undoable(ed.name + " deleted everywhere", () => {
+      DB.editions = DB.editions.filter(e => e.id !== ed.id);
+      DB.issues.forEach(i => { i.editions = i.editions.filter(x => x !== ed.id); });
+      Object.keys(DB.data).forEach(k => { delete DB.data[k][ed.id]; });
+      open.delete(ed.id);
+      save(); closeSheet(); renderAll();
+    });
   });
 }
 function dropFromMonth(ed){
   const iss = issueById(current);
   confirmAsk("Take " + ed.name + " out of " + iss.label + "?", "It stays in your other months and nothing already logged is lost — it just won't appear in " + iss.label + ".", "Remove from " + iss.label, () => {
-    iss.editions = iss.editions.filter(x => x !== ed.id);
-    open.delete(ed.id);
-    save(); renderSummary(); renderGrid();
+    undoable(ed.name + " removed from " + iss.label, () => {
+      iss.editions = iss.editions.filter(x => x !== ed.id);
+      open.delete(ed.id);
+      save(); renderSummary(); renderGrid();
+    });
   });
 }
 
@@ -2242,15 +2372,24 @@ function markAllEditions(v){
 function toggleAllEditions(){
   const eds = currentEditions();
   if (!eds.length) return;
-  if (eds.every(e => pct(e.id) >= 1)){ markAllEditions(0); return; }
+  if (eds.every(e => pct(e.id) >= 1)){
+    undoable(issueById(current).label + " cleared", () => markAllEditions(0));
+    return;
+  }
   const partial = eds.filter(e => pct(e.id) > 0 && pct(e.id) < 1);
-  if (!partial.length){ markAllEditions(100); return; }
+  if (!partial.length){
+    undoable("Everything in " + issueById(current).label + " marked finished",
+             () => markAllEditions(100));
+    return;
+  }
   confirmAsk("Mark every edition finished?",
     partial.length + (partial.length > 1 ? " editions are" : " edition is") + " part-way through (" +
     partial.map(e => e.name + " " + showPct(pct(e.id)) + "%").join(", ") +
     "). Every unfinished slider in " + issueById(current).label +
     " jumps to 100% and you lose where each one had got to. Dates and comments are untouched.",
-    "Mark them all finished", () => markAllEditions(100));
+    "Mark them all finished",
+    () => undoable("Everything in " + issueById(current).label + " marked finished",
+                   () => markAllEditions(100)));
 }
 
 /* ============ backup: JSON in/out, CSV out ============ */
@@ -2413,7 +2552,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v7 · 3 Sep";
+const APP_VERSION = "v8 · 3 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2504,7 +2643,7 @@ async function loadAll(){
        rows written before accounts existed -- otherwise renaming yourself
        would leave your old comments signed with the old name for ever. */
     const entry = {id:r.id, by:r.author_name || "", byId:r.author || "",
-                   at:r.created_at, text:r.body};
+                   parent:r.parent_id || null, at:r.created_at, text:r.body};
     if (r.step_id){ (cell.notes[r.step_id] = cell.notes[r.step_id] || []).push(entry); }
     else cell.note.push(entry);
   });
@@ -2576,9 +2715,10 @@ async function pushEntry(monthId, edId, stepId, patch){
 }
 async function pushComment(entry, monthId, edId, stepId){
   if (!CAN_EDIT) return;
-  const {error} = await sb.from("comments").insert({
+  const {error} = await sb.from("comments").upsert({
     id:entry.id, month_id:monthId, edition_id:edId, step_id:stepId || null,
-    body:entry.text, author:ME && ME.id, author_name:entry.by, created_at:entry.at});
+    body:entry.text, author:entry.byId || (ME && ME.id), author_name:entry.by,
+    parent_id:entry.parent || null, created_at:entry.at});
   if (error){ console.error(error); setLive("off"); }
 }
 async function dropComment(id){
@@ -2618,6 +2758,8 @@ function listen(){
       if (payload.table === "history") return;
       /* somebody arrived or left: just repaint the faces, don't reload */
       if (payload.table === "presence"){ readPresence(); return; }
+      /* a notification for me: light the dot, no need to reload the month */
+      if (payload.table === "notifications"){ loadNotes(); return; }
       /* Somebody else moved something: glow it, so the change is seen
          rather than just silently appearing. Our own writes are skipped. */
       if (payload.table === "entries"){
@@ -2651,6 +2793,239 @@ function paintFlashes(){
       setTimeout(() => el.classList.remove("just-touched"), 2900);
     }
   });
+}
+
+/* ---------- undo ----------
+   The database is the truth, so undo restores the whole structural
+   picture and pushes it back: pushStructure() already upserts what is
+   in DB and deletes what is not, so putting DB back the way it was and
+   pushing is enough. Entries and comments cascade away with a deleted
+   month, so those are re-sent too. All these tables are tiny -- a few
+   hundred rows -- which is what makes the blunt approach the safe one. */
+let undoTimer = null;
+const undoBar = document.createElement("div");
+undoBar.className = "undobar";
+undoBar.innerHTML = '<span id="undoWhat"></span><button type="button" id="undoGo">Undo</button>';
+document.addEventListener("DOMContentLoaded", () => document.body.appendChild(undoBar));
+
+function snapshotStructure(){
+  return JSON.parse(JSON.stringify({
+    folders:DB.folders, issues:DB.issues, editions:DB.editions,
+    phases:DB.phases, steps:DB.steps, data:DB.data, current:current
+  }));
+}
+async function restoreStructure(snap){
+  DB.folders  = snap.folders;  DB.issues = snap.issues;
+  DB.editions = snap.editions; DB.phases = snap.phases;
+  DB.steps    = snap.steps;    DB.data   = snap.data;
+  if (snap.current && DB.issues.some(i => i.id === snap.current)) current = snap.current;
+  lastIssuePct = -1;
+  renderAll();
+  if (!CAN_EDIT) return;
+  await pushStructure();
+  await pushEveryCell();
+  await pushEveryComment();
+}
+/* re-send every value we hold, for rows that may have cascaded away */
+async function pushEveryCell(){
+  const rows = [];
+  DB.issues.forEach(m => (m.editions || []).forEach(eid => {
+    const c = DB.data[m.id] && DB.data[m.id][eid];
+    if (!c) return;
+    DB.steps.forEach(st => {
+      const v = st.type === "status" ? c.status[st.id] : null;
+      const d = st.type === "date"   ? c.dates[st.id]  : null;
+      if ((v === undefined || v === null || v === 0) && !d) return;
+      rows.push({month_id:m.id, edition_id:eid, step_id:st.id,
+                 progress:st.type === "status" ? (v || 0) : null,
+                 on_date:d || null, updated_by:ME && ME.id});
+    });
+  }));
+  for (let i = 0; i < rows.length; i += 200){
+    const {error} = await sb.from("entries").upsert(rows.slice(i, i + 200));
+    if (error){ console.error(error); break; }
+  }
+}
+async function pushEveryComment(){
+  const rows = [];
+  DB.issues.forEach(m => (m.editions || []).forEach(eid => {
+    const c = DB.data[m.id] && DB.data[m.id][eid];
+    if (!c) return;
+    const add = (arr, stepId) => (arr || []).forEach(n => rows.push({
+      id:n.id, month_id:m.id, edition_id:eid, step_id:stepId,
+      body:n.text, author:n.byId || null, author_name:n.by || "",
+      parent_id:n.parent || null, created_at:n.at}));
+    Object.keys(c.notes || {}).forEach(sid => add(c.notes[sid], sid));
+    add(c.note, null);
+  }));
+  /* parents before replies, or the foreign key rejects the reply */
+  rows.sort((a, b) => (a.parent_id ? 1 : 0) - (b.parent_id ? 1 : 0));
+  for (let i = 0; i < rows.length; i += 200){
+    const {error} = await sb.from("comments").upsert(rows.slice(i, i + 200));
+    if (error){ console.error(error); break; }
+  }
+}
+
+/* Run something undoable. `undoFn` is optional: without it, the whole
+   structural snapshot taken before `doFn` is what gets restored. */
+function undoable(label, doFn, undoFn){
+  const snap = undoFn ? null : snapshotStructure();
+  doFn();
+  showUndo(label, undoFn || (() => restoreStructure(snap)));
+}
+function showUndo(label, fn){
+  clearTimeout(undoTimer);
+  if (!undoBar.isConnected) document.body.appendChild(undoBar);
+  undoBar.querySelector("#undoWhat").textContent = label;
+  undoBar.classList.add("on");
+  undoBar.querySelector("#undoGo").onclick = async () => {
+    clearTimeout(undoTimer);
+    undoBar.classList.remove("on");
+    await fn();
+  };
+  undoTimer = setTimeout(() => undoBar.classList.remove("on"), 9000);
+}
+
+/* ---------- notifications ---------- */
+/* scrollIntoView is missing in a few environments; never let a scroll
+   nicety be the thing that stops a notification from opening. */
+function scrollTo_(el){
+  if (!el) return;
+  try { el.scrollIntoView({behavior:"smooth", block:"center"}); }
+  catch(e){ try { el.scrollIntoView(); } catch(e2){} }
+}
+
+let NOTES = [];          /* my own; RLS makes sure I can't see anyone else's */
+let notesOff = false;    /* true once the table turns out to be missing */
+
+async function notifyReply(parent, entry, ctx){
+  /* never tell somebody about their own reply */
+  if (!parent.byId || !ME || parent.byId === ME.id || notesOff) return;
+  const ed = DB.editions.find(e => e.id === ctx.edition);
+  const {error} = await sb.from("notifications").insert({
+    user_id: parent.byId,
+    actor: ME.id,
+    actor_name: ME.name || "",
+    kind: "reply",
+    month_id: ctx.month, edition_id: ctx.edition, step_id: ctx.step || null,
+    comment_id: entry.id,
+    preview: entry.text.slice(0, 180)
+  });
+  if (error){
+    if (/does not exist|schema cache/i.test(error.message || "")) notesOff = true;
+    else console.error(error);
+  }
+}
+
+async function loadNotes(){
+  if (!ME || notesOff) return;
+  const {data, error} = await sb.from("notifications")
+    .select("*").eq("user_id", ME.id).order("created_at", {ascending:false}).limit(50);
+  if (error){
+    if (/does not exist|schema cache/i.test(error.message || "")) notesOff = true;
+    return;
+  }
+  NOTES = data || [];
+  paintBell();
+}
+function paintBell(){
+  const dot = document.getElementById("bellDot");
+  if (!dot) return;
+  const unread = NOTES.filter(n => !n.read_at).length;
+  dot.hidden = unread === 0;
+  const bell = document.getElementById("bell");
+  if (bell) bell.setAttribute("aria-label",
+    unread ? unread + (unread === 1 ? " unread notification" : " unread notifications")
+           : "Notifications");
+}
+
+/* Where a notification points, in words: Dutch · Prep · Articles reminder */
+function noteWhere(n){
+  const m  = DB.issues.find(i => i.id === n.month_id);
+  const f  = m && DB.folders.find(x => x.id === m.folder);
+  const ed = DB.editions.find(e => e.id === n.edition_id);
+  const st = DB.steps.find(x => x.id === n.step_id);
+  const ph = st && DB.phases.find(x => x.id === st.phase);
+  return [f && f.name, m && m.label, ed && ed.name, ph && ph.name, st && st.label]
+    .filter(Boolean).join(" · ");
+}
+
+function openBell(){
+  closeCtx();
+  const sheet = openSheet(
+    '<div class="nt-head"><h3 style="margin:0">Notifications</h3>' +
+    (NOTES.some(n => !n.read_at)
+      ? '<button type="button" class="nt-clear" id="ntAll">Mark all read</button>' : "") +
+    "</div><div id=\"ntBody\"></div>");
+  const body = sheet.querySelector("#ntBody");
+
+  if (notesOff){
+    body.innerHTML = '<p class="nt-empty">Notifications need one more database ' +
+      'migration — run migrate3.sql in Supabase.</p>';
+    return;
+  }
+  if (!NOTES.length){
+    body.innerHTML = '<p class="nt-empty">Nothing yet. When somebody replies to ' +
+      'one of your comments, it turns up here.</p>';
+    return;
+  }
+  NOTES.forEach(n => {
+    const who = whoIs(n.actor, n.actor_name);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "nt-item" + (n.read_at ? "" : " unread");
+    b.innerHTML = avatarOf(who, 30) +
+      '<div class="nt-body"><div class="nt-who"><b>' + esc(who.name || "Someone") +
+      "</b> replied to you</div>" +
+      '<div class="nt-txt"></div>' +
+      '<div class="nt-where">' + esc(noteWhere(n)) + "</div></div>" +
+      '<span class="nt-when">' + esc(relTime(n.created_at)) + "</span>";
+    b.querySelector(".nt-txt").textContent = n.preview || "";
+    b.onclick = () => { closeSheet(); goToNote(n); };
+    body.appendChild(b);
+  });
+  const all = sheet.querySelector("#ntAll");
+  if (all) all.onclick = async () => {
+    const ids = NOTES.filter(n => !n.read_at).map(n => n.id);
+    NOTES.forEach(n => { n.read_at = n.read_at || new Date().toISOString(); });
+    paintBell(); closeSheet();
+    if (ids.length) await sb.from("notifications")
+      .update({read_at:new Date().toISOString()}).in("id", ids);
+  };
+}
+
+/* Open the month, the language and the phase the notification points at,
+   then scroll the step into view and glow it. */
+async function goToNote(n){
+  if (!n.read_at){
+    n.read_at = new Date().toISOString();
+    paintBell();
+    sb.from("notifications").update({read_at:n.read_at}).eq("id", n.id);
+  }
+  const step = DB.steps.find(x => x.id === n.step_id);
+  if (n.month_id && DB.issues.some(i => i.id === n.month_id)) current = n.month_id;
+  if (n.edition_id) open.add(n.edition_id);
+  if (step && n.edition_id) openPhase.add(n.edition_id + ":" + step.phase);
+  renderAll();
+
+  /* let the layout settle, then find the row */
+  await new Promise(r => setTimeout(r, 60));
+  const sel = '[data-flash="' + n.edition_id + "|" + n.step_id + '"]';
+  const el = document.querySelector(sel);
+  if (el){
+    scrollTo_(el);
+    el.classList.add("just-touched");
+    setTimeout(() => el.classList.remove("just-touched"), 2900);
+    /* and highlight the actual comment, if it is on screen */
+    const c = el.querySelector('[data-cid="' + n.comment_id + '"]');
+    if (c){
+      c.classList.add("just-touched");
+      setTimeout(() => c.classList.remove("just-touched"), 2900);
+    }
+  } else {
+    const card = document.querySelector('.card[data-ed="' + n.edition_id + '"]');
+    scrollTo_(card);
+  }
 }
 
 /* ---------- who else is here ----------
@@ -2736,6 +3111,7 @@ async function afterSignIn(session){
   renderAll();
   listen();
   joinPresence();
+  loadNotes();
 }
 function paintWhoami(){
   const el = document.getElementById("whoami");
@@ -3088,8 +3464,11 @@ function wireGate(){
   document.getElementById("gateMark").innerHTML = LOGO;
   document.getElementById("ver").textContent = APP_VERSION;
   document.getElementById("gateVer").textContent = APP_VERSION;
-  document.getElementById("cog").innerHTML = DOTS;
+  document.getElementById("cog").innerHTML = GEAR;
   document.getElementById("cog").onclick = e => { e.stopPropagation(); openCog(); };
+  const bellEl = document.getElementById("bell");
+  bellEl.insertAdjacentHTML("afterbegin", BELL);
+  bellEl.onclick = e => { e.stopPropagation(); openBell(); };
   buildRailBig();
   wireGate();
   const {data} = await sb.auth.getSession();
