@@ -920,6 +920,10 @@ let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
 let current = null;
 let open = new Set();
 const openPhase = new Set();
+/* which step comment boxes are open, as "edition|step". Kept out here
+   because a re-render throws the DOM away, and an open note closing
+   itself mid-sentence is worse than the render being a frame slower. */
+const noting = new Set();
 const treeShut = new Set();
 
 function isoOf(d){ return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
@@ -1347,7 +1351,7 @@ function selectMonth(id){
   if (current === id) return;
   current = id; lastIssuePct = -1;
   ensureCells();
-  open = new Set();
+  open = new Set(); noting.clear();
   renderAll();
 }
 
@@ -1444,7 +1448,7 @@ function monthSheet(folderId, existing){
       DB.issues.push(m);
       current = m.id; lastIssuePct = -1;
       ensureCells();
-      open = new Set();
+      open = new Set(); noting.clear();
       save(); renderAll();
     }
   };
@@ -2017,9 +2021,12 @@ function buildCard(ed, isFresh){
       nw.appendChild(nin);
       row.appendChild(nw);
       cb.classList.toggle("has", (c.notes[s.id] || []).length > 0);
+      const nkey = ed.id + "|" + s.id;
+      if (noting.has(nkey)){ row.classList.add("noting"); cb.classList.add("on"); }
       cb.onclick = () => {
         const on = row.classList.toggle("noting");
         cb.classList.toggle("on", on);
+        on ? noting.add(nkey) : noting.delete(nkey);
         if (on) setTimeout(() => { const t = nin.querySelector("textarea"); if (t) t.focus(); }, 120);
       };
       list.appendChild(row);
@@ -2504,7 +2511,7 @@ function applyImport(text){
     "Replace everything", () => {
       DB = incoming;
       current = DB.issues.length ? DB.issues[DB.issues.length - 1].id : null;
-      open = new Set(); openPhase.clear(); lastIssuePct = -1;
+      open = new Set(); openPhase.clear(); noting.clear(); lastIssuePct = -1;
       ensureCells(); save(); closeSheet(); renderAll();
     });
   return null;
@@ -2579,7 +2586,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v10 · 4 Sep";
+const APP_VERSION = "v11 · 4 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2683,6 +2690,7 @@ async function loadAll(){
 
 /* ---------- writing ---------- */
 let pushTimer = null, pushing = false;
+let myStructurePush = 0;   /* when we last wrote structure, to ignore our own echo */
 function queueStructurePush(){
   if (!CAN_EDIT) return;
   clearTimeout(pushTimer);
@@ -2691,6 +2699,7 @@ function queueStructurePush(){
 async function pushStructure(){
   if (!CAN_EDIT || pushing) return;
   pushing = true; setLive("busy");
+  myStructurePush = Date.now();
   try {
     const idx = (arr, extra) => arr.map((o, i) => Object.assign({sort:i}, extra ? extra(o) : o));
     await sb.from("folders").upsert(DB.folders.map((f, i) => ({id:f.id, name:f.name, color:f.color || "", sort:i})));
@@ -2788,13 +2797,32 @@ function scheduleReload(){
       scheduleReload();
       return;
     }
-    const keepOpen = new Set(open), keepPhase = new Set(openPhase), y = window.scrollY;
+    const keepOpen = new Set(open), keepPhase = new Set(openPhase),
+          keepNoting = new Set(noting), y = window.scrollY;
     try { await loadAll(); } catch(e){ setLive("off"); return; }
-    open = keepOpen; openPhase.clear(); keepPhase.forEach(k => openPhase.add(k));
+    open = keepOpen;
+    openPhase.clear(); keepPhase.forEach(k => openPhase.add(k));
+    noting.clear();   keepNoting.forEach(k => noting.add(k));
     renderAll();
     window.scrollTo(0, y);
   }, 500);
 }
+/* Realtime echoes our own writes straight back at us. Reloading on
+   those is pure loss: the screen already shows the change, and the
+   rebuild throws away anything the DOM was holding -- an open comment
+   box, a half-typed note -- half a second after you touched a slider.
+   That is the "correction lag". Only a colleague's change needs a reload. */
+function mine(payload){
+  const row = payload.new || {};
+  if (!ME) return false;
+  if (payload.table === "entries")  return row.updated_by === ME.id;
+  if (payload.table === "comments") return row.author === ME.id;
+  /* structural tables carry no author, so lean on our own push clock */
+  if (["folders","months","editions","month_editions","phases","steps"].indexOf(payload.table) >= 0)
+    return Date.now() - myStructurePush < 4000;
+  return false;
+}
+
 function listen(){
   if (LIVE) sb.removeChannel(LIVE);
   LIVE = sb.channel("localpages")
@@ -2810,6 +2838,7 @@ function listen(){
         const row = payload.new || payload.old || {};
         if (row.updated_by && ME && row.updated_by !== ME.id) flashStep(row);
       }
+      if (mine(payload)) return;
       scheduleReload();
     })
     .subscribe(status => { setLive(status === "SUBSCRIBED" ? "" : "busy"); });
@@ -3167,7 +3196,7 @@ async function afterSignIn(session){
   document.getElementById("app").hidden = false;
   paintWhoami();
   if (!booted){ booted = true; }
-  open = new Set(); openPhase.clear();
+  open = new Set(); openPhase.clear(); noting.clear();
   renderAll();
   listen();
   joinPresence();
