@@ -124,8 +124,8 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .cmt-meta .cmt-del{margin-left:0}
 .reply-to{font-size:11px;color:var(--ink-3);font-weight:300;padding:2px 0 6px 2px}
 .reply-to b{font-weight:400;color:var(--acc)}
-.reply-to button{color:var(--ink-3);margin-left:6px}
-.reply-to button:hover{color:var(--danger)}
+.reply-to button{color:var(--acc);margin-left:8px;font-size:11px;font-weight:400}
+.reply-to button:hover{text-decoration:underline}
 
 /* the undo bar */
 .undobar{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
@@ -1601,11 +1601,11 @@ function commentBox(getArr, placeholder, onChange, ctx){
   banner.className = "reply-to"; banner.hidden = true;
   const paintBanner = () => {
     banner.hidden = !replyTo;
-    if (!replyTo) return;
+    if (!replyTo){ ta.placeholder = placeholder || "Add a comment\u2026"; return; }
     const w = whoIs(replyTo.byId, replyTo.by);
     banner.innerHTML = "Replying to <b>" + esc(w.name || "someone") +
-      '</b><button type="button" aria-label="Cancel reply">' + XMARK + "</button>";
-    banner.querySelector("button").onclick = () => { replyTo = null; paintBanner(); };
+      '</b><button type="button" class="reply-cancel">Cancel \u2014 post as a new comment</button>';
+    banner.querySelector("button").onclick = () => { replyTo = null; paintBanner(); ta.focus(); };
     ta.placeholder = "Reply to " + (w.name || "them") + "\u2026";
   };
 
@@ -1685,7 +1685,7 @@ function commentBox(getArr, placeholder, onChange, ctx){
   const post = () => {
     const txt = ta.value.trim();
     if (!txt) return;
-    ensureName(() => {
+    ensureName(async () => {
       const arr = getArr();
       if (!Array.isArray(arr)) return;
       const parent = replyTo;
@@ -1693,17 +1693,34 @@ function commentBox(getArr, placeholder, onChange, ctx){
                      at:new Date().toISOString(), text:txt,
                      parent:(parent && parent.id) || null};
       arr.push(entry);
-      if (ctx){
-        pushComment(entry, ctx.month, ctx.edition, ctx.step);
-        logHistory((parent ? "Replied on " : "Commented on ") + (ctx.stepLabel || ctx.edName), ctx);
-        if (parent) notifyReply(parent, entry, ctx);
-      }
       replyTo = null;
       ta.value = ""; paint(); if (onChange) onChange();
+
+      if (!ctx) return;
+      const why = await pushComment(entry, ctx.month, ctx.edition, ctx.step);
+      if (why){
+        /* it never reached the database, so take it back off screen and
+           hand the words back rather than letting a reload eat them */
+        const i = arr.findIndex(x => x.id === entry.id);
+        if (i >= 0) arr.splice(i, 1);
+        if (!ta.value) ta.value = txt;
+        replyTo = parent;
+        paint(); if (onChange) onChange();
+        toast(why.indexOf("Saved as") === 0 ? why : "Not saved: " + why);
+        return;
+      }
+      logHistory((parent ? "Replied on " : "Commented on ") + (ctx.stepLabel || ctx.edName), ctx);
+      if (parent && entry.parent) notifyReply(parent, entry, ctx);
+      else if (parent && !entry.parent)
+        toast("Saved as a normal comment — replies need migrate3.sql run in Supabase.");
     });
   };
   btn.onclick = post;
-  ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); post(); } };
+  ta.onkeydown = e => {
+    /* second thoughts: Escape drops out of replying and leaves what you typed */
+    if (e.key === "Escape" && replyTo){ e.preventDefault(); replyTo = null; paintBanner(); return; }
+    if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); post(); }
+  };
 
   wrap.appendChild(list); wrap.appendChild(banner); wrap.appendChild(composer);
   paint();
@@ -2552,7 +2569,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v8 · 3 Sep";
+const APP_VERSION = "v9 · 4 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2713,13 +2730,30 @@ async function pushEntry(monthId, edId, stepId, patch){
   const {error} = await sb.from("entries").upsert(row, {onConflict:"month_id,edition_id,step_id"});
   if (error){ console.error(error); setLive("off"); }
 }
+/* Returns null when the comment is safely stored, or a plain-English
+   reason when it is not. Somebody's words must never disappear just
+   because a write failed, so every caller checks. */
 async function pushComment(entry, monthId, edId, stepId){
-  if (!CAN_EDIT) return;
-  const {error} = await sb.from("comments").upsert({
+  if (!CAN_EDIT) return "You have read-only access, so comments can't be saved.";
+  const row = {
     id:entry.id, month_id:monthId, edition_id:edId, step_id:stepId || null,
     body:entry.text, author:entry.byId || (ME && ME.id), author_name:entry.by,
-    parent_id:entry.parent || null, created_at:entry.at});
-  if (error){ console.error(error); setLive("off"); }
+    parent_id:entry.parent || null, created_at:entry.at};
+  let {error} = await sb.from("comments").upsert(row);
+
+  /* The replies migration hasn't been run: save it as an ordinary
+     comment rather than losing what was typed. */
+  if (error && /parent_id|schema cache/i.test(error.message || "")){
+    delete row.parent_id;
+    const retry = await sb.from("comments").upsert(row);
+    if (!retry.error){
+      entry.parent = null;
+      return "Saved as a normal comment — replies need migrate3.sql run in Supabase.";
+    }
+    error = retry.error;
+  }
+  if (error){ console.error(error); setLive("off"); return error.message || "The database refused it."; }
+  return null;
 }
 async function dropComment(id){
   if (!CAN_EDIT) return;
@@ -2873,7 +2907,23 @@ function undoable(label, doFn, undoFn){
   doFn();
   showUndo(label, undoFn || (() => restoreStructure(snap)));
 }
+/* A brief message with nothing to press. Used when something went
+   wrong that the person needs to know about but cannot act on. */
+let toastTimer = null;
+function toast(msg){
+  clearTimeout(undoTimer); clearTimeout(toastTimer);
+  if (!undoBar.isConnected) document.body.appendChild(undoBar);
+  undoBar.querySelector("#undoWhat").textContent = msg;
+  undoBar.querySelector("#undoGo").hidden = true;
+  undoBar.classList.add("on");
+  toastTimer = setTimeout(() => {
+    undoBar.classList.remove("on");
+    undoBar.querySelector("#undoGo").hidden = false;
+  }, 6000);
+}
 function showUndo(label, fn){
+  clearTimeout(toastTimer);
+  undoBar.querySelector("#undoGo").hidden = false;
   clearTimeout(undoTimer);
   if (!undoBar.isConnected) document.body.appendChild(undoBar);
   undoBar.querySelector("#undoWhat").textContent = label;
