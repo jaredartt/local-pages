@@ -73,6 +73,10 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:3px}
 
 .wrap{max-width:830px;margin:0 auto;padding:0 34px 120px}
+/* the Team calendar wants room for overlapping tasks, so it drops the
+   normal reading-width cap and just keeps a side margin */
+body.cal-wide #sectWrap{max-width:none;padding-left:28px;padding-right:28px}
+@media (max-width:620px){ body.cal-wide #sectWrap{padding-left:14px;padding-right:14px} }
 
 /* ---------- top ---------- */
 .topbar{position:sticky;top:0;z-index:20;background:var(--bg)}
@@ -483,6 +487,8 @@ span.step-icon{background:transparent}
 .btn{padding:12px 24px;border-radius:999px;font-size:14px;font-weight:400;transition:.2s ease}
 .btn.ghostbtn{color:var(--ink-3)}
 .btn.ghostbtn:hover{background:var(--sunk);color:var(--ink)}
+.btn.outlinebtn{color:var(--ink-2);border:1.5px solid var(--line)}
+.btn.outlinebtn:hover{background:var(--sunk);color:var(--ink);border-color:var(--ink-3)}
 .btn.primary{background:var(--ink);color:var(--bg);font-weight:500}
 .btn.primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
 .btn.danger{background:var(--danger);color:#fff;font-weight:500}
@@ -566,11 +572,11 @@ body.dragging-now *{cursor:grabbing !important}
 
 /* who else has this open */
 .presence{display:flex;align-items:center;padding-right:2px}
-.presence .av{position:relative;width:26px;height:26px;font-size:11px;margin-left:-7px;
-              box-shadow:0 0 0 2.5px var(--bg);transition:transform .2s ease;cursor:pointer}
-.presence .av:first-child{margin-left:0}
-.presence .av:hover{transform:translateY(-2px)}
-.av-dot{position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;border-radius:50%;
+.presence .av-wrap{position:relative;margin-left:-7px;cursor:pointer;transition:transform .2s ease}
+.presence .av-wrap:first-child{margin-left:0}
+.presence .av-wrap:hover{transform:translateY(-2px)}
+.presence .av{width:26px;height:26px;font-size:11px;box-shadow:0 0 0 2.5px var(--bg)}
+.av-dot{position:absolute;right:-2px;bottom:-2px;width:9px;height:9px;border-radius:50%;
   background:var(--f-done);box-shadow:0 0 0 2.5px var(--bg);pointer-events:none}
 
 /* somebody else just changed this */
@@ -607,8 +613,20 @@ body.dragging-now *{cursor:grabbing !important}
 .field textarea{width:100%;background:var(--sunk);border-radius:16px;padding:12px 16px;font-size:14px;font-weight:300;line-height:1.55;resize:vertical;min-height:64px;transition:background-color .2s ease}
 .field textarea:focus{outline:none;background:var(--acc-soft)}
 .field textarea::placeholder{color:var(--ink-3)}
-.field input[type="time"]{width:100%;background:var(--sunk);border-radius:16px;padding:10px 16px;font-size:14px;font-weight:300;color:var(--ink)}
-.field input[type="time"]:focus{outline:none;background:var(--acc-soft)}
+.timebtn{width:100%;background:var(--sunk);border-radius:16px;padding:10px 16px;font-size:14px;
+  font-weight:300;color:var(--ink);text-align:left;font-variant-numeric:tabular-nums;transition:.15s ease}
+.timebtn:hover{background:var(--acc-soft)}
+.timebtn.picking{background:var(--acc-soft)}
+.timebtn.empty{color:var(--ink-3)}
+.tp{position:fixed;z-index:120;width:172px;background:var(--surface);border-radius:24px;
+  box-shadow:var(--shadow-sheet);padding:14px 14px 10px;animation:sheetIn .24s cubic-bezier(.34,1.3,.5,1)}
+.tp-cols{display:flex;gap:8px}
+.tp-col{flex:1;max-height:184px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}
+.tp-col::-webkit-scrollbar{width:0;height:0}
+.tp-col button{padding:7px 0;border-radius:12px;font-size:13.5px;font-weight:400;color:var(--ink-2);
+  text-align:center;transition:.15s ease;font-variant-numeric:tabular-nums;flex:none}
+.tp-col button:hover{background:var(--sunk);color:var(--ink)}
+.tp-col button.on,.tp-col button.on:hover{background:var(--acc);color:#fff;font-weight:500}
 .asg-picklist{display:flex;flex-wrap:wrap;gap:8px;background:var(--sunk);border-radius:16px;padding:10px}
 .asg-pick{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:400;color:var(--ink);transition:.15s ease}
 .asg-pick:hover{background:var(--box-shadow, var(--surface))}
@@ -795,7 +813,7 @@ body.readonly .crumb{pointer-events:auto}
 .cal-daycol.today{background-color:var(--acc-soft)}
 
 .cal-task{
-  position:absolute;left:3px;right:3px;z-index:1;
+  position:absolute;z-index:1;
   border-radius:10px;border-left:3px solid var(--acc);
   padding:5px 8px;overflow:hidden;cursor:grab;
   display:flex;flex-direction:column;gap:1px;
@@ -806,12 +824,18 @@ body.readonly .crumb{pointer-events:auto}
 .cal-task-cat{font-size:8.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .cal-task b{font-size:12px;font-weight:500;color:var(--ink);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cal-task-time{font-size:10px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.cal-task-cmt{font-size:10px;color:var(--ink);opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .cal-task .asg-stack{margin-top:2px}
 .cal-task .asg-stack .av{width:16px;height:16px;font-size:7.5px;margin-left:-6px}
 .cal-task .asg-stack .av:first-child{margin-left:0}
-.cal-resize{position:absolute;left:0;right:0;bottom:0;height:8px;cursor:ns-resize}
+.cal-resize{position:absolute;left:0;right:0;height:9px;cursor:ns-resize}
+.cal-resize-top{top:0}
+.cal-resize-bottom{bottom:0}
 
 .ac-who{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:400;color:var(--ink);padding:2px 0}
+.asg-edit-btn{font-size:12px;font-weight:500;color:var(--acc);padding:5px 12px;border-radius:999px;
+  background:var(--acc-soft);transition:.15s ease}
+.asg-edit-btn:hover{background:var(--acc);color:#fff}
 </style>
 <script>
 (function(){
@@ -1180,10 +1204,12 @@ const I_DESIGN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" str
 const I_TEAM = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="5.2" r="2.1"/><path d="M1.7 13a4.2 4.2 0 0 1 8.2 0"/><path d="M10.3 3.6c1.1.2 1.9 1.2 1.9 2.4 0 1.1-.7 2.1-1.7 2.4"/><path d="M10.8 9.3c1.6.5 2.7 1.9 3.1 3.7"/></svg>';
 const I_EXTRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="2.4" width="11.2" height="11.2" rx="3.2"/><path d="M8 5.4v5.2M5.4 8h5.2"/></svg>';
 const I_REPORTS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 13V7.4M8 13V3.2M12.4 13V9.6"/><path d="M2.4 13h11.2"/></svg>';
+const I_CREATIVE = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.3c2.3 2.9 4.1 5.3 4.1 7.4a4.1 4.1 0 0 1-8.2 0c0-2.1 1.8-4.5 4.1-7.4Z"/></svg>';
 const SECTION_META = {
   local:     {label:"Local Pages",    fallback:LOGO},
   magazines: {label:"Magazines",      fallback:I_MAG},
   design:    {label:"Graphic Design", fallback:I_DESIGN},
+  creative:  {label:"Creative Well",  fallback:I_CREATIVE},
   team:      {label:"Team",           fallback:I_TEAM},
   extra:     {label:"Extra",          fallback:I_EXTRA},
   reports:   {label:"Reports",        fallback:I_REPORTS}
@@ -1236,7 +1262,7 @@ let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
           me:{name:""}, people:[], peopleColors:{}, sections:{},
           memberTasks:[], memberSteps:[]};
 let current = null;
-let SECTION = "local";   /* "local" | "magazines" | "design" | "team" | "extra" | "reports" */
+let SECTION = "local";   /* "local" | "magazines" | "design" | "creative" | "team" | "extra" | "reports" */
 let open = new Set();
 const openPhase = new Set();
 /* which step comment boxes are open, as "edition|step". Kept out here
@@ -1601,6 +1627,92 @@ function dateButton(getIso, setIso){
   };
   paint();
   b.onclick = e => { e.stopPropagation(); openDP(b, getIso(), iso => { setIso(iso); paint(); }); };
+  return b;
+}
+
+/* ============ time picker ============
+   Same rounded-sheet feel as the date picker above, for a time: two
+   scrolling columns -- hour, then minute in 15-minute steps, since the
+   whole calendar already snaps to quarter hours and a full 60-line
+   minute list would just be noise -- instead of the browser's own
+   bare, square <input type="time">. */
+const tp = document.createElement("div");
+tp.className = "tp"; tp.hidden = true;
+document.body.appendChild(tp);
+let tpCtx = null;
+function closeTP(){
+  if (tp.hidden) return;
+  if (tpCtx && tpCtx.anchor) tpCtx.anchor.classList.remove("picking");
+  tp.hidden = true; tp.innerHTML = ""; tpCtx = null;
+}
+function openTP(anchor, hhmm, onPick){
+  const parts = (hhmm || "").split(":");
+  const h = parts[0] !== undefined && parts[0] !== "" ? +parts[0] : null;
+  const m = parts[1] !== undefined && parts[1] !== "" ? +parts[1] : null;
+  tpCtx = {anchor, h, m, onPick};
+  anchor.classList.add("picking");
+  drawTP();
+  tp.hidden = false;
+  const r = anchor.getBoundingClientRect(), W = 172, H = tp.offsetHeight;
+  const left = Math.max(14, Math.min(r.left, window.innerWidth - W - 14));
+  let top = r.bottom + 8;
+  if (top + H > window.innerHeight - 14) top = Math.max(14, r.top - H - 8);
+  tp.style.left = left + "px"; tp.style.top = top + "px";
+  const on = tp.querySelector("button.on");
+  if (on) on.scrollIntoView({block:"center"});
+}
+function drawTP(){
+  const mins = [0, 15, 30, 45];
+  const hCells = Array.from({length:24}, (_, h) =>
+    '<button type="button" class="tp-h' + (h === tpCtx.h ? " on" : "") + '" data-h="' + h + '">' +
+      String(h).padStart(2, "0") + "</button>").join("");
+  const mCells = mins.map(m =>
+    '<button type="button" class="tp-m' + (m === tpCtx.m ? " on" : "") + '" data-m="' + m + '">' +
+      String(m).padStart(2, "0") + "</button>").join("");
+  tp.innerHTML =
+    '<div class="tp-cols"><div class="tp-col" id="tpH">' + hCells + '</div>' +
+    '<div class="tp-col" id="tpM">' + mCells + "</div></div>" +
+    '<div class="dp-foot"><button type="button" data-act="clear">Clear</button>' +
+    '<button type="button" data-act="now">Now</button>' +
+    '<button type="button" data-act="done">Done</button></div>';
+}
+function commitTP(){
+  if (!tpCtx) return;
+  const val = (tpCtx.h === null || tpCtx.m === null) ? "" :
+    String(tpCtx.h).padStart(2, "0") + ":" + String(tpCtx.m).padStart(2, "0");
+  tpCtx.onPick(val);
+}
+tp.addEventListener("click", e => {
+  e.stopPropagation();
+  if (!tpCtx) return;
+  const hb = e.target.closest(".tp-h");
+  if (hb){ tpCtx.h = +hb.dataset.h; commitTP(); drawTP(); return; }
+  const mb = e.target.closest(".tp-m");
+  if (mb){ tpCtx.m = +mb.dataset.m; commitTP(); drawTP(); return; }
+  const act = e.target.closest("[data-act]");
+  if (!act) return;
+  if (act.dataset.act === "clear"){ tpCtx.h = null; tpCtx.m = null; commitTP(); closeTP(); return; }
+  if (act.dataset.act === "now"){
+    const d = new Date();
+    tpCtx.h = d.getHours(); tpCtx.m = Math.round(d.getMinutes() / 15) * 15 % 60;
+    commitTP(); closeTP(); return;
+  }
+  closeTP();   /* "done" */
+});
+document.addEventListener("click", e => { if (!tp.hidden && !tp.contains(e.target)) closeTP(); });
+window.addEventListener("scroll", closeTP, true);
+window.addEventListener("resize", closeTP);
+
+function timeButton(getVal, setVal){
+  const b = document.createElement("button");
+  b.type = "button";
+  const paint = () => {
+    const v = getVal();
+    b.textContent = v || "Set time";
+    b.className = "timebtn" + (!v ? " empty" : "");
+  };
+  paint();
+  b.onclick = e => { e.stopPropagation(); openTP(b, getVal(), v => { setVal(v); paint(); }); };
   return b;
 }
 
@@ -2448,7 +2560,7 @@ function buildCard(ed, isFresh){
       asg.onclick = e => {
         e.stopPropagation();
         const r = asg.getBoundingClientRect();
-        assignMenu(r.right, r.bottom + 6, ed.id, s.id, paintAsg);
+        assignMenu(r.right, r.bottom + 6, current, ed.id, s.id, paintAsg);
       };
       ctrls.appendChild(asg);
       row.appendChild(ctrls);
@@ -2622,6 +2734,7 @@ function brandMenu(x, y){
     {icon:sectionIconHTML("local", 15), label:"Local Pages", fn:() => goSection("local")},
     {icon:sectionIconHTML("magazines", 15), label:"Magazines", fn:() => goSection("magazines")},
     {icon:sectionIconHTML("design", 15), label:"Graphic Design", fn:() => goSection("design")},
+    {icon:sectionIconHTML("creative", 15), label:"Creative Well", fn:() => goSection("creative")},
     {sep:true},
     {icon:sectionIconHTML("team", 15), label:"Team", fn:() => goSection("team")},
     {icon:sectionIconHTML("extra", 15), label:"Extra", fn:() => goSection("extra")},
@@ -2722,8 +2835,8 @@ function taskSheet(existing){
       '<div class="field"><label>&nbsp;</label><button type="button" class="btn ghostbtn" id="txStatus" style="width:100%"></button></div>' +
     "</div>" +
     '<div class="two">' +
-      '<div class="field"><label for="txStart">Start time</label><input type="time" id="txStart" value="' + esc(t.startTime || "") + '"></div>' +
-      '<div class="field"><label for="txEnd">End time</label><input type="time" id="txEnd" value="' + esc(t.endTime || "") + '"></div>' +
+      '<div class="field"><label>Start time</label><div id="txStartWrap"></div></div>' +
+      '<div class="field"><label>End time</label><div id="txEndWrap"></div></div>' +
     "</div>" +
     '<div class="field"><label for="txNotes">Notes</label><textarea id="txNotes" rows="3" placeholder="What’s this task about?">' +
       esc(t.notes) + "</textarea></div>" +
@@ -2757,6 +2870,8 @@ function taskSheet(existing){
 
   sheet.querySelector("#txDateWrap").appendChild(
     dateButton(() => t.calDate || "", iso => { t.calDate = iso; }));
+  sheet.querySelector("#txStartWrap").appendChild(timeButton(() => t.startTime || "", v => { t.startTime = v; }));
+  sheet.querySelector("#txEndWrap").appendChild(timeButton(() => t.endTime || "", v => { t.endTime = v; }));
 
   const statusBtn = sheet.querySelector("#txStatus");
   let status = t.status;
@@ -2779,8 +2894,6 @@ function taskSheet(existing){
     if (!title){ sheet.querySelector("#txTitle").focus(); return; }
     t.title = title;
     t.notes = sheet.querySelector("#txNotes").value.trim();
-    t.startTime = sheet.querySelector("#txStart").value || "";
-    t.endTime = sheet.querySelector("#txEnd").value || "";
     t.status = status;
     const prevAssignees = new Set(t.assignees);
     t.assignees = Array.from(selAssignees);
@@ -2934,7 +3047,8 @@ function renderReportsSection(container){
    date/time from taskSheet). Both are normalised into one flat "cal
    item" shape by calAllItems() so the grid, the drag code and the
    filters don't need to know which kind they're looking at. */
-const CAL_START_HOUR = 7, CAL_END_HOUR = 22;   /* 7:00 .. 22:00, 15 hourly rows */
+const CAL_START_HOUR = 7, CAL_END_HOUR = 18;   /* 7:00 .. 18:00, 11 hourly rows -- kept
+   short on purpose so a day's overlaps and the drag handles have room to work in */
 const CAL_ROW_PX = 48;
 const CAL_DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 let calWeekStart = "";     /* ISO date of the Monday currently shown; set on first render */
@@ -3015,28 +3129,50 @@ function calCommitItem(it, calDate, startTime, endTime){
    thread, same commentBox). */
 function assignmentCalSheet(it){
   const st = DB.steps.find(x => x.id === it.stepId);
-  const who = whoIs(it.userId, "");
   const ed = DB.editions.find(x => x.id === it.edId);
   const sheet = openSheet(
     "<h3>" + esc(st ? st.label : "Step") + "</h3>" +
     '<p class="hint">' + esc(it.where || "") + "</p>" +
-    '<div class="field"><label>Assigned to</label><div class="ac-who">' + avatarOf(who, 24) +
-      "<span>" + esc(who.name || "Someone") + "</span></div></div>" +
+    '<div class="field"><label>Assigned to</label><div class="ac-who" id="acWho"></div></div>' +
     '<div class="two"><div class="field"><label>Category</label><span class="task-cat">Local Pages</span></div>' +
       '<div class="field"><label>Calendar date</label><div id="acDateWrap"></div></div></div>' +
     '<div class="two">' +
-      '<div class="field"><label for="acStart">Start</label><input type="time" id="acStart" value="' + esc(it.startTime || "") + '"></div>' +
-      '<div class="field"><label for="acEnd">End</label><input type="time" id="acEnd" value="' + esc(it.endTime || "") + '"></div>' +
+      '<div class="field"><label>Start</label><div id="acStartWrap"></div></div>' +
+      '<div class="field"><label>End</label><div id="acEndWrap"></div></div>' +
     "</div>" +
     '<p class="pf-sec">Comments</p><div id="acComments"></div>' +
     '<div class="actions">' +
-      (it.calDate ? '<button type="button" class="btn ghostbtn" id="acUnschedule">Remove from calendar</button>' : "") +
+      (it.calDate ? '<button type="button" class="btn outlinebtn" id="acUnschedule">Remove from calendar</button>' : "") +
       '<button type="button" class="btn ghostbtn" data-close>Close</button>' +
       '<button type="button" class="btn primary" id="acSave">Save</button>' +
     "</div>");
   sheet.querySelector("[data-close]").onclick = closeSheet;
   let calDate = it.calDate || todayISO();
+  let startTime = it.startTime || "", endTime = it.endTime || "";
   sheet.querySelector("#acDateWrap").appendChild(dateButton(() => calDate, iso => { calDate = iso || todayISO(); }));
+  sheet.querySelector("#acStartWrap").appendChild(timeButton(() => startTime, v => { startTime = v; }));
+  sheet.querySelector("#acEndWrap").appendChild(timeButton(() => endTime, v => { endTime = v; }));
+
+  /* who's on this step, right from the calendar -- same multi-select
+     "who's on this" menu the Local Pages grid uses, not just a
+     read-out of the one person this particular block belongs to. */
+  const whoWrap = sheet.querySelector("#acWho");
+  const paintWho = () => {
+    const c = DB.data[it.monthId] && DB.data[it.monthId][it.edId];
+    const list = (c && c.assignee && c.assignee[it.stepId]) || [];
+    const whos = list.filter(a => a.userId).map(a => whoIs(a.userId, ""));
+    whoWrap.innerHTML =
+      (whos.length ? '<span class="asg-stack">' + whos.map(w => avatarOf(w, 24)).join("") + "</span>"
+                    : '<span class="hint" style="padding:0">Nobody assigned</span>') +
+      (CAN_EDIT ? '<button type="button" class="asg-edit-btn">' + (whos.length ? "Change" : "Assign") + "</button>" : "");
+    const editBtn = whoWrap.querySelector(".asg-edit-btn");
+    if (editBtn) editBtn.onclick = e => {
+      e.stopPropagation();
+      const r = editBtn.getBoundingClientRect();
+      assignMenu(r.left, r.bottom + 6, it.monthId, it.edId, it.stepId, paintWho);
+    };
+  };
+  paintWho();
 
   const cbox = commentBox(() => {
     const c = DB.data[it.monthId] && DB.data[it.monthId][it.edId];
@@ -3047,8 +3183,6 @@ function assignmentCalSheet(it){
   sheet.querySelector("#acComments").appendChild(cbox.el);
 
   sheet.querySelector("#acSave").onclick = () => {
-    const startTime = sheet.querySelector("#acStart").value || "";
-    const endTime = sheet.querySelector("#acEnd").value || "";
     closeSheet();
     calCommitItem(it, calDate, startTime, endTime);
     renderSection();
@@ -3127,26 +3261,96 @@ function startCalResize(e, el, it){
   document.addEventListener("mousemove", onMove);
   document.addEventListener("mouseup", onUp);
 }
-function calBlockEl(it){
+/* Same idea from the other edge -- the bottom stays put, the top (and
+   so the start time) moves. */
+function startCalResizeTop(e, el, it){
+  if (!CAN_EDIT || e.button !== 0) return;
+  e.preventDefault(); e.stopPropagation();
+  const startY = e.clientY, startTop = parseFloat(el.style.top), startHeight = parseFloat(el.style.height);
+  const bottomEdge = startTop + startHeight;
+  let top = startTop, height = startHeight;
+  const onMove = ev => {
+    const dy = ev.clientY - startY;
+    let newTop = calSnap(startTop + dy);
+    newTop = Math.max(0, Math.min(newTop, bottomEdge - 24));
+    top = newTop; height = bottomEdge - newTop;
+    el.style.top = top + "px";
+    el.style.height = height + "px";
+  };
+  const onUp = () => {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    calCommitItem(it, it.calDate, calYToTime(top), calYToTime(top + height));
+    renderSection();
+  };
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+}
+function calItemComments(it){
+  if (it.kind === "task") return DB.taskComments[it.task.id] || [];
+  const c = DB.data[it.monthId] && DB.data[it.monthId][it.edId];
+  return (c && c.notes && c.notes[it.stepId]) || [];
+}
+function calBlockEl(it, colIndex, colCount){
+  colIndex = colIndex || 0; colCount = colCount || 1;
   const el = document.createElement("div");
   el.className = "cal-task";
   const top = calTimeToY(it.startTime), bottom = calTimeToY(it.endTime);
   el.style.top = Math.max(0, top) + "px";
   el.style.height = Math.max(24, bottom - top) + "px";
+  /* overlapping same-day tasks split the column between them instead
+     of sitting on top of one another */
+  const w = 100 / colCount;
+  const edge = colCount === 1 ? 3 : (colIndex === 0 || colIndex === colCount - 1 ? 2.5 : 2);
+  el.style.left = "calc(" + (colIndex * w) + "% + " + edge + "px)";
+  el.style.width = "calc(" + w + "% - " + (edge * 2) + "px)";
   const color = calItemColor(it);
   el.style.background = hexToRgba(color, 0.16);
   el.style.borderLeftColor = color;
   const whos = it.assignees.map(id => whoIs(id, ""));
+  const cmts = calItemComments(it);
+  const lastCmt = cmts.length ? cmts.slice().sort((a, b) => String(a.at).localeCompare(String(b.at))).pop() : null;
   el.innerHTML =
     '<span class="cal-task-cat" style="color:' + color + '">' + esc(CATEGORY_LABEL[it.category] || it.category) + "</span>" +
     "<b>" + esc(it.title) + "</b>" +
     '<span class="cal-task-time">' + esc(it.startTime) + "–" + esc(it.endTime) + "</span>" +
     (whos.length ? '<span class="asg-stack">' + whos.slice(0, 3).map(w => avatarOf(w, 16)).join("") + "</span>" : "") +
-    '<span class="cal-resize" title="Drag to resize"></span>';
+    (lastCmt ? '<span class="cal-task-cmt"></span>' : "") +
+    '<span class="cal-resize cal-resize-top" title="Drag to resize"></span>' +
+    '<span class="cal-resize cal-resize-bottom" title="Drag to resize"></span>';
+  if (lastCmt) el.querySelector(".cal-task-cmt").textContent = lastCmt.text;
   el.title = it.title + (whos.length ? " · " + whos.map(w => w.name || "someone").join(", ") : "");
   el.addEventListener("mousedown", e => { if (!e.target.closest(".cal-resize")) startCalMove(e, el, it); });
-  el.querySelector(".cal-resize").addEventListener("mousedown", e => startCalResize(e, el, it));
+  el.querySelector(".cal-resize-bottom").addEventListener("mousedown", e => startCalResize(e, el, it));
+  el.querySelector(".cal-resize-top").addEventListener("mousedown", e => startCalResizeTop(e, el, it));
   return el;
+}
+/* Interval-graph column packing: walk same-day items start-first,
+   give each the lowest column index nothing still running occupies,
+   and once a run of mutually-overlapping items has fully ended, tell
+   all of them how many columns that cluster needed. */
+function calLayoutDay(items){
+  const withPos = items.map(it => ({it, top:calTimeToY(it.startTime), bottom:calTimeToY(it.endTime)}))
+    .sort((a, b) => a.top - b.top || a.bottom - b.bottom);
+  const out = [];
+  let active = [], cluster = [];
+  const flush = () => {
+    const cols = cluster.reduce((m, x) => Math.max(m, x.col), 0) + 1;
+    cluster.forEach(x => { x.cols = cols; out.push(x); });
+    cluster = [];
+  };
+  withPos.forEach(entry => {
+    active = active.filter(a => a.bottom > entry.top);
+    if (!active.length && cluster.length) flush();
+    const used = new Set(active.map(a => a.col));
+    let col = 0;
+    while (used.has(col)) col++;
+    entry.col = col;
+    active.push(entry);
+    cluster.push(entry);
+  });
+  if (cluster.length) flush();
+  return out;
 }
 function calGridHTML(dates){
   const rows = CAL_END_HOUR - CAL_START_HOUR;
@@ -3210,8 +3414,8 @@ function renderCalendarSection(container){
   const gridEl = container.querySelector("#calGrid");
   dates.forEach((d, di) => {
     const col = gridEl.querySelector('.cal-daycol[data-d="' + di + '"]');
-    scheduled.filter(it => it.calDate === d).sort((a, b) => a.startTime.localeCompare(b.startTime))
-      .forEach(it => col.appendChild(calBlockEl(it)));
+    const laidOut = calLayoutDay(scheduled.filter(it => it.calDate === d));
+    laidOut.forEach(entry => col.appendChild(calBlockEl(entry.it, entry.col, entry.cols)));
   });
 
   container.querySelector("#calPrev").onclick = () => { calWeekStart = addDays(calWeekStart, -7); renderSection(); };
@@ -3226,12 +3430,14 @@ function renderCalendarSection(container){
     });
   };
   container.querySelector("#calFUser").onclick = e => {
+    e.stopPropagation();
     const r = e.currentTarget.getBoundingClientRect();
     openCtx(r.left, r.bottom + 6, [{label:"Everyone", fn:() => { calFilterUser = ""; renderSection(); }}, {sep:true}]
       .concat(users.map(p => ({icon:avatarOf(whoIs(p.id, ""), 20), label:(p.name || p.email || "").trim(),
         fn:() => { calFilterUser = p.id; renderSection(); }}))));
   };
   container.querySelector("#calFCat").onclick = e => {
+    e.stopPropagation();
     const r = e.currentTarget.getBoundingClientRect();
     openCtx(r.left, r.bottom + 6, [
       {label:"All categories", fn:() => { calFilterCat = ""; renderSection(); }}, {sep:true},
@@ -3248,6 +3454,7 @@ function renderSection(){
   const local = document.getElementById("localSect");
   const sect = document.getElementById("sectWrap");
   const crumb = document.getElementById("crumb");
+  document.body.classList.toggle("cal-wide", SECTION === "team");
   if (SECTION === "local"){
     local.hidden = false; sect.hidden = true;
     if (crumb) crumb.hidden = false;
@@ -3260,6 +3467,7 @@ function renderSection(){
   else if (SECTION === "reports") renderReportsSection(sect);
   else if (SECTION === "magazines") placeholderSection(sect, "Magazines");
   else if (SECTION === "design") placeholderSection(sect, "Graphic Design");
+  else if (SECTION === "creative") placeholderSection(sect, "Creative Well");
 }
 function tasksPage(userId, name){
   openPage((name || "Their") + "\u2019s tasks", body => {
@@ -3846,7 +4054,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v20 · 22 Sep";
+const APP_VERSION = "v21 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -4105,25 +4313,27 @@ function maybeAutoComplete(edId, stepId, isDone){
 }
 /* Any number of people (0, 1, 2, ...) can be on a step -- toggling adds
    or removes one row rather than replacing a single slot. */
-function toggleAssignee(edId, stepId, userId, onDone){
-  const c = cell(edId);
+function toggleAssignee(monthId, edId, stepId, userId, onDone){
+  const c = DB.data[monthId] && DB.data[monthId][edId];
+  if (!c) return;
   if (!c.assignee) c.assignee = {};
   const list = c.assignee[stepId] = c.assignee[stepId] || [];
   const idx = list.findIndex(a => a.userId === userId);
   if (idx >= 0){
     list.splice(idx, 1);
-    dropAssignment(current, edId, stepId, userId);
+    dropAssignment(monthId, edId, stepId, userId);
   } else {
     list.push({userId, completedAt:""});
-    pushAssignment(current, edId, stepId, userId, "");
+    pushAssignment(monthId, edId, stepId, userId, "");
   }
   if (onDone) onDone();
 }
 /* The little "who's on this" menu that opens from the avatar(s) next to
    a step's comment button. Unlike a normal dropdown it stays open while
    you tick multiple people -- it only closes when you click elsewhere. */
-function assignMenu(x, y, edId, stepId, onDone){
-  const list = (cell(edId).assignee || {})[stepId] || [];
+function assignMenu(x, y, monthId, edId, stepId, onDone){
+  const c = DB.data[monthId] && DB.data[monthId][edId];
+  const list = (c && c.assignee || {})[stepId] || [];
   const ids = new Set(list.map(a => a.userId));
   const named = PROFILES.filter(p => (p.name || p.email || "").trim());
   ctxEl.innerHTML = (named.length ? named.map(p => {
@@ -4142,8 +4352,8 @@ function assignMenu(x, y, edId, stepId, onDone){
   ctxEl.querySelectorAll("button[data-u]").forEach(b => {
     b.onclick = e => {
       e.stopPropagation();
-      toggleAssignee(edId, stepId, b.dataset.u, onDone);
-      assignMenu(x, y, edId, stepId, onDone);   /* repaint checked state, stays open */
+      toggleAssignee(monthId, edId, stepId, b.dataset.u, onDone);
+      assignMenu(x, y, monthId, edId, stepId, onDone);   /* repaint checked state, stays open */
     };
   });
 }
@@ -4699,14 +4909,12 @@ function paintPresence(){
   const others = ONLINE.filter(p => !ME || p.id !== ME.id)
                        .sort((a, b) => String(a.at).localeCompare(String(b.at)));
   el.innerHTML = others.map(p =>
-    avatarHTML(p.name, 26).replace(
-      /<span class="av"/,
-      '<span class="av" data-uid="' + esc(p.id) + '"'
-    ).replace("</span>", '<span class="av-dot"></span></span>')
+    '<span class="av-wrap" data-uid="' + esc(p.id) + '">' + avatarHTML(p.name, 26) +
+      '<span class="av-dot"></span></span>'
   ).join("");
   el.title = "";
-  el.querySelectorAll(".av[data-uid]").forEach(av => {
-    av.onclick = () => goToPerson(av.dataset.uid);
+  el.querySelectorAll(".av-wrap[data-uid]").forEach(wrap => {
+    wrap.onclick = () => goToPerson(wrap.dataset.uid);
   });
 }
 
