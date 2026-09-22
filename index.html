@@ -450,6 +450,9 @@ span.step-icon{background:transparent}
 .icon-opt{width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);transition:.12s ease}
 .icon-opt:hover{background:var(--acc-soft);color:var(--ink)}
 .icon-opt.on{background:var(--acc);color:#fff}
+.icon-recent-label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--ink-3);margin:0 0 7px}
+.icon-recent-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.icon-grid .pp-none{grid-column:1/-1;white-space:nowrap}
 
 .flagpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px;max-height:164px;overflow:auto;background:var(--sunk);border-radius:20px;padding:12px}
 .flagpick button{border-radius:10px;padding:7px 4px;display:grid;place-items:center;transition:.2s ease}
@@ -938,11 +941,31 @@ function userColorHex(p){
    underscores turned into spaces. */
 const ICON_NAMES = ["edit","draw","brush","format_paint","palette","content_cut","straighten","colorize","photo_camera","image","collections","videocam","movie","theaters","photo_library","mic","music_note","headphones","radio","podcasts","mail","send","drafts","inbox","outbox","forward_to_inbox","mark_email_read","markunread","chat","forum","sms","phone","call","contact_phone","support_agent","print","scanner","fax","translate","language","public","flag","place","location_on","map","pin_drop","explore","schedule","event","calendar_month","calendar_today","access_time","timer","alarm","hourglass_empty","hourglass_top","update","history","sync","refresh","autorenew","task_alt","check_circle","checklist","fact_check","rule","verified","pending","priority_high","warning","error","info","help","lightbulb","bolt","star","star_border","favorite","favorite_border","bookmark","bookmark_border","label","sell","redeem","card_giftcard","folder","folder_open","insert_drive_file","description","article","newspaper","menu_book","library_books","book","auto_stories","attach_file","link","share","save","save_alt","backup","restore","archive","delete_outline","inventory_2","lock","lock_open","key","shield","security","visibility","visibility_off","group","groups","person","people","supervisor_account","badge","group_work","handshake","work","business_center","school","store","shopping_cart","local_shipping","storefront","build","construction","engineering","science","biotech","medical_services","healing","local_hospital","computer","laptop","smartphone","tablet","tv","wifi","bluetooth","battery_full","cloud","cloud_upload","cloud_download","cloud_done","code","terminal","bug_report","extension","apps","widgets","dashboard","view_column","grid_view","list","table_chart","bar_chart","pie_chart","analytics","trending_up","campaign","notifications","notifications_active","celebration","emoji_events","thumb_up","thumb_down","home","apartment","meeting_room","chair","weekend","restaurant","local_cafe","cake","fastfood","directions_car","flight","train","hiking","sports_esports","wb_sunny","dark_mode","nightlight","umbrella","recycling","eco","park","pets"];
 function iconLabel(name){ return String(name || "").replace(/_/g, " "); }
-function iconGlyph(name, size, colorId){
+/* The glyph itself never carries a colour any more -- whatever shows it
+   (the .mark square, an .icon-opt button, a menu row) decides the tint
+   through CSS/currentColor. A picked "background colour" tints the
+   square behind the icon, not the icon, so it reads the same everywhere
+   the icon appears (including places with no square at all, like menus). */
+function iconGlyph(name, size){
   if (!name) return "";
-  const hex = colorId ? colorOf(colorId) : "";
-  return '<span class="material-symbols-outlined" style="font-size:' + (size || 16) + "px" +
-    (hex ? ";color:" + esc(hex) : "") + '">' + esc(name) + "</span>";
+  return '<span class="material-symbols-outlined" style="font-size:' + (size || 16) + 'px">' + esc(name) + "</span>";
+}
+/* Last few icons picked from any icon picker in the app, most recent
+   first -- shown as a quick-access row above the full grid. */
+const ICON_RECENT_KEY = "lp-recent-icons";
+function recentIcons(){
+  try {
+    const arr = JSON.parse(localStorage.getItem(ICON_RECENT_KEY) || "[]");
+    return Array.isArray(arr) ? arr.filter(n => ICON_NAMES.indexOf(n) >= 0).slice(0, 5) : [];
+  } catch(e){ return []; }
+}
+function pushRecentIcon(name){
+  if (!name) return;
+  try {
+    const arr = recentIcons().filter(n => n !== name);
+    arr.unshift(name);
+    localStorage.setItem(ICON_RECENT_KEY, JSON.stringify(arr.slice(0, 5)));
+  } catch(e){}
 }
 function personColor(name){
   if (!name) return "";
@@ -1169,15 +1192,21 @@ function sectionMeta(id){
 }
 function sectionIconHTML(id, size){
   const m = sectionMeta(id);
-  if (m.icon) return iconGlyph(m.icon, size, m.color);
+  if (m.icon) return iconGlyph(m.icon, size);
   return (SECTION_META[id] || SECTION_META.local).fallback;
 }
+/* The brand square's colour picker sets the SQUARE's background, not the
+   icon -- the icon (custom or fallback) always renders in the square's
+   own white foreground colour via .mark{color:#fff}, so it stays legible
+   against every swatch. No colour picked -> back to the default accent. */
 function paintBrand(){
   const markEl = document.getElementById("mark");
   const subEl = document.getElementById("brandSub");
   const meta = SECTION_META[SECTION] || SECTION_META.local;
   if (markEl){
+    const sm = sectionMeta(SECTION);
     markEl.innerHTML = sectionIconHTML(SECTION, 20);
+    markEl.style.background = sm.color ? colorOf(sm.color) : "";
     markEl.title = CAN_EDIT ? "Change icon" : "";
   }
   if (subEl) subEl.textContent = meta.label;
@@ -1827,6 +1856,13 @@ function phaseSheet(existing, at){
   sheet.querySelector("#phName").focus();
   sheet.querySelector("#phName").select();
 }
+/* Choose an icon (+ optionally a background colour for the square that
+   holds it -- only the brand/section icon uses that; step icons pass
+   {noColor:true} and never show the swatch row). Picking an icon or a
+   colour just updates local state and repaints -- nothing commits until
+   "Done" (or "No icon", which clears both and commits immediately), so
+   you can change the colour without having to re-click the icon, and
+   vice versa. */
 function iconSheet(current, currentColor, onPick, opts){
   const noColor = !!(opts && opts.noColor);
   const swatches = noColor ? "" : COLORS.map(c =>
@@ -1835,36 +1871,48 @@ function iconSheet(current, currentColor, onPick, opts){
     ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
   scrim2.innerHTML = '<div class="sheet narrow" role="dialog" aria-modal="true">' +
     "<h3>Choose an icon</h3>" +
-    (noColor ? "" : '<div class="field"><label>Colour</label><div class="colorpick" id="icCol">' + swatches + "</div></div>") +
-    '<div class="field icon-search"><input type="text" id="icSearch" placeholder="Search icons\u2026" autocomplete="off"></div>' +
+    (noColor ? "" : '<div class="field"><label>Background colour</label><div class="colorpick" id="icCol">' + swatches + "</div></div>") +
+    '<div class="field icon-search"><input type="text" id="icSearch" placeholder="Search icons…" autocomplete="off"></div>' +
+    '<div class="icon-recent" id="icRecent"></div>' +
     '<div class="icon-grid" id="icGrid"></div>' +
     '<div class="actions"><button type="button" class="btn ghostbtn" id="icNone">No icon</button>' +
     '<button type="button" class="btn primary" id="icClose">Done</button></div></div>';
   scrim2.hidden = false;
   const sheet = scrim2.querySelector(".sheet");
   const grid = sheet.querySelector("#icGrid");
+  const recentWrap = sheet.querySelector("#icRecent");
   const search = sheet.querySelector("#icSearch");
   let col = noColor ? "" : (currentColor || "");
+  let selected = current || "";
+  const optBtn = n => '<button type="button" class="icon-opt' + (n === selected ? " on" : "") +
+    '" data-n="' + n + '" title="' + esc(iconLabel(n)) + '">' + iconGlyph(n, 19) + "</button>";
+  const wireOpts = root => root.querySelectorAll("button[data-n]").forEach(b => {
+    b.onclick = () => { selected = b.dataset.n; draw(); };
+  });
   const draw = () => {
     const q = search.value.trim().toLowerCase();
     const list = q ? ICON_NAMES.filter(n => iconLabel(n).indexOf(q) >= 0) : ICON_NAMES;
-    grid.innerHTML = list.length
-      ? list.map(n => '<button type="button" class="icon-opt' + (n === current ? " on" : "") +
-          '" data-n="' + n + '" title="' + esc(iconLabel(n)) + '">' + iconGlyph(n, 19, col) + "</button>").join("")
-      : '<p class="pp-none">No icons match.</p>';
-    grid.querySelectorAll("button[data-n]").forEach(b => {
-      b.onclick = () => { closeConfirm(); onPick(b.dataset.n, col); };
-    });
+    const recent = recentIcons();
+    recentWrap.innerHTML = recent.length
+      ? '<p class="icon-recent-label">Recent</p><div class="icon-recent-row">' + recent.map(optBtn).join("") + "</div>"
+      : "";
+    wireOpts(recentWrap);
+    grid.innerHTML = list.length ? list.map(optBtn).join("") : '<p class="pp-none">No icons match.</p>';
+    wireOpts(grid);
   };
   if (!noColor){
     sheet.querySelectorAll("#icCol button").forEach(b => {
-      b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#icCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); };
+      b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#icCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); };
     });
   }
   search.oninput = draw;
   draw();
-  sheet.querySelector("#icClose").onclick = closeConfirm;
-  sheet.querySelector("#icNone").onclick = () => { closeConfirm(); onPick("", col); };
+  sheet.querySelector("#icClose").onclick = () => {
+    if (selected) pushRecentIcon(selected);
+    closeConfirm();
+    onPick(selected, col);
+  };
+  sheet.querySelector("#icNone").onclick = () => { closeConfirm(); onPick("", ""); };
   setTimeout(() => search.focus(), 30);
 }
 function stepSheet(phaseId, existing, at){
@@ -3798,7 +3846,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v18 · 22 Sep";
+const APP_VERSION = "v19 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
