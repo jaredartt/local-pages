@@ -78,7 +78,8 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .topbar{position:sticky;top:0;z-index:20;background:var(--bg)}
 .topbar-in{max-width:830px;margin:0 auto;padding:26px 34px 20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
 .brand{margin-right:auto;display:flex;align-items:center;gap:13px}
-.mark{width:38px;height:38px;border-radius:13px;flex:none;background:var(--acc);display:grid;place-items:center;color:#fff}
+.mark{width:38px;height:38px;border-radius:13px;flex:none;background:var(--acc);display:inline-flex;align-items:center;justify-content:center;color:#fff;transition:filter .15s ease}
+.mark:hover{filter:brightness(1.08)}
 .mark svg{width:20px;height:20px}
 .brand h1{font-size:17px;letter-spacing:.01em}
 .brand p{margin:2px 0 0;font-size:11px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase;font-weight:400}
@@ -707,8 +708,8 @@ body.readonly .crumb{pointer-events:auto}
 <header class="topbar">
   <div class="topbar-in">
     <div class="brand">
-      <div class="mark" id="mark"></div>
-      <div><h1>Local Pages</h1><p>Liahona</p></div>
+      <button type="button" class="mark" id="mark"></button>
+      <div id="brandText"><h1>Creative team</h1><p id="brandSub"></p></div>
     </div>
     <button class="crumb" id="crumb" aria-haspopup="true"></button>
     <div class="topright">
@@ -998,6 +999,41 @@ const I_SIGNOUT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" st
 const I_MAG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.6c-1.3-.9-2.8-1.2-4.4-1V11c1.6-.2 3.1.1 4.4 1V3.6Z"/><path d="M8 3.6c1.3-.9 2.8-1.2 4.4-1V11c-1.6-.2-3.1.1-4.4 1V3.6Z"/></svg>';
 const I_DESIGN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a5.6 5.6 0 1 0 3.7 9.8c.4-.3.2-1-.3-1-.6 0-1-.5-1-1.1 0-.6.5-1.1 1.1-1.1H13a1.6 1.6 0 0 0 1.6-1.6c0-2.6-2.9-5-6.6-5Z"/><circle cx="5.4" cy="7.2" r=".7" fill="currentColor" stroke="none"/><circle cx="7.7" cy="5.3" r=".7" fill="currentColor" stroke="none"/><circle cx="10.2" cy="6.4" r=".7" fill="currentColor" stroke="none"/></svg>';
 const I_TEAM = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="5.2" r="2.1"/><path d="M1.7 13a4.2 4.2 0 0 1 8.2 0"/><path d="M10.3 3.6c1.1.2 1.9 1.2 1.9 2.4 0 1.1-.7 2.1-1.7 2.4"/><path d="M10.8 9.3c1.6.5 2.7 1.9 3.1 3.7"/></svg>';
+const SECTION_META = {
+  local:     {label:"Local Pages",    fallback:LOGO},
+  magazines: {label:"Magazines",      fallback:I_MAG},
+  design:    {label:"Graphic Design", fallback:I_DESIGN},
+  team:      {label:"Team",           fallback:I_TEAM}
+};
+function sectionMeta(id){
+  const s = (DB.sections && DB.sections[id]) || null;
+  return {icon:s ? s.icon : "", color:s ? s.icon_color : ""};
+}
+function sectionIconHTML(id, size){
+  const m = sectionMeta(id);
+  if (m.icon) return iconGlyph(m.icon, size, m.color);
+  return (SECTION_META[id] || SECTION_META.local).fallback;
+}
+function paintBrand(){
+  const markEl = document.getElementById("mark");
+  const subEl = document.getElementById("brandSub");
+  const meta = SECTION_META[SECTION] || SECTION_META.local;
+  if (markEl){
+    markEl.innerHTML = sectionIconHTML(SECTION, 20);
+    markEl.title = CAN_EDIT ? "Change icon" : "";
+  }
+  if (subEl) subEl.textContent = meta.label;
+}
+async function pushSectionIcon(id, icon, iconColor){
+  if (!CAN_EDIT) return;
+  DB.sections = DB.sections || {};
+  DB.sections[id] = {icon:icon || "", icon_color:iconColor || ""};
+  paintBrand();
+  const row = {id, icon:icon || "", icon_color:iconColor || "",
+               updated_at:new Date().toISOString(), updated_by:ME && ME.id};
+  const {error} = await sb.from("sections").upsert(row);
+  if (error){ console.error(error); setLive("off"); }
+}
 const I_SUN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="2.7"/><path d="M8 1.4v1.7M8 12.9v1.7M1.4 8h1.7M12.9 8h1.7M3.4 3.4l1.2 1.2M11.4 11.4l1.2 1.2M12.6 3.4l-1.2 1.2M4.6 11.4l-1.2 1.2"/></svg>';
 const I_MOON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.3 9.7A5.6 5.6 0 1 1 6.3 2.7a4.6 4.6 0 0 0 7 7Z"/></svg>';
 const I_MONITOR = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.7" y="2.6" width="12.6" height="8.3" rx="1.3"/><path d="M5.3 13.8h5.4M8 10.9v2.9"/></svg>';
@@ -1008,7 +1044,7 @@ const CMT_FILL = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.6 8c
 
 /* ============ data ============ */
 let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
-          me:{name:""}, people:[], peopleColors:{}};
+          me:{name:""}, people:[], peopleColors:{}, sections:{}};
 let current = null;
 let SECTION = "local";   /* "local" | "magazines" | "design" | "team" */
 let teamOpenId = null;   /* which team member's task list is expanded */
@@ -2349,11 +2385,11 @@ function goSection(name){
 function brandMenu(x, y){
   closeCtx();
   openCtx(x, y, [
-    {icon:I_GRID, label:"Local Pages", fn:() => goSection("local")},
-    {icon:I_MAG, label:"Magazines", fn:() => goSection("magazines")},
-    {icon:I_DESIGN, label:"Graphic Design", fn:() => goSection("design")},
+    {icon:sectionIconHTML("local", 15), label:"Local Pages", fn:() => goSection("local")},
+    {icon:sectionIconHTML("magazines", 15), label:"Magazines", fn:() => goSection("magazines")},
+    {icon:sectionIconHTML("design", 15), label:"Graphic Design", fn:() => goSection("design")},
     {sep:true},
-    {icon:I_TEAM, label:"Team", fn:() => goSection("team")}
+    {icon:sectionIconHTML("team", 15), label:"Team", fn:() => goSection("team")}
   ]);
 }
 function placeholderSection(container, name){
@@ -2408,6 +2444,7 @@ function renderTeamSection(container){
   }
 }
 function renderSection(){
+  paintBrand();
   const local = document.getElementById("localSect");
   const sect = document.getElementById("sectWrap");
   const crumb = document.getElementById("crumb");
@@ -2917,13 +2954,13 @@ function openCog(){
 }
 
 /* ============ boot ============ */
-function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); if (pageRedraw) pageRedraw(pageEl.querySelector("#pgBody")); if (SECTION !== "local") renderSection(); }
+function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); if (pageRedraw) pageRedraw(pageEl.querySelector("#pgBody")); paintBrand(); if (SECTION !== "local") renderSection(); }
 
 
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v13 · 22 Sep";
+const APP_VERSION = "v14 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2954,10 +2991,10 @@ function gateMsg(text, kind){
 async function loadAll(){
   setLive("busy");
   const q = t => sb.from(t).select("*");
-  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments] =
+  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections] =
     await Promise.all(["folders","months","editions","month_editions","phases","steps",
-                       "entries","comments","profiles","assignments"].map(q));
-  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments]
+                       "entries","comments","profiles","assignments","sections"].map(q));
+  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections]
     .find(r => r.error);
   if (bad){ setLive("off"); throw bad.error; }
 
@@ -2974,8 +3011,10 @@ async function loadAll(){
     })),
     issues: [], data: {},
     me: {name:(ME && ME.name) || ""},
-    people: [], peopleColors: {}, peopleAvatars: {}
+    people: [], peopleColors: {}, peopleAvatars: {},
+    sections: {}
   };
+  sections.data.forEach(r => { db.sections[r.id] = {icon:r.icon || "", icon_color:r.icon_color || ""}; });
 
   PROFILES = profiles.data.slice().sort((a, b) => (a.color_index || 0) - (b.color_index || 0));
   PROFILES.forEach(p => {
@@ -3222,6 +3261,7 @@ function mine(payload){
   if (!ME) return false;
   if (payload.table === "entries")     return row.updated_by === ME.id;
   if (payload.table === "assignments") return row.updated_by === ME.id;
+  if (payload.table === "sections")    return row.updated_by === ME.id;
   if (payload.table === "comments") return row.author === ME.id;
   /* structural tables carry no author, so lean on our own push clock */
   if (["folders","months","editions","month_editions","phases","steps"].indexOf(payload.table) >= 0)
@@ -4029,8 +4069,19 @@ function wireGate(){
   document.getElementById("gateVer").textContent = APP_VERSION;
   document.getElementById("cog").innerHTML = GEAR;
   document.getElementById("cog").onclick = e => { e.stopPropagation(); openCog(); };
-  const brandEl = document.querySelector(".brand");
-  if (brandEl) brandEl.onclick = e => { e.stopPropagation(); const r = brandEl.getBoundingClientRect(); brandMenu(r.left, r.bottom + 8); };
+  const brandText = document.getElementById("brandText");
+  const markBtn = document.getElementById("mark");
+  const openBrandMenu = () => {
+    const r = (brandText || markBtn).getBoundingClientRect();
+    brandMenu(r.left, r.bottom + 8);
+  };
+  if (brandText) brandText.onclick = e => { e.stopPropagation(); openBrandMenu(); };
+  if (markBtn) markBtn.onclick = e => {
+    e.stopPropagation();
+    if (!CAN_EDIT){ openBrandMenu(); return; }
+    const m = sectionMeta(SECTION);
+    iconSheet(m.icon, m.color, (name, color) => { pushSectionIcon(SECTION, name, color); });
+  };
   const bellEl = document.getElementById("bell");
   bellEl.insertAdjacentHTML("afterbegin", BELL);
   bellEl.onclick = e => { e.stopPropagation(); openBell(); };
