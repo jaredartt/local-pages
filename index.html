@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@200;300;400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0&display=block">
 <style>
 
 :root{
@@ -240,7 +241,13 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .step{display:grid;grid-template-columns:1fr auto;gap:0 20px;align-items:center;padding:7px 0}
 .step-label{font-size:14.5px;font-weight:300;color:var(--ink);min-width:0;transition:color .3s ease}
 .step.is-done .step-label{color:var(--ink-3)}
-.step.type-date .step-label{color:var(--ink-2);font-weight:200}
+.step-name{display:flex;align-items:center;gap:9px;min-width:0}
+.step-icon{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;flex:none;color:var(--ink-3);background:var(--sunk);transition:.15s ease}
+button.step-icon:hover{color:var(--ink);background:var(--acc-soft)}
+button.step-icon.empty{opacity:.5}
+span.step-icon{background:transparent}
+.material-symbols-outlined{font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 20;vertical-align:middle;line-height:1;display:block}
+
 
 .ctrls{display:flex;align-items:center;gap:10px}
 
@@ -431,6 +438,14 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .colorpick button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
 .colorpick button.nocol{box-shadow:inset 0 0 0 2px var(--track)}
 .colorpick button.nocol[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--track),0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
+.step-icon-pick{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:var(--sunk);border-radius:16px;padding:10px 16px;font-size:14px;font-weight:300;color:var(--ink-2);transition:.15s ease}
+.step-icon-pick:hover{background:var(--acc-soft)}
+.step-icon-pick .ic-prev{width:22px;height:22px;border-radius:999px;display:grid;place-items:center;flex:none;color:var(--ink-3)}
+.icon-search{margin-bottom:12px}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px;max-height:min(46vh,320px);overflow:auto;background:var(--sunk);border-radius:16px;padding:10px}
+.icon-opt{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2);transition:.12s ease}
+.icon-opt:hover{background:var(--acc-soft);color:var(--ink)}
+.icon-opt.on{background:var(--acc);color:#fff}
 
 .flagpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px;max-height:164px;overflow:auto;background:var(--sunk);border-radius:20px;padding:12px}
 .flagpick button{border-radius:10px;padding:7px 4px;display:grid;place-items:center;transition:.2s ease}
@@ -562,6 +577,27 @@ body.dragging-now *{cursor:grabbing !important}
 .pf-av:hover .pf-edit{opacity:1}
 .pf-hint{font-size:11.5px;color:var(--ink-3);font-weight:300;text-align:center;line-height:1.5}
 .pf-clear{font-size:11.5px;color:var(--danger);font-weight:300}
+.pf-name-row{display:flex;gap:8px}
+.pf-name-row input{flex:1;min-width:0}
+.pf-name-row .btn{flex:none;padding:12px 18px}
+.pf-sec{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--ink-3);margin:24px 0 8px}
+.pf-tasks{display:flex;flex-direction:column;gap:2px;max-height:260px;overflow:auto;margin-bottom:10px}
+.pf-viewall{width:100%}
+
+/* task rows: My tasks, View all tasks, Team */
+.task-row{display:flex;align-items:center;gap:6px}
+.task-nav{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:8px;border-radius:14px;text-align:left}
+.task-nav:hover{background:var(--sunk)}
+.task-icon{width:26px;height:26px;border-radius:999px;display:grid;place-items:center;flex:none;background:var(--sunk);color:var(--ink-3)}
+.task-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.task-mid b{font-size:12.5px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-mid span{font-size:11px;color:var(--ink-3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-pill{flex:none;font-size:10px;font-weight:500;letter-spacing:.02em;padding:4px 10px;border-radius:999px;background:var(--sunk);color:var(--ink-3)}
+.task-pill.done{background:var(--f-done-soft,#E4F4EA);color:var(--f-done)}
+.task-empty{font-size:12px;color:var(--ink-3);font-weight:300;padding:9px 2px}
+.task-row.wide{padding:2px 0}
+.task-cal{flex:none}
+.task-cal .datebtn{padding:6px 12px;font-size:11px}
 
 /* people panel */
 .pp-row{display:flex;align-items:center;gap:11px;padding:9px 2px}
@@ -585,8 +621,26 @@ body.dragging-now *{cursor:grabbing !important}
 .pp-x:hover{opacity:1!important;background:var(--danger-soft);color:var(--danger)}
 .pp-x svg{width:10px;height:10px}
 
+.brand{cursor:pointer}
+.brand:hover h1{color:var(--acc)}
+.pageov{position:fixed;inset:0;z-index:150;background:var(--bg);overflow:auto}
+.pageov-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:14px;padding:18px 24px;background:var(--bg);border-bottom:1px solid var(--line)}
+.pageov-back{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow-lift);flex:none;color:var(--ink-2)}
+.pageov-back:hover{background:var(--sunk)}
+.pageov-back svg{width:16px;height:16px}
+.pageov-head h2{font-size:19px;font-weight:500}
+.pageov-body{max-width:640px;margin:0 auto;padding:22px 24px 60px}
+.team-row{width:100%;text-align:left}
+.team-row .chev{margin-left:auto;color:var(--ink-3);transform:rotate(-90deg);flex:none}
+.team-row .chev svg{width:14px;height:14px}
+
 /* a face on every comment */
 .cmt-meta .av{width:20px;height:20px;font-size:9.5px;margin-right:-2px}
+.asg{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;flex:none;background:var(--sunk);color:var(--ink-3);transition:.15s ease;overflow:hidden;padding:0}
+.asg:hover{background:var(--acc-soft)}
+.asg:disabled{cursor:default}
+.asg:disabled:hover{background:var(--sunk)}
+.asg .av{width:26px;height:26px;font-size:10.5px}
 
 .live{width:7px;height:7px;border-radius:50%;background:var(--f-done);flex:none;transition:background-color .3s ease}
 .live.off{background:var(--danger)}
@@ -704,6 +758,17 @@ const COLORS = [
 /* one colour per person, handed out in the order they first appear */
 const PERSON_COLORS = ["#E0413F","#2F6FE0","#2FA05F","#D9A61B","#E85B9E",
                        "#38AEE8","#EE7C22","#8158E0","#17A398","#7CA82B"];
+
+/* a small curated slice of Google's free Material Symbols library --
+   enough to cover a production checklist without shipping the whole
+   ~3000-icon set down the wire. Search matches the name with
+   underscores turned into spaces. */
+const ICON_NAMES = ["edit","draw","brush","format_paint","palette","content_cut","straighten","colorize","photo_camera","image","collections","videocam","movie","theaters","photo_library","mic","music_note","headphones","radio","podcasts","mail","send","drafts","inbox","outbox","forward_to_inbox","mark_email_read","markunread","chat","forum","sms","phone","call","contact_phone","support_agent","print","scanner","fax","translate","language","public","flag","place","location_on","map","pin_drop","explore","schedule","event","calendar_month","calendar_today","access_time","timer","alarm","hourglass_empty","hourglass_top","update","history","sync","refresh","autorenew","task_alt","check_circle","checklist","fact_check","rule","verified","pending","priority_high","warning","error","info","help","lightbulb","bolt","star","star_border","favorite","favorite_border","bookmark","bookmark_border","label","sell","redeem","card_giftcard","folder","folder_open","insert_drive_file","description","article","newspaper","menu_book","library_books","book","auto_stories","attach_file","link","share","save","save_alt","backup","restore","archive","delete_outline","inventory_2","lock","lock_open","key","shield","security","visibility","visibility_off","group","groups","person","people","supervisor_account","badge","group_work","handshake","work","business_center","school","store","shopping_cart","local_shipping","storefront","build","construction","engineering","science","biotech","medical_services","healing","local_hospital","computer","laptop","smartphone","tablet","tv","wifi","bluetooth","battery_full","cloud","cloud_upload","cloud_download","cloud_done","code","terminal","bug_report","extension","apps","widgets","dashboard","view_column","grid_view","list","table_chart","bar_chart","pie_chart","analytics","trending_up","campaign","notifications","notifications_active","celebration","emoji_events","thumb_up","thumb_down","home","apartment","meeting_room","chair","weekend","restaurant","local_cafe","cake","fastfood","directions_car","flight","train","hiking","sports_esports","wb_sunny","dark_mode","nightlight","umbrella","recycling","eco","park","pets"];
+function iconLabel(name){ return String(name || "").replace(/_/g, " "); }
+function iconGlyph(name, size){
+  if (!name) return "";
+  return '<span class="material-symbols-outlined" style="font-size:' + (size || 16) + 'px">' + esc(name) + "</span>";
+}
 function personColor(name){
   if (!name) return "";
   const k = name.trim().toLowerCase();
@@ -909,6 +974,10 @@ const I_USER = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strok
 const I_DOWN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6v7.6"/><path d="M5 7.4 8 10.4l3-3"/><path d="M2.8 12.8h10.4"/></svg>';
 const I_UP   = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10.4V2.8"/><path d="M5 5.8 8 2.8l3 3"/><path d="M2.8 12.8h10.4"/></svg>';
 const I_TABLE= '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2.3" y="3" width="11.4" height="10" rx="1.6"/><path d="M2.3 6.6h11.4M6.4 6.6V13"/></svg>';
+const I_SIGNOUT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 2.6H3.6a1 1 0 0 0-1 1v8.8a1 1 0 0 0 1 1h3"/><path d="M10.8 5.2 13.6 8l-2.8 2.8"/><path d="M13.4 8H6"/></svg>';
+const I_MAG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.6c-1.3-.9-2.8-1.2-4.4-1V11c1.6-.2 3.1.1 4.4 1V3.6Z"/><path d="M8 3.6c1.3-.9 2.8-1.2 4.4-1V11c-1.6-.2-3.1.1-4.4 1V3.6Z"/></svg>';
+const I_DESIGN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a5.6 5.6 0 1 0 3.7 9.8c.4-.3.2-1-.3-1-.6 0-1-.5-1-1.1 0-.6.5-1.1 1.1-1.1H13a1.6 1.6 0 0 0 1.6-1.6c0-2.6-2.9-5-6.6-5Z"/><circle cx="5.4" cy="7.2" r=".7" fill="currentColor" stroke="none"/><circle cx="7.7" cy="5.3" r=".7" fill="currentColor" stroke="none"/><circle cx="10.2" cy="6.4" r=".7" fill="currentColor" stroke="none"/></svg>';
+const I_TEAM = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="5.2" r="2.1"/><path d="M1.7 13a4.2 4.2 0 0 1 8.2 0"/><path d="M10.3 3.6c1.1.2 1.9 1.2 1.9 2.4 0 1.1-.7 2.1-1.7 2.4"/><path d="M10.8 9.3c1.6.5 2.7 1.9 3.1 3.7"/></svg>';
 const GRIP = '<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="6" cy="4" r="1.25"/><circle cx="10" cy="4" r="1.25"/><circle cx="6" cy="8" r="1.25"/><circle cx="10" cy="8" r="1.25"/><circle cx="6" cy="12" r="1.25"/><circle cx="10" cy="12" r="1.25"/></svg>';
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.1"/><path d="M5.4 8.2l1.9 1.9 3.4-4"/></svg>';
 const CMT   = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 8c0 2.5-2.5 4.6-5.6 4.6-.7 0-1.4-.1-2-.3L2.8 13.4l1-2.4C3 10.2 2.4 9.2 2.4 8c0-2.5 2.5-4.6 5.6-4.6S13.6 5.5 13.6 8Z"/></svg>';
@@ -931,7 +1000,7 @@ function todayISO(){ return isoOf(new Date()); }
 function shiftFromToday(days){ const d = new Date(); d.setDate(d.getDate() + days); return isoOf(d); }
 
 function blank(){
-  const o = {status:{}, dates:{}, notes:{}, note:""};
+  const o = {status:{}, dates:{}, notes:{}, note:"", assignee:{}};
   statusSteps().forEach(s => { o.status[s.id] = 0; });
   dateSteps().forEach(s => { o.dates[s.id] = ""; });
   return o;
@@ -1002,6 +1071,7 @@ function ensureCells(){
       if (!c.notes) c.notes = {};
       if (!c.status) c.status = {};
       if (!c.dates) c.dates = {};
+      if (!c.assignee) c.assignee = {};
       /* comments used to be one shared string per step; they are now a list
          of entries, each with a name and a time */
       Object.keys(c.notes).forEach(k => {
@@ -1538,6 +1608,34 @@ function phaseSheet(existing, at){
   sheet.querySelector("#phName").focus();
   sheet.querySelector("#phName").select();
 }
+function iconSheet(current, onPick){
+  scrim2.innerHTML = '<div class="sheet narrow" role="dialog" aria-modal="true">' +
+    "<h3>Choose an icon</h3>" +
+    '<div class="field icon-search"><input type="text" id="icSearch" placeholder="Search icons\u2026" autocomplete="off"></div>' +
+    '<div class="icon-grid" id="icGrid"></div>' +
+    '<div class="actions"><button type="button" class="btn ghostbtn" id="icNone">No icon</button>' +
+    '<button type="button" class="btn primary" id="icClose">Done</button></div></div>';
+  scrim2.hidden = false;
+  const sheet = scrim2.querySelector(".sheet");
+  const grid = sheet.querySelector("#icGrid");
+  const search = sheet.querySelector("#icSearch");
+  const draw = () => {
+    const q = search.value.trim().toLowerCase();
+    const list = q ? ICON_NAMES.filter(n => iconLabel(n).indexOf(q) >= 0) : ICON_NAMES;
+    grid.innerHTML = list.length
+      ? list.map(n => '<button type="button" class="icon-opt' + (n === current ? " on" : "") +
+          '" data-n="' + n + '" title="' + esc(iconLabel(n)) + '">' + iconGlyph(n, 19) + "</button>").join("")
+      : '<p class="pp-none">No icons match.</p>';
+    grid.querySelectorAll("button[data-n]").forEach(b => {
+      b.onclick = () => { closeConfirm(); onPick(b.dataset.n); };
+    });
+  };
+  search.oninput = draw;
+  draw();
+  sheet.querySelector("#icClose").onclick = closeConfirm;
+  sheet.querySelector("#icNone").onclick = () => { closeConfirm(); onPick(""); };
+  setTimeout(() => search.focus(), 30);
+}
 function stepSheet(phaseId, existing, at){
   const isDate = existing ? existing.type === "date" : false;
   const sheet = openSheet(
@@ -1545,6 +1643,7 @@ function stepSheet(phaseId, existing, at){
     "<p class='hint'>Steps are shared by every edition and every month.</p>" +
     '<div class="field"><label for="stName">Name</label><input type="text" id="stName" value="' +
       esc(existing ? existing.label : "") + '" placeholder="Send to printer"></div>' +
+    '<div class="field"><label>Icon</label><button type="button" class="step-icon-pick" id="stIconBtn"></button></div>' +
     '<div class="field"><label for="stType">Type</label><select class="sel" id="stType">' +
       '<option value="status"' + (isDate ? "" : " selected") + '>Progress slider</option>' +
       '<option value="date"' + (isDate ? " selected" : "") + ">Date</option></select></div>" +
@@ -1554,6 +1653,15 @@ function stepSheet(phaseId, existing, at){
       (existing ? "Save" : "Create step") + "</button></div>");
 
   sheet.querySelector("[data-close]").onclick = closeSheet;
+  let icon = existing ? (existing.icon || "") : "";
+  const iconBtn = sheet.querySelector("#stIconBtn");
+  const paintIcon = () => {
+    iconBtn.innerHTML = '<span class="ic-prev">' +
+      (icon ? iconGlyph(icon, 18) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
+      "</span><span>" + (icon ? iconLabel(icon) : "Choose an icon") + "</span>";
+  };
+  paintIcon();
+  iconBtn.onclick = () => iconSheet(icon, v => { icon = v; paintIcon(); });
   const typeSel = sheet.querySelector("#stType"), doneWrap = sheet.querySelector("#stDoneWrap");
   const syncType = () => { doneWrap.style.display = typeSel.value === "date" ? "none" : ""; };
   typeSel.onchange = syncType; syncType();
@@ -1565,9 +1673,9 @@ function stepSheet(phaseId, existing, at){
     const done = sheet.querySelector("#stDone").value.trim() || "Done";
     closeSheet();
     if (existing){
-      existing.label = label; existing.type = type; existing.done = done;
+      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon;
     } else {
-      const s = {id:slug(label), phase:phaseId, label, type, done};
+      const s = {id:slug(label), phase:phaseId, label, type, done, icon};
       let idx = typeof at === "number" ? at : -1;
       if (idx < 0){
         const list = stepsOf(phaseId);
@@ -1944,8 +2052,23 @@ function buildCard(ed, isFresh){
       row.className = "step type-" + s.type;
       row.dataset.id = s.id;
       row.dataset.flash = ed.id + "|" + s.id;   /* so a colleague's edit can glow here */
-      row.innerHTML = '<span class="step-label">' + esc(s.label) + "</span>";
+      const iconHTML = s.icon
+        ? (CAN_EDIT
+            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15) + "</button>"
+            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15) + "</span>")
+        : (CAN_EDIT
+            ? '<button type="button" class="step-icon empty" title="Add an icon">' +
+              '<span class="material-symbols-outlined" style="font-size:15px">add</span></button>'
+            : "");
+      row.innerHTML = '<span class="step-name">' + iconHTML + '<span class="step-label">' + esc(s.label) + "</span></span>";
       row.appendChild(gripFor(row));
+      if (CAN_EDIT){
+        const iconBtn = row.querySelector(".step-icon");
+        if (iconBtn) iconBtn.onclick = e => {
+          e.stopPropagation();
+          iconSheet(s.icon || "", v => { s.icon = v; save(); renderGrid(); });
+        };
+      }
       row.oncontextmenu = e => {
         if (e.target.closest("input,textarea") || !CAN_EDIT) return;
         e.preventDefault(); e.stopPropagation(); stepMenu(s, e.clientX, e.clientY);
@@ -1983,6 +2106,7 @@ function buildCard(ed, isFresh){
         rng.onchange = () => {
           const v = Number(rng.value);
           pushEntry(current, ed.id, s.id, {progress:v});
+          maybeAutoComplete(ed.id, s.id, v >= 100);
           if (v !== dragFrom)
             logHistory(ed.name + " · " + s.label + " · " + dragFrom + "% \u2192 " + v + "%",
               {month:current, edition:ed.id, step:s.id, edName:ed.name, stepLabel:s.label});
@@ -1996,6 +2120,7 @@ function buildCard(ed, isFresh){
           const was = cell(ed.id).dates[s.id] || "";
           cell(ed.id).dates[s.id] = iso;
           pushEntry(current, ed.id, s.id, {on_date:iso || null});
+          maybeAutoComplete(ed.id, s.id, !!iso);
           if (iso !== was)
             logHistory(ed.name + " \u00b7 " + s.label + " \u00b7 " + (iso ? shortDate(iso) : "cleared"),
               {month:current, edition:ed.id, step:s.id, edName:ed.name, stepLabel:s.label});
@@ -2008,6 +2133,26 @@ function buildCard(ed, isFresh){
       cb.type = "button"; cb.className = "cmt"; cb.innerHTML = CMT;
       cb.setAttribute("aria-label", "Comment on " + s.label);
       ctrls.appendChild(cb);
+
+      const asg = document.createElement("button");
+      asg.type = "button"; asg.className = "asg";
+      if (!CAN_EDIT) asg.disabled = true;
+      const paintAsg = () => {
+        const a = (cell(ed.id).assignee || {})[s.id];
+        const who = a && a.userId ? whoIs(a.userId, "") : null;
+        asg.classList.toggle("empty", !who);
+        asg.innerHTML = who ? avatarOf(who, 24)
+          : '<span class="material-symbols-outlined" style="font-size:14px">person_add</span>';
+        asg.title = who ? "Assigned to " + (who.name || "someone") + (CAN_EDIT ? " · click to change" : "")
+          : (CAN_EDIT ? "Assign someone" : "Nobody assigned");
+      };
+      paintAsg();
+      asg.onclick = e => {
+        e.stopPropagation();
+        const r = asg.getBoundingClientRect();
+        assignMenu(r.right, r.bottom + 6, ed.id, s.id, paintAsg);
+      };
+      ctrls.appendChild(asg);
       row.appendChild(ctrls);
 
       const nw = document.createElement("div");
@@ -2139,7 +2284,84 @@ document.addEventListener("keydown", e => {
   closeDP(); closeCtx(); closeTree();
   if (!scrim2.hidden) closeConfirm();
   else if (!scrim.hidden) closeSheet();
+  else if (!pageEl.hidden) closePage();
 });
+
+/* ============ full-page overlays: tasks, team ============ */
+const pageEl = document.createElement("div");
+pageEl.className = "pageov"; pageEl.hidden = true;
+pageEl.setAttribute("role", "dialog"); pageEl.setAttribute("aria-modal", "true");
+document.body.appendChild(pageEl);
+let pageRedraw = null;   /* the open page's own draw function, re-run after every live reload */
+function closePage(){ pageEl.hidden = true; pageEl.innerHTML = ""; pageRedraw = null; }
+function openPage(title, draw){
+  closeCtx(); closeTree();
+  pageEl.innerHTML = '<div class="pageov-head"><button type="button" class="pageov-back" id="pgBack">' + ARR_L +
+    "</button><h2></h2></div>" + '<div class="pageov-body" id="pgBody"></div>';
+  pageEl.querySelector("h2").textContent = title;
+  pageEl.hidden = false;
+  pageEl.querySelector("#pgBack").onclick = closePage;
+  pageRedraw = draw;
+  draw(pageEl.querySelector("#pgBody"));
+  return pageEl;
+}
+function underConstruction(name){
+  closeCtx();
+  const sheet = openSheet("<h3>" + esc(name) + "</h3>" +
+    '<p class="hint">This section is under construction \u2014 nothing lives here yet.</p>' +
+    '<div class="actions"><button type="button" class="btn primary" data-close>OK</button></div>');
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+}
+function brandMenu(x, y){
+  closeCtx();
+  openCtx(x, y, [
+    {icon:I_GRID, label:"Local Pages"},
+    {icon:I_MAG, label:"Magazines", fn:() => underConstruction("Magazines")},
+    {icon:I_DESIGN, label:"Graphic Design", fn:() => underConstruction("Graphic Design")},
+    {sep:true},
+    {icon:I_TEAM, label:"Team", fn:teamPage}
+  ]);
+}
+function teamPage(){
+  openPage("Team", body => {
+    body.innerHTML = '<p class="hint">Everyone with an account. Open someone to see what\'s assigned ' +
+      'to them, in real time \u2014 any full-access teammate can edit it, same as your own.</p>' +
+      '<div id="teamList"></div>';
+    const list = body.querySelector("#teamList");
+    list.innerHTML = PROFILES.map((p, i) => {
+      const nm = (p.name || p.email || "").trim();
+      const me = ME && p.id === ME.id;
+      return '<button type="button" class="pp-row team-row" data-i="' + i + '">' + avatarHTML(nm, 30) +
+        "<div><div class='pp-name'>" + esc(nm) + (me ? " <span class='pp-sub'>\u00b7 you</span>" : "") + "</div>" +
+        "<div class='pp-sub'>" + esc(p.email || "") + "</div></div>" +
+        '<span class="chev">' + CHEV + "</span></button>";
+    }).join("");
+    list.querySelectorAll("[data-i]").forEach(b => {
+      b.onclick = () => { const p = PROFILES[+b.dataset.i]; tasksPage(p.id, (p.name || p.email || "").trim()); };
+    });
+  });
+}
+function tasksPage(userId, name){
+  openPage((name || "Their") + "\u2019s tasks", body => {
+    const list = myTasks(userId);
+    body.innerHTML =
+      '<p class="hint">Every step ' + esc(name || "they") + ' has ever been assigned, most recent month first. ' +
+      "The tick follows the step itself \u2014 anyone can finish it. The date is just when this one was wrapped up, " +
+      "and any full-access teammate can correct it." + "</p>" +
+      '<div class="task-list">' + taskRowsHTML(list, true) + "</div>";
+    wireTaskRows(body, list, closePage);
+    body.querySelectorAll(".task-cal[data-cal]").forEach(host => {
+      const t = list[+host.dataset.cal];
+      const btn = dateButton(() => t.completedAt || "", iso => {
+        t.completedAt = iso;
+        const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
+        if (c && c.assignee && c.assignee[t.stepId]) c.assignee[t.stepId].completedAt = iso;
+        pushAssignment(t.monthId, t.edId, t.stepId, userId, iso || null);
+      });
+      host.appendChild(btn);
+    });
+  });
+}
 function showErr(sheet, msg){
   let e = sheet.querySelector(".err");
   if (!e){ e = document.createElement("p"); e.className = "err"; sheet.querySelector(".actions").before(e); }
@@ -2554,6 +2776,13 @@ async function historySheet(){
       '</span><span class="t">' + esc(relTime(r.at)) + "</span></div>";
   }).join("");
 }
+async function doSignOut(){
+  clearInterval(beatTimer);
+  if (!presenceOff && ME) await sb.from("presence").delete().eq("user_id", ME.id);
+  if (LIVE) sb.removeChannel(LIVE);
+  await sb.auth.signOut();
+  location.reload();
+}
 function openCog(){
   const r = document.getElementById("cog").getBoundingClientRect();
   const eds = currentEditions();
@@ -2576,17 +2805,19 @@ function openCog(){
     items.push({icon:I_DROP, label:"Reset phase colours", fn:resetColors});
     items.push({icon:I_GRID, label:"Reset phases and steps", fn:resetStructure});
   }
+  items.push({sep:true});
+  items.push({icon:I_SIGNOUT, label:"Sign out", danger:true, fn:doSignOut});
   openCtx(r.right - 250, r.bottom + 8, items);
 }
 
 /* ============ boot ============ */
-function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); }
+function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); if (pageRedraw) pageRedraw(pageEl.querySelector("#pgBody")); }
 
 
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v11 · 4 Sep";
+const APP_VERSION = "v12 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2617,10 +2848,10 @@ function gateMsg(text, kind){
 async function loadAll(){
   setLive("busy");
   const q = t => sb.from(t).select("*");
-  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles] =
+  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments] =
     await Promise.all(["folders","months","editions","month_editions","phases","steps",
-                       "entries","comments","profiles"].map(q));
-  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles]
+                       "entries","comments","profiles","assignments"].map(q));
+  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments]
     .find(r => r.error);
   if (bad){ setLive("off"); throw bad.error; }
 
@@ -2633,7 +2864,7 @@ async function loadAll(){
     })),
     phases: phases.data.sort(bySort).map(p => ({id:p.id, name:p.name, color:p.color || ""})),
     steps: steps.data.sort(bySort).map(s => ({
-      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done"
+      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || ""
     })),
     issues: [], data: {},
     me: {name:(ME && ME.name) || ""},
@@ -2658,7 +2889,7 @@ async function loadAll(){
   db.issues.forEach(m => { db.data[m.id] = {}; });
 
   const blankCell = () => {
-    const c = {status:{}, dates:{}, notes:{}, note:[]};
+    const c = {status:{}, dates:{}, notes:{}, note:[], assignee:{}};
     db.steps.forEach(s => { if (s.type === "status") c.status[s.id] = 0; else c.dates[s.id] = ""; c.notes[s.id] = []; });
     return c;
   };
@@ -2669,6 +2900,11 @@ async function loadAll(){
     if (!cell) return;
     if (r.progress !== null && r.progress !== undefined) cell.status[r.step_id] = r.progress;
     if (r.on_date) cell.dates[r.step_id] = r.on_date;
+  });
+  assignments.data.forEach(r => {
+    const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
+    if (!cell || !r.user_id) return;
+    cell.assignee[r.step_id] = {userId:r.user_id, completedAt:r.completed_at || ""};
   });
   comments.data.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(r => {
     const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
@@ -2708,7 +2944,7 @@ async function pushStructure(){
       flag:e.flag || null, std:!!e.std, sort:i})));
     await sb.from("phases").upsert(DB.phases.map((p, i) => ({id:p.id, name:p.name, color:p.color || "", sort:i})));
     await sb.from("steps").upsert(DB.steps.map((s, i) => ({
-      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", sort:i})));
+      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "", sort:i})));
     await sb.from("months").upsert(DB.issues.map((m, i) => ({
       id:m.id, folder_id:m.folder, label:m.label, submitted:m.submitted || null,
       color:m.color || "", sort:i})));
@@ -2748,6 +2984,69 @@ async function pushEntry(monthId, edId, stepId, patch){
                              updated_at:new Date().toISOString(), updated_by:ME && ME.id}, patch);
   const {error} = await sb.from("entries").upsert(row, {onConflict:"month_id,edition_id,step_id"});
   if (error){ console.error(error); setLive("off"); }
+}
+
+/* ---------- assignments ----------
+   Who is on the hook for a step, in a given month x edition. A separate
+   row from `entries` on purpose: everyone still shares one done/not-done
+   state for the step itself, this just tags a face onto it. */
+async function pushAssignment(monthId, edId, stepId, userId, completedAt){
+  if (!CAN_EDIT) return;
+  if (!userId){
+    const {error} = await sb.from("assignments").delete()
+      .eq("month_id", monthId).eq("edition_id", edId).eq("step_id", stepId);
+    if (error) console.error(error);
+    return;
+  }
+  const row = {month_id:monthId, edition_id:edId, step_id:stepId, user_id:userId,
+               completed_at:completedAt || null, updated_at:new Date().toISOString(), updated_by:ME && ME.id};
+  const {error} = await sb.from("assignments").upsert(row, {onConflict:"month_id,edition_id,step_id"});
+  if (error){ console.error(error); setLive("off"); }
+}
+/* The first time a step you're assigned to lands on "done", stamp today
+   as when you wrapped it up. It only fires once -- after that the date
+   is yours to correct from the tasks page, not something we keep
+   silently overwriting every time the step is touched again. */
+function maybeAutoComplete(edId, stepId, isDone){
+  if (!isDone || !CAN_EDIT) return;
+  const c = cell(edId);
+  const a = c.assignee && c.assignee[stepId];
+  if (!a || !a.userId || a.completedAt) return;
+  a.completedAt = todayISO();
+  pushAssignment(current, edId, stepId, a.userId, a.completedAt);
+}
+function setAssignee(edId, stepId, userId, onDone){
+  const c = cell(edId);
+  if (!c.assignee) c.assignee = {};
+  if (!userId){
+    delete c.assignee[stepId];
+    pushAssignment(current, edId, stepId, null, null);
+  } else {
+    const prev = c.assignee[stepId];
+    c.assignee[stepId] = {userId, completedAt: prev ? prev.completedAt : ""};
+    pushAssignment(current, edId, stepId, userId, c.assignee[stepId].completedAt);
+  }
+  if (onDone) onDone();
+}
+/* The little "who's on this" menu that opens from the avatar next to a
+   step's comment button -- and, unassigned, from the empty placeholder. */
+function assignMenu(x, y, edId, stepId, onDone){
+  closeCtx();
+  const cur = (cell(edId).assignee || {})[stepId];
+  const items = [];
+  if (cur && cur.userId){
+    items.push({icon:XMARK, label:"Unassign", danger:true, fn:() => setAssignee(edId, stepId, null, onDone)});
+    items.push({sep:true});
+  }
+  PROFILES.forEach(p => {
+    const nm = (p.name || p.email || "").trim();
+    if (!nm) return;
+    const who = {name:nm, avatar:p.avatar || "", color:PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length]};
+    items.push({icon:avatarOf(who, 22), label:nm + (ME && p.id === ME.id ? " · you" : ""),
+                fn:() => setAssignee(edId, stepId, p.id, onDone)});
+  });
+  if (!items.length) items.push({label:"No accounts yet"});
+  openCtx(x, y, items);
 }
 /* Returns null when the comment is safely stored, or a plain-English
    reason when it is not. Somebody's words must never disappear just
@@ -2815,7 +3114,8 @@ function scheduleReload(){
 function mine(payload){
   const row = payload.new || {};
   if (!ME) return false;
-  if (payload.table === "entries")  return row.updated_by === ME.id;
+  if (payload.table === "entries")     return row.updated_by === ME.id;
+  if (payload.table === "assignments") return row.updated_by === ME.id;
   if (payload.table === "comments") return row.author === ME.id;
   /* structural tables carry no author, so lean on our own push clock */
   if (["folders","months","editions","month_editions","phases","steps"].indexOf(payload.table) >= 0)
@@ -2898,8 +3198,26 @@ async function restoreStructure(snap){
   await pushStructure();
   await pushEveryCell();
   await pushEveryComment();
+  await pushEveryAssignment();
 }
 /* re-send every value we hold, for rows that may have cascaded away */
+async function pushEveryAssignment(){
+  const rows = [];
+  DB.issues.forEach(m => (m.editions || []).forEach(eid => {
+    const c = DB.data[m.id] && DB.data[m.id][eid];
+    if (!c || !c.assignee) return;
+    Object.keys(c.assignee).forEach(stepId => {
+      const a = c.assignee[stepId];
+      if (!a || !a.userId) return;
+      rows.push({month_id:m.id, edition_id:eid, step_id:stepId, user_id:a.userId,
+                 completed_at:a.completedAt || null, updated_by:ME && ME.id});
+    });
+  }));
+  for (let i = 0; i < rows.length; i += 200){
+    const {error} = await sb.from("assignments").upsert(rows.slice(i, i + 200));
+    if (error){ console.error(error); break; }
+  }
+}
 async function pushEveryCell(){
   const rows = [];
   DB.issues.forEach(m => (m.editions || []).forEach(eid => {
@@ -3029,15 +3347,16 @@ function paintBell(){
 }
 
 /* Where a notification points, in words: Dutch · Prep · Articles reminder */
-function noteWhere(n){
-  const m  = DB.issues.find(i => i.id === n.month_id);
+function stepWhere(monthId, edId, stepId){
+  const m  = DB.issues.find(i => i.id === monthId);
   const f  = m && DB.folders.find(x => x.id === m.folder);
-  const ed = DB.editions.find(e => e.id === n.edition_id);
-  const st = DB.steps.find(x => x.id === n.step_id);
+  const ed = DB.editions.find(e => e.id === edId);
+  const st = DB.steps.find(x => x.id === stepId);
   const ph = st && DB.phases.find(x => x.id === st.phase);
   return [f && f.name, m && m.label, ed && ed.name, ph && ph.name, st && st.label]
     .filter(Boolean).join(" · ");
 }
+function noteWhere(n){ return stepWhere(n.month_id, n.edition_id, n.step_id); }
 
 function openBell(){
   closeCtx();
@@ -3083,38 +3402,91 @@ function openBell(){
   };
 }
 
-/* Open the month, the language and the phase the notification points at,
-   then scroll the step into view and glow it. */
+/* Open the month, the language and the phase a step lives in, then
+   scroll it into view and glow it. Shared by notifications, My tasks,
+   View all tasks and Team. */
+async function goToStep(monthId, edId, stepId){
+  const step = DB.steps.find(x => x.id === stepId);
+  if (monthId && DB.issues.some(i => i.id === monthId)) current = monthId;
+  if (edId) open.add(edId);
+  if (step && edId) openPhase.add(edId + ":" + step.phase);
+  renderAll();
+
+  /* let the layout settle, then find the row */
+  await new Promise(r => setTimeout(r, 60));
+  const el = document.querySelector('[data-flash="' + edId + "|" + stepId + '"]');
+  if (el){
+    scrollTo_(el);
+    el.classList.add("just-touched");
+    setTimeout(() => el.classList.remove("just-touched"), 2900);
+  } else {
+    const card = document.querySelector('.card[data-ed="' + edId + '"]');
+    scrollTo_(card);
+  }
+  return el;
+}
 async function goToNote(n){
   if (!n.read_at){
     n.read_at = new Date().toISOString();
     paintBell();
     sb.from("notifications").update({read_at:n.read_at}).eq("id", n.id);
   }
-  const step = DB.steps.find(x => x.id === n.step_id);
-  if (n.month_id && DB.issues.some(i => i.id === n.month_id)) current = n.month_id;
-  if (n.edition_id) open.add(n.edition_id);
-  if (step && n.edition_id) openPhase.add(n.edition_id + ":" + step.phase);
-  renderAll();
-
-  /* let the layout settle, then find the row */
-  await new Promise(r => setTimeout(r, 60));
-  const sel = '[data-flash="' + n.edition_id + "|" + n.step_id + '"]';
-  const el = document.querySelector(sel);
-  if (el){
-    scrollTo_(el);
-    el.classList.add("just-touched");
-    setTimeout(() => el.classList.remove("just-touched"), 2900);
-    /* and highlight the actual comment, if it is on screen */
-    const c = el.querySelector('[data-cid="' + n.comment_id + '"]');
-    if (c){
-      c.classList.add("just-touched");
-      setTimeout(() => c.classList.remove("just-touched"), 2900);
-    }
-  } else {
-    const card = document.querySelector('.card[data-ed="' + n.edition_id + '"]');
-    scrollTo_(card);
+  const el = await goToStep(n.month_id, n.edition_id, n.step_id);
+  /* and highlight the actual comment, if it is on screen */
+  const c = el && el.querySelector('[data-cid="' + n.comment_id + '"]');
+  if (c){
+    c.classList.add("just-touched");
+    setTimeout(() => c.classList.remove("just-touched"), 2900);
   }
+}
+
+/* ---------- assigned work: My tasks / View all tasks / Team ---------- */
+/* Every step, for every month there has ever been, that `userId` is
+   assigned to. DB.data already holds every month (loadAll fetches the
+   whole table, not just the current one), so this needs no extra trip
+   to the database. */
+function myTasks(userId){
+  if (!userId) return [];
+  const order = {};
+  DB.issues.forEach((m, i) => { order[m.id] = i; });
+  const out = [];
+  DB.issues.forEach(m => {
+    (m.editions || []).forEach(edId => {
+      const c = DB.data[m.id] && DB.data[m.id][edId];
+      if (!c || !c.assignee) return;
+      Object.keys(c.assignee).forEach(stepId => {
+        const a = c.assignee[stepId];
+        if (!a || a.userId !== userId) return;
+        const st = DB.steps.find(x => x.id === stepId);
+        if (!st) return;
+        const done = st.type === "status" ? (c.status[stepId] || 0) >= 100 : !!c.dates[stepId];
+        out.push({monthId:m.id, edId, stepId, done, completedAt:a.completedAt || ""});
+      });
+    });
+  });
+  out.sort((x, y) => (x.done !== y.done ? (x.done ? 1 : -1) : order[y.monthId] - order[x.monthId]));
+  return out;
+}
+function taskRowsHTML(list, withDate){
+  if (!list.length) return '<p class="task-empty">Nothing assigned yet.</p>';
+  return list.map((t, i) => {
+    const st = DB.steps.find(x => x.id === t.stepId);
+    const label = st ? st.label : t.stepId;
+    const icon = st && st.icon ? iconGlyph(st.icon, 14)
+      : '<span class="material-symbols-outlined" style="font-size:14px">task_alt</span>';
+    return '<div class="task-row' + (withDate ? ' wide' : "") + '" data-i="' + i + '">' +
+      '<button type="button" class="task-nav"><span class="task-icon">' + icon + "</span>" +
+      '<span class="task-mid"><b>' + esc(label) + "</b><span>" + esc(stepWhere(t.monthId, t.edId, t.stepId)) + "</span></span>" +
+      '<span class="task-pill' + (t.done ? " done" : "") + '">' + (t.done ? "Done" : "In process") + "</span></button>" +
+      (withDate ? '<span class="task-cal" data-cal="' + i + '"></span>' : "") +
+      "</div>";
+  }).join("");
+}
+function wireTaskRows(container, list, onNav){
+  container.querySelectorAll(".task-row .task-nav").forEach(b => {
+    const row = b.closest(".task-row");
+    b.onclick = () => { const t = list[+row.dataset.i]; if (onNav) onNav(); goToStep(t.monthId, t.edId, t.stepId); };
+  });
 }
 
 /* ---------- who else is here ----------
@@ -3253,13 +3625,11 @@ function profileSheet(){
       '<p class="pf-hint" id="pfHint"></p>' +
     "</div>" +
     '<div class="field"><label for="pfName">Display name</label>' +
-      '<input type="text" id="pfName" maxlength="40"></div>' +
-    '<p class="pf-hint" style="margin-top:-4px;text-align:left">' +
-      "This is the name on your comments and in the history.</p>" +
-    '<div class="actions">' +
-      '<button type="button" class="btn ghostbtn" id="pfOut">Sign out</button>' +
-      '<button type="button" class="btn primary" id="pfSave">Save</button>' +
-    "</div>");
+      '<div class="pf-name-row"><input type="text" id="pfName" maxlength="40">' +
+      '<button type="button" class="btn primary" id="pfSave">Save</button></div></div>' +
+    '<p class="pf-sec">My tasks</p>' +
+    '<div class="pf-tasks" id="pfTasks"></div>' +
+    '<button type="button" class="btn ghostbtn pf-viewall" id="pfViewAll">View all tasks</button>');
 
   const avEl   = sheet.querySelector("#pfAv");
   const hintEl = sheet.querySelector("#pfHint");
@@ -3296,13 +3666,11 @@ function profileSheet(){
     file.value = "";
   };
 
-  sheet.querySelector("#pfOut").onclick = async () => {
-    clearInterval(beatTimer);
-    if (!presenceOff && ME) await sb.from("presence").delete().eq("user_id", ME.id);
-    if (LIVE) sb.removeChannel(LIVE);
-    await sb.auth.signOut();
-    location.reload();
-  };
+  const myList = myTasks(ME.id);
+  sheet.querySelector("#pfTasks").innerHTML = taskRowsHTML(myList);
+  wireTaskRows(sheet.querySelector("#pfTasks"), myList, closeSheet);
+  sheet.querySelector("#pfViewAll").onclick = () => { closeSheet(); tasksPage(ME.id, ME.name || "You"); };
+
   sheet.querySelector("#pfSave").onclick = async () => {
     const nm = nameEl.value.trim();
     if (!nm){ hintEl.textContent = "A name, please."; return; }
@@ -3555,6 +3923,8 @@ function wireGate(){
   document.getElementById("gateVer").textContent = APP_VERSION;
   document.getElementById("cog").innerHTML = GEAR;
   document.getElementById("cog").onclick = e => { e.stopPropagation(); openCog(); };
+  const brandEl = document.querySelector(".brand");
+  if (brandEl) brandEl.onclick = e => { e.stopPropagation(); const r = brandEl.getBoundingClientRect(); brandMenu(r.left, r.bottom + 8); };
   const bellEl = document.getElementById("bell");
   bellEl.insertAdjacentHTML("afterbegin", BELL);
   bellEl.onclick = e => { e.stopPropagation(); openBell(); };
