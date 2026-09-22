@@ -566,10 +566,12 @@ body.dragging-now *{cursor:grabbing !important}
 
 /* who else has this open */
 .presence{display:flex;align-items:center;padding-right:2px}
-.presence .av{width:26px;height:26px;font-size:11px;margin-left:-7px;
-              box-shadow:0 0 0 2.5px var(--bg);transition:transform .2s ease;cursor:default}
+.presence .av{position:relative;width:26px;height:26px;font-size:11px;margin-left:-7px;
+              box-shadow:0 0 0 2.5px var(--bg);transition:transform .2s ease;cursor:pointer}
 .presence .av:first-child{margin-left:0}
 .presence .av:hover{transform:translateY(-2px)}
+.av-dot{position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;border-radius:50%;
+  background:var(--f-done);box-shadow:0 0 0 2.5px var(--bg);pointer-events:none}
 
 /* somebody else just changed this */
 @keyframes touched{0%{background:var(--acc-soft)}100%{background:transparent}}
@@ -2123,6 +2125,7 @@ function commentBox(getArr, placeholder, onChange, ctx){
       if (parent && entry.parent) notifyReply(parent, entry, ctx);
       else if (parent && !entry.parent)
         toast("Saved as a normal comment — replies need migrate3.sql run in Supabase.");
+      notifyAssignees(entry, ctx, parent && parent.byId);
     });
   };
   btn.onclick = post;
@@ -2386,7 +2389,6 @@ function buildCard(ed, isFresh){
         paint(c.status[s.id] || 0);
         rng.oninput = () => {
           const v = Number(rng.value);
-          if (v !== (cell(ed.id).status[s.id] || 0)) playSound("tick");
           cell(ed.id).status[s.id] = v;
           paint(v); refreshEdition(ed, true); renderSummary();
         };
@@ -2571,7 +2573,7 @@ function refreshEdition(ed, silent){
 /* ============ sheets / menus ============ */
 const scrim = document.getElementById("scrim");
 const scrim2 = document.getElementById("scrim2");
-function closeSheet(){ if (!scrim.hidden) playSound("close"); scrim.hidden = true; scrim.innerHTML = ""; }
+function closeSheet(){ scrim.hidden = true; scrim.innerHTML = ""; }
 function closeConfirm(){ scrim2.hidden = true; scrim2.innerHTML = ""; }
 scrim.addEventListener("click", e => { if (e.target === scrim) closeSheet(); });
 scrim2.addEventListener("click", e => { if (e.target === scrim2) closeConfirm(); });
@@ -2606,6 +2608,13 @@ function goSection(name){
   closeCtx(); closeTree();
   renderSection();
   window.scrollTo(0, 0);
+}
+/* Click a face in the "who's here" row: jump to Team, filtered down to
+   that one person's schedule. */
+function goToPerson(uid){
+  if (!uid) return;
+  calFilterUser = uid;
+  goSection("team");
 }
 function brandMenu(x, y){
   closeCtx();
@@ -2671,7 +2680,7 @@ function renderExtraSection(container){
       e.preventDefault();
       openCtx(e.clientX, e.clientY, [
         {icon:CHECK, label:t.status === "done" ? "Mark as to do" : "Mark as done",
-         fn:() => { t.status = t.status === "done" ? "todo" : "done"; pushTask(t); playSound("complete"); renderSection(); }},
+         fn:() => { const wasDone = t.status === "done"; t.status = wasDone ? "todo" : "done"; pushTask(t); if (!wasDone) playSound("complete"); renderSection(); }},
         {sep:true},
         {icon:XMARK, label:"Delete task", danger:true, fn:() => deleteTask(t)}
       ]);
@@ -2740,7 +2749,7 @@ function taskSheet(existing){
       b.onclick = () => {
         const id = b.dataset.u;
         if (selAssignees.has(id)) selAssignees.delete(id); else selAssignees.add(id);
-        playSound("select"); paintAsgPick();
+        paintAsgPick();
       };
     });
   };
@@ -2756,7 +2765,7 @@ function taskSheet(existing){
     statusBtn.classList.toggle("primary", status === "done");
   };
   paintStatus();
-  statusBtn.onclick = () => { status = status === "done" ? "todo" : "done"; paintStatus(); playSound(status === "done" ? "complete" : "select"); };
+  statusBtn.onclick = () => { const goingDone = status !== "done"; status = goingDone ? "done" : "todo"; paintStatus(); if (goingDone) playSound("complete"); };
 
   if (!isNew){
     const cbox = commentBox(() => (DB.taskComments[t.id] = DB.taskComments[t.id] || []),
@@ -2780,7 +2789,7 @@ function taskSheet(existing){
     pushTask(t);
     t.assignees.filter(id => !prevAssignees.has(id)).forEach(id => pushTaskAssignee(t.id, id));
     Array.from(prevAssignees).filter(id => !selAssignees.has(id)).forEach(id => dropTaskAssignee(t.id, id));
-    playSound(isNew ? "complete" : "select");
+    playSound("save");
     renderSection();
   };
   sheet.querySelector("#txSave").onclick = commit;
@@ -2897,18 +2906,17 @@ function renderReportsSection(container){
     '<div class="rep-list">' + (perUser.length ? perUser.map(repUserHTML).join("") : '<p class="sect-empty">No accounts yet.</p>') + "</div>";
 
   container.querySelectorAll(".rep-mode").forEach(b => {
-    b.onclick = () => { if (reportMode === b.dataset.m) return; reportMode = b.dataset.m; reportOffset = 0; playSound("select"); renderSection(); };
+    b.onclick = () => { if (reportMode === b.dataset.m) return; reportMode = b.dataset.m; reportOffset = 0; renderSection(); };
   });
-  container.querySelector("#repPrev").onclick = () => { reportOffset--; playSound("select"); renderSection(); };
-  container.querySelector("#repNext").onclick = () => { reportOffset++; playSound("select"); renderSection(); };
+  container.querySelector("#repPrev").onclick = () => { reportOffset--; renderSection(); };
+  container.querySelector("#repNext").onclick = () => { reportOffset++; renderSection(); };
   const todayBtn = container.querySelector("#repToday");
-  if (todayBtn) todayBtn.onclick = () => { reportOffset = 0; playSound("select"); renderSection(); };
+  if (todayBtn) todayBtn.onclick = () => { reportOffset = 0; renderSection(); };
   container.querySelectorAll(".rep-card").forEach(card => {
     const uid = card.dataset.u;
     const u = perUser.find(x => x.p.id === uid);
     card.querySelector(".rep-head").onclick = () => {
       reportOpenUser = reportOpenUser === uid ? null : uid;
-      playSound(reportOpenUser ? "open" : "close");
       renderSection();
     };
     card.querySelectorAll(".rep-task[data-i]").forEach(b => {
@@ -3043,14 +3051,12 @@ function assignmentCalSheet(it){
     const endTime = sheet.querySelector("#acEnd").value || "";
     closeSheet();
     calCommitItem(it, calDate, startTime, endTime);
-    playSound("select");
     renderSection();
   };
   const unschedBtn = sheet.querySelector("#acUnschedule");
   if (unschedBtn) unschedBtn.onclick = () => {
     closeSheet();
     calCommitItem(it, "", "", "");
-    playSound("close");
     renderSection();
   };
 }
@@ -3081,7 +3087,7 @@ function startCalMove(e, el, it){
     if (!moved) return;
     let newTop = calSnap(startTop + dy);
     newTop = Math.max(0, Math.min(newTop, total - height));
-    if (newTop !== lastTop){ lastTop = newTop; playSound("drag"); }
+    if (newTop !== lastTop) lastTop = newTop;
     el.style.top = newTop + "px";
     const under = cols.find(c => { const r = c.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX < r.right; });
     if (under && under !== targetCol){ targetCol = under; targetCol.appendChild(el); }
@@ -3093,7 +3099,6 @@ function startCalMove(e, el, it){
     const top = parseFloat(el.style.top);
     const startTime = calYToTime(top), endTime = calYToTime(top + height);
     calCommitItem(it, targetCol.dataset.date, startTime, endTime);
-    playSound("select");
     renderSection();
   };
   document.addEventListener("mousemove", onMove);
@@ -3109,7 +3114,7 @@ function startCalResize(e, el, it){
     const dy = ev.clientY - startY;
     let newH = calSnap(startHeight + dy);
     newH = Math.max(24, Math.min(newH, total - top));
-    if (newH !== lastH){ lastH = newH; playSound("drag"); }
+    if (newH !== lastH) lastH = newH;
     el.style.height = newH + "px";
   };
   const onUp = () => {
@@ -3117,7 +3122,6 @@ function startCalResize(e, el, it){
     document.removeEventListener("mouseup", onUp);
     const height = parseFloat(el.style.height);
     calCommitItem(it, it.calDate, calYToTime(top), calYToTime(top + height));
-    playSound("select");
     renderSection();
   };
   document.addEventListener("mousemove", onMove);
@@ -3210,10 +3214,10 @@ function renderCalendarSection(container){
       .forEach(it => col.appendChild(calBlockEl(it)));
   });
 
-  container.querySelector("#calPrev").onclick = () => { calWeekStart = addDays(calWeekStart, -7); playSound("select"); renderSection(); };
-  container.querySelector("#calNext").onclick = () => { calWeekStart = addDays(calWeekStart, 7); playSound("select"); renderSection(); };
+  container.querySelector("#calPrev").onclick = () => { calWeekStart = addDays(calWeekStart, -7); renderSection(); };
+  container.querySelector("#calNext").onclick = () => { calWeekStart = addDays(calWeekStart, 7); renderSection(); };
   const todayBtn = container.querySelector("#calToday");
-  if (todayBtn) todayBtn.onclick = () => { calWeekStart = isoOf(mondayOf(new Date())); playSound("select"); renderSection(); };
+  if (todayBtn) todayBtn.onclick = () => { calWeekStart = isoOf(mondayOf(new Date())); renderSection(); };
   container.querySelector("#calMonthBtn").onclick = e => {
     openDP(e.currentTarget, calWeekStart, iso => {
       if (!iso) return;
@@ -3287,7 +3291,6 @@ function showErr(sheet, msg){
 function openSheet(html){
   scrim.innerHTML = '<div class="sheet" role="dialog" aria-modal="true">' + html + "</div>";
   scrim.hidden = false;
-  playSound("open");
   return scrim.querySelector(".sheet");
 }
 
@@ -3295,9 +3298,8 @@ const ctxEl = document.createElement("div");
 ctxEl.className = "ctx"; ctxEl.hidden = true;
 ctxEl.setAttribute("role", "menu");
 document.body.appendChild(ctxEl);
-function closeCtx(){ if (!ctxEl.hidden){ ctxEl.hidden = true; ctxEl.innerHTML = ""; playSound("close"); } }
+function closeCtx(){ if (!ctxEl.hidden){ ctxEl.hidden = true; ctxEl.innerHTML = ""; } }
 function openCtx(x, y, items){
-  playSound("open");
   ctxEl.innerHTML = items.map((it, i) => {
     if (it.sep) return '<div class="sep"></div>';
     if (it.swatches) return '<div class="sw-row" data-i="' + i + '">' + COLORS.map(c =>
@@ -3313,7 +3315,7 @@ function openCtx(x, y, items){
   ctxEl.style.left = Math.max(10, Math.min(x, window.innerWidth - W - 10)) + "px";
   ctxEl.style.top  = Math.max(10, Math.min(y, window.innerHeight - H - 10)) + "px";
   ctxEl.querySelectorAll("button[data-i]").forEach(b => {
-    b.onclick = e => { e.stopPropagation(); const fn = items[+b.dataset.i].fn; playSound("select"); closeCtx(); if (fn) requestAnimationFrame(fn); };
+    b.onclick = e => { e.stopPropagation(); const fn = items[+b.dataset.i].fn; closeCtx(); if (fn) requestAnimationFrame(fn); };
   });
   ctxEl.querySelectorAll(".sw-row").forEach(row => {
     const it = items[+row.dataset.i];
@@ -3722,14 +3724,13 @@ function actx(){
   try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ _actx = null; }
   return _actx;
 }
+/* Only three things make a sound, on purpose: finishing something,
+   saving a task, and a notification landing. Everything else in the
+   app (opening menus, dragging, navigating) stays silent. */
 const SOUND_TONES = {
-  open:     [660, 784, 880],
-  close:    [520, 466, 392],
   complete: [523, 659, 784, 988],
-  tick:     [1046, 1180, 1320, 1400],
-  select:   [740, 830, 880],
-  drag:     [660, 700, 740],
-  delete:   [392, 349, 311]
+  save:     [660, 784, 880],
+  notify:   [740, 880, 988, 1046]
 };
 function playSound(kind){
   const vol = soundVolume();
@@ -3737,16 +3738,16 @@ function playSound(kind){
   const ctx = actx();
   if (!ctx) return;
   if (ctx.state === "suspended") ctx.resume();
-  const freqs = SOUND_TONES[kind] || SOUND_TONES.select;
+  const freqs = SOUND_TONES[kind] || SOUND_TONES.save;
   const f = freqs[Math.floor(Math.random() * freqs.length)] * (0.97 + Math.random() * 0.06);
   const t0 = ctx.currentTime;
-  const dur = kind === "tick" || kind === "drag" ? 0.05 : kind === "complete" ? 0.18 : 0.13;
+  const dur = kind === "complete" ? 0.18 : 0.13;
   const osc = ctx.createOscillator(), gain = ctx.createGain();
   osc.type = kind === "complete" ? "triangle" : "sine";
   osc.frequency.setValueAtTime(f, t0);
   if (kind === "complete") osc.frequency.exponentialRampToValueAtTime(f * 1.5, t0 + 0.09);
-  if (kind === "close" || kind === "delete") osc.frequency.exponentialRampToValueAtTime(f * 0.8, t0 + dur);
-  const peak = (kind === "tick" || kind === "drag" ? 0.1 : 0.16) * vol;
+  if (kind === "notify") osc.frequency.exponentialRampToValueAtTime(f * 1.15, t0 + dur);
+  const peak = 0.16 * vol;
   gain.gain.setValueAtTime(0.0001, t0);
   gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.007);
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
@@ -3797,7 +3798,7 @@ function settingsSheet(){
 
   const themeSel = sheet.querySelector("#setTheme");
   themeSel.value = currentTheme();
-  themeSel.onchange = () => { applyTheme(themeSel.value); playSound("select"); };
+  themeSel.onchange = () => { applyTheme(themeSel.value); };
 
   const volEl = sheet.querySelector("#setVol"), volIcon = sheet.querySelector("#setVolIcon");
   volEl.value = String(Math.round(soundVolume() * 100));
@@ -3807,7 +3808,6 @@ function settingsSheet(){
   };
   paintVolIcon();
   volEl.oninput = () => { setSoundVolume(volEl.value / 100); paintVolIcon(); };
-  volEl.onchange = () => playSound("tick");
 }
 function openCog(){
   const r = document.getElementById("cog").getBoundingClientRect();
@@ -3846,7 +3846,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v19 · 22 Sep";
+const APP_VERSION = "v20 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -4126,7 +4126,6 @@ function assignMenu(x, y, edId, stepId, onDone){
   const list = (cell(edId).assignee || {})[stepId] || [];
   const ids = new Set(list.map(a => a.userId));
   const named = PROFILES.filter(p => (p.name || p.email || "").trim());
-  playSound("open");
   ctxEl.innerHTML = (named.length ? named.map(p => {
     const nm = (p.name || p.email || "").trim();
     const who = {name:nm, avatar:p.avatar || "", color:userColorHex(p)};
@@ -4143,7 +4142,6 @@ function assignMenu(x, y, edId, stepId, onDone){
   ctxEl.querySelectorAll("button[data-u]").forEach(b => {
     b.onclick = e => {
       e.stopPropagation();
-      playSound("select");
       toggleAssignee(edId, stepId, b.dataset.u, onDone);
       assignMenu(x, y, edId, stepId, onDone);   /* repaint checked state, stays open */
     };
@@ -4235,8 +4233,14 @@ function listen(){
       if (payload.table === "history") return;
       /* somebody arrived or left: just repaint the faces, don't reload */
       if (payload.table === "presence"){ readPresence(); return; }
-      /* a notification for me: light the dot, no need to reload the month */
-      if (payload.table === "notifications"){ loadNotes(); return; }
+      /* a notification for me: light the dot, no need to reload the month.
+         Only a brand-new one makes a sound -- marking one read echoes back
+         through this same channel and must stay silent. */
+      if (payload.table === "notifications"){
+        if (payload.eventType === "INSERT") playSound("notify");
+        loadNotes();
+        return;
+      }
       /* Somebody else moved something: glow it, so the change is seen
          rather than just silently appearing. Our own writes are skipped. */
       if (payload.table === "entries"){
@@ -4417,16 +4421,44 @@ let notesOff = false;    /* true once the table turns out to be missing */
 async function notifyReply(parent, entry, ctx){
   /* never tell somebody about their own reply */
   if (!parent.byId || !ME || parent.byId === ME.id || notesOff) return;
-  const ed = DB.editions.find(e => e.id === ctx.edition);
   const {error} = await sb.from("notifications").insert({
     user_id: parent.byId,
     actor: ME.id,
     actor_name: ME.name || "",
     kind: "reply",
-    month_id: ctx.month, edition_id: ctx.edition, step_id: ctx.step || null,
+    month_id: ctx.month || null, edition_id: ctx.edition || null, step_id: ctx.step || null,
+    task_id: ctx.task || null,
     comment_id: entry.id,
     preview: entry.text.slice(0, 180)
   });
+  if (error){
+    if (/does not exist|schema cache/i.test(error.message || "")) notesOff = true;
+    else console.error(error);
+  }
+}
+/* Everyone assigned to the step or task this comment landed on, other
+   than whoever just posted it and whoever already got a "reply" note
+   above, hears that something new showed up on their work. */
+async function notifyAssignees(entry, ctx, alreadyNotified){
+  if (!ME || notesOff) return;
+  let targets = [];
+  if (ctx.task){
+    const t = DB.tasks.find(x => x.id === ctx.task);
+    if (t) targets = t.assignees.slice();
+  } else if (ctx.step){
+    const cell = DB.data[ctx.month] && DB.data[ctx.month][ctx.edition];
+    const asg = cell && cell.assignee && cell.assignee[ctx.step];
+    if (asg) targets = asg.map(a => a.userId);
+  }
+  targets = Array.from(new Set(targets))
+    .filter(id => id && id !== ME.id && id !== alreadyNotified);
+  if (!targets.length) return;
+  const rows = targets.map(uid => ({
+    user_id: uid, actor: ME.id, actor_name: ME.name || "", kind: "comment",
+    month_id: ctx.month || null, edition_id: ctx.edition || null, step_id: ctx.step || null,
+    task_id: ctx.task || null, comment_id: entry.id, preview: entry.text.slice(0, 180)
+  }));
+  const {error} = await sb.from("notifications").insert(rows);
   if (error){
     if (/does not exist|schema cache/i.test(error.message || "")) notesOff = true;
     else console.error(error);
@@ -4465,7 +4497,13 @@ function stepWhere(monthId, edId, stepId){
   return [f && f.name, m && m.label, ed && ed.name, ph && ph.name, st && st.label]
     .filter(Boolean).join(" · ");
 }
-function noteWhere(n){ return stepWhere(n.month_id, n.edition_id, n.step_id); }
+function noteWhere(n){
+  if (n.task_id){
+    const t = DB.tasks.find(x => x.id === n.task_id);
+    return "Extra \u00b7 " + (t ? (t.title || "Untitled task") : "a task");
+  }
+  return stepWhere(n.month_id, n.edition_id, n.step_id);
+}
 
 function openBell(){
   closeCtx();
@@ -4482,8 +4520,8 @@ function openBell(){
     return;
   }
   if (!NOTES.length){
-    body.innerHTML = '<p class="nt-empty">Nothing yet. When somebody replies to ' +
-      'one of your comments, it turns up here.</p>';
+    body.innerHTML = '<p class="nt-empty">Nothing yet. When somebody replies to you, ' +
+      'or comments on a step or task you\u2019re assigned to, it turns up here.</p>';
     return;
   }
   NOTES.forEach(n => {
@@ -4493,7 +4531,7 @@ function openBell(){
     b.className = "nt-item" + (n.read_at ? "" : " unread");
     b.innerHTML = avatarOf(who, 30) +
       '<div class="nt-body"><div class="nt-who"><b>' + esc(who.name || "Someone") +
-      "</b> replied to you</div>" +
+      "</b> " + (n.kind === "reply" ? "replied to you" : "commented on something you\u2019re assigned to") + "</div>" +
       '<div class="nt-txt"></div>' +
       '<div class="nt-where">' + esc(noteWhere(n)) + "</div></div>" +
       '<span class="nt-when">' + esc(relTime(n.created_at)) + "</span>";
@@ -4540,6 +4578,7 @@ async function goToNote(n){
     paintBell();
     sb.from("notifications").update({read_at:n.read_at}).eq("id", n.id);
   }
+  if (n.task_id){ goToTask(n.task_id); return; }
   const el = await goToStep(n.month_id, n.edition_id, n.step_id);
   /* and highlight the actual comment, if it is on screen */
   const c = el && el.querySelector('[data-cid="' + n.comment_id + '"]');
@@ -4547,6 +4586,15 @@ async function goToNote(n){
     c.classList.add("just-touched");
     setTimeout(() => c.classList.remove("just-touched"), 2900);
   }
+}
+/* Open the Extra page and pop the task straight up -- there's no
+   language/phase/step to drill into, so this *is* "that specific place"
+   for a task. */
+function goToTask(taskId){
+  const t = DB.tasks.find(x => x.id === taskId);
+  if (!t){ toast("That task has since been deleted."); return; }
+  goSection("extra");
+  setTimeout(() => taskSheet(t), 60);
 }
 
 /* ---------- assigned work: My tasks / View all tasks / Team ---------- */
@@ -4650,10 +4698,16 @@ function paintPresence(){
   /* Me first, then everyone else, oldest arrival first so the row is stable. */
   const others = ONLINE.filter(p => !ME || p.id !== ME.id)
                        .sort((a, b) => String(a.at).localeCompare(String(b.at)));
-  el.innerHTML = others.map(p => avatarHTML(p.name, 26)).join("");
-  el.title = others.length
-    ? others.map(p => p.name).join(", ") + (others.length === 1 ? " is here too" : " are here too")
-    : "";
+  el.innerHTML = others.map(p =>
+    avatarHTML(p.name, 26).replace(
+      /<span class="av"/,
+      '<span class="av" data-uid="' + esc(p.id) + '"'
+    ).replace("</span>", '<span class="av-dot"></span></span>')
+  ).join("");
+  el.title = "";
+  el.querySelectorAll(".av[data-uid]").forEach(av => {
+    av.onclick = () => goToPerson(av.dataset.uid);
+  });
 }
 
 /* ---------- sign in ---------- */
@@ -4754,7 +4808,7 @@ function profileSheet(){
       USER_COLORS.map(c => '<button type="button" data-c="' + c.id + '" aria-pressed="' +
         (pendingColor === c.id) + '" style="background:' + c.v + '" aria-label="' + c.id + '"></button>').join("");
     colWrap.querySelectorAll("button").forEach(b => {
-      b.onclick = () => { pendingColor = b.dataset.c; paintCol(); paintAv(); playSound("select"); };
+      b.onclick = () => { pendingColor = b.dataset.c; paintCol(); paintAv(); };
     });
   };
 
@@ -4814,7 +4868,6 @@ function profileSheet(){
     DB.peopleColors[nm.toLowerCase()] = userColorHex(ME);
     closeSheet();
     paintWhoami();
-    playSound("complete");
     beat();                      /* so the new name shows on my face right away */
     scheduleReload();
   };
