@@ -645,9 +645,12 @@ body.dragging-now *{cursor:grabbing !important}
 .extra-noasg{flex:none;font-size:11px;color:var(--ink-3);font-style:italic}
 .extra-cmt-ct{flex:none;display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--ink-3)}
 .extra-cmt-ct svg{width:13px;height:13px;display:block}
+.stage-pill{flex:none;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:500;
+  letter-spacing:.02em;padding:4px 10px 4px 8px;border-radius:999px;background:var(--acc-soft);color:var(--ink-2)}
+.stage-pill .material-symbols-outlined{font-size:12px}
 .rep-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
-.rep-modes{display:flex;background:var(--sunk);border-radius:999px;padding:3px}
-.rep-mode{padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:500;color:var(--ink-3);transition:.15s ease}
+.rep-modes{display:flex;flex-wrap:wrap;background:var(--sunk);border-radius:999px;padding:3px;gap:1px}
+.rep-mode{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:500;color:var(--ink-3);transition:.15s ease;white-space:nowrap}
 .rep-mode.on{background:var(--surface);color:var(--ink);box-shadow:var(--box-shadow)}
 .rep-nav{display:flex;align-items:center;gap:10px}
 .rep-arrow{width:32px;height:32px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:var(--sunk);color:var(--ink-3);transition:.15s ease}
@@ -2747,7 +2750,15 @@ function placeholderSection(container, name){
     '<p>This section is under construction - nothing lives here yet.</p></div></section>';
 }
 function tasksSorted(){ return DB.tasks.slice().sort((a, b) => (a.sort || 0) - (b.sort || 0)); }
-/* One card in the Extra list. */
+/* An idea's stage, in the Creative Well only -- "" reads as the
+   default, "just an idea", so nothing has to be backfilled. */
+const IDEA_STAGES = {
+  idea:    {label:"Just an idea",      icon:"lightbulb"},
+  meeting: {label:"Made in a meeting", icon:"groups"},
+  parked:  {label:"Parked for later",  icon:"inventory_2"}
+};
+/* One card in the Extra list, or the Creative Well -- same shape,
+   `t.category` decides the label and whether a stage pill shows. */
 function extraCardHTML(t){
   const whos = t.assignees.map(id => whoIs(id, ""));
   const shown = whos.slice(0, 4);
@@ -2756,34 +2767,38 @@ function extraCardHTML(t){
       (whos.length > shown.length ? '<span class="asg-more">+' + (whos.length - shown.length) + "</span>" : "") + "</span>"
     : '<span class="extra-noasg">Unassigned</span>';
   const cmts = (DB.taskComments[t.id] || []).length;
+  const stage = t.category === "creative" ? (IDEA_STAGES[t.stage] || IDEA_STAGES.idea) : null;
   return '<article class="extra-card' + (t.status === "done" ? " done" : "") + '" data-id="' + t.id + '">' +
     '<button type="button" class="extra-card-main">' +
       '<span class="task-icon">' + (t.status === "done" ? CHECK : '<span class="material-symbols-outlined" style="font-size:15px">task_alt</span>') + "</span>" +
       '<span class="extra-card-mid"><b>' + esc(t.title || "Untitled task") + "</b><span>" +
         (t.notes ? esc(t.notes.length > 70 ? t.notes.slice(0, 70) + "…" : t.notes) : "No notes yet") +
       "</span></span>" +
-      '<span class="task-cat">Extra</span>' +
+      '<span class="task-cat">' + esc(CATEGORY_LABEL[t.category] || "Extra") + "</span>" +
+      (stage ? '<span class="stage-pill"><span class="material-symbols-outlined">' + stage.icon + "</span>" + esc(stage.label) + "</span>" : "") +
       (cmts ? '<span class="extra-cmt-ct">' + CMT_FILL + cmts + "</span>" : "") +
       stack +
       '<span class="task-pill' + (t.status === "done" ? " done" : "") + '">' + (t.status === "done" ? "Done" : "To do") + "</span>" +
     "</button></article>";
 }
-function renderExtraSection(container){
-  const list = tasksSorted();
+/* Shared by the Extra page and the Creative Well -- same list, board
+   and card-menu behaviour, just filtered to one category and labelled
+   for it. */
+function renderTaskListSection(container, cat, title, description, newLabel){
+  const list = tasksSorted().filter(t => (t.category || "extra") === cat);
   const todo = list.filter(t => t.status !== "done"), done = list.filter(t => t.status === "done");
   container.innerHTML =
-    '<section class="summary"><div class="ring-side"><h2>Extra</h2>' +
-    "<p>Tasks that don’t belong to any Local Pages edition — create one, put whoever’s on it, and track it here." +
+    '<section class="summary"><div class="ring-side"><h2>' + esc(title) + "</h2><p>" + description +
     (CAN_EDIT ? "" : " Read-only — ask a full-access teammate for changes.") + "</p></div></section>" +
     (CAN_EDIT ? '<div class="extra-toolbar"><button type="button" class="btn primary" id="exNew">' +
-      '<span class="material-symbols-outlined" style="font-size:16px">add</span>New task</button></div>' : "") +
+      '<span class="material-symbols-outlined" style="font-size:16px">add</span>' + esc(newLabel) + "</button></div>" : "") +
     '<div class="extra-list" id="exList">' +
-      (list.length ? "" : '<p class="sect-empty">Nothing here yet' + (CAN_EDIT ? " — add the first task above." : ".") + "</p>") +
+      (list.length ? "" : '<p class="sect-empty">Nothing here yet' + (CAN_EDIT ? " — add the first one above." : ".") + "</p>") +
       (todo.length ? '<p class="extra-group-h">To do · ' + todo.length + "</p>" + todo.map(extraCardHTML).join("") : "") +
       (done.length ? '<p class="extra-group-h">Done · ' + done.length + "</p>" + done.map(extraCardHTML).join("") : "") +
     "</div>";
   const newBtn = container.querySelector("#exNew");
-  if (newBtn) newBtn.onclick = () => taskSheet(null);
+  if (newBtn) newBtn.onclick = () => taskSheet(null, cat);
   container.querySelectorAll(".extra-card").forEach(card => {
     const t = list.find(x => x.id === card.dataset.id);
     if (!t) return;
@@ -2799,6 +2814,16 @@ function renderExtraSection(container){
       ]);
     });
   });
+}
+function renderExtraSection(container){
+  renderTaskListSection(container, "extra", "Extra",
+    "Tasks that don’t belong to any Local Pages edition — create one, put whoever’s on it, and track it here.",
+    "New task");
+}
+function renderCreativeSection(container){
+  renderTaskListSection(container, "creative", "Creative Well",
+    "Ideas for the creative meetings — drop one in whenever it comes up, and come back to it later.",
+    "New idea");
 }
 function deleteTask(t){
   confirmAsk("Delete “" + esc(t.title || "this task") + "”?",
@@ -2819,17 +2844,20 @@ function deleteTask(t){
    optional calendar slot (so it can also show up on the Team calendar),
    notes, and -- once it exists -- a full comment thread, exactly like
    any step in Local Pages. */
-function taskSheet(existing){
+function taskSheet(existing, defaultCategory){
   const isNew = !existing;
-  const t = existing || {id:"tk-" + newId(), title:"", category:"extra", notes:"", status:"todo",
-                          calDate:"", startTime:"", endTime:"", color:"", sort:DB.tasks.length,
+  const t = existing || {id:"tk-" + newId(), title:"", category:defaultCategory || "extra", notes:"", status:"todo",
+                          calDate:"", startTime:"", endTime:"", color:"", sort:DB.tasks.length, stage:"",
                           createdBy:ME && ME.id, assignees:[]};
+  const isIdea = t.category === "creative";
+  const noun = isIdea ? "idea" : "task";
   const selAssignees = new Set(t.assignees);
   const sheet = openSheet(
-    "<h3>" + (isNew ? "New task" : "Edit task") + "</h3>" +
+    "<h3>" + (isNew ? "New " + noun : "Edit " + noun) + "</h3>" +
     '<div class="field"><label for="txTitle">Title</label><input type="text" id="txTitle" maxlength="120" value="' +
-      esc(t.title) + '" placeholder="Design the September poster"></div>' +
+      esc(t.title) + '" placeholder="' + (isIdea ? "A fresh idea for the newsletter" : "Design the September poster") + '"></div>' +
     '<div class="field"><label>Assigned to</label><div class="asg-picklist" id="txAsg"></div></div>' +
+    (isIdea ? '<div class="field"><label>Stage</label><div class="rep-modes" id="txStage"></div></div>' : "") +
     '<div class="two">' +
       '<div class="field"><label>Calendar date</label><div id="txDateWrap"></div></div>' +
       '<div class="field"><label>&nbsp;</label><button type="button" class="btn ghostbtn" id="txStatus" style="width:100%"></button></div>' +
@@ -2838,13 +2866,14 @@ function taskSheet(existing){
       '<div class="field"><label>Start time</label><div id="txStartWrap"></div></div>' +
       '<div class="field"><label>End time</label><div id="txEndWrap"></div></div>' +
     "</div>" +
-    '<div class="field"><label for="txNotes">Notes</label><textarea id="txNotes" rows="3" placeholder="What’s this task about?">' +
+    '<div class="field"><label for="txNotes">Notes</label><textarea id="txNotes" rows="3" placeholder="' +
+      (isIdea ? "What’s the idea?" : "What’s this task about?") + '">' +
       esc(t.notes) + "</textarea></div>" +
     (isNew ? "" : '<p class="pf-sec">Comments</p><div id="txComments"></div>') +
     '<div class="actions">' +
       (isNew ? "" : '<button type="button" class="btn danger" id="txDelete">Delete</button>') +
       '<button type="button" class="btn ghostbtn" data-close>Cancel</button>' +
-      '<button type="button" class="btn primary" id="txSave">' + (isNew ? "Create task" : "Save") + "</button></div>");
+      '<button type="button" class="btn primary" id="txSave">' + (isNew ? "Create " + noun : "Save") + "</button></div>");
   sheet.querySelector("[data-close]").onclick = closeSheet;
   if (!CAN_EDIT) sheet.querySelectorAll("input,textarea,button").forEach(el => { if (!el.hasAttribute("data-close")) el.disabled = true; });
 
@@ -2873,6 +2902,20 @@ function taskSheet(existing){
   sheet.querySelector("#txStartWrap").appendChild(timeButton(() => t.startTime || "", v => { t.startTime = v; }));
   sheet.querySelector("#txEndWrap").appendChild(timeButton(() => t.endTime || "", v => { t.endTime = v; }));
 
+  let stage = t.stage || "idea";
+  if (isIdea){
+    const stageWrap = sheet.querySelector("#txStage");
+    const paintStage = () => {
+      stageWrap.innerHTML = Object.keys(IDEA_STAGES).map(k =>
+        '<button type="button" class="rep-mode' + (stage === k ? " on" : "") + '" data-k="' + k + '">' +
+          esc(IDEA_STAGES[k].label) + "</button>").join("");
+      stageWrap.querySelectorAll("button[data-k]").forEach(b => {
+        b.onclick = () => { stage = b.dataset.k; paintStage(); };
+      });
+    };
+    paintStage();
+  }
+
   const statusBtn = sheet.querySelector("#txStatus");
   let status = t.status;
   const paintStatus = () => {
@@ -2895,6 +2938,7 @@ function taskSheet(existing){
     t.title = title;
     t.notes = sheet.querySelector("#txNotes").value.trim();
     t.status = status;
+    if (isIdea) t.stage = stage;
     const prevAssignees = new Set(t.assignees);
     t.assignees = Array.from(selAssignees);
     closeSheet();
@@ -2914,8 +2958,8 @@ function taskSheet(existing){
    Only tasks that have actually been placed on the calendar (a
    cal_date, from either a Local Pages assignment or an Extra task)
    count towards a period -- nothing is guessed from completion alone. */
-const CATEGORY_LABEL = {local:"Local Pages", magazines:"Magazines", design:"Graphic Design", extra:"Extra"};
-const CATEGORY_COLOR = {local:"#2F8FE0", magazines:"#EE8B22", design:"#8158E0", extra:"#33A96B"};
+const CATEGORY_LABEL = {local:"Local Pages", magazines:"Magazines", design:"Graphic Design", extra:"Extra", creative:"Creative Well"};
+const CATEGORY_COLOR = {local:"#2F8FE0", magazines:"#EE8B22", design:"#8158E0", extra:"#33A96B", creative:"#D6488C"};
 function taskMinutes(startTime, endTime){
   if (!startTime || !endTime) return 60;
   const [sh, sm] = startTime.split(":").map(Number), [eh, em] = endTime.split(":").map(Number);
@@ -2947,6 +2991,31 @@ function monthRange(offset){
   const to = new Date(base.getFullYear(), base.getMonth() + 1, 0);
   return {from:isoOf(from), to:isoOf(to), label:MONTH_NAMES[base.getMonth()] + " " + base.getFullYear()};
 }
+function dayRange(offset){
+  const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + offset);
+  const iso = isoOf(d);
+  const thisYear = new Date().getFullYear();
+  const label = d.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}) +
+    (d.getFullYear() !== thisYear ? ", " + d.getFullYear() : "");
+  return {from:iso, to:iso, label};
+}
+/* qNum: 1-4. offset steps by a whole year, so "Q2" always means
+   April-June of whichever year the offset lands on. */
+function quarterRange(qNum, offset){
+  const year = new Date().getFullYear() + offset;
+  const startMonth = (qNum - 1) * 3;
+  const from = new Date(year, startMonth, 1);
+  const to = new Date(year, startMonth + 3, 0);
+  return {from:isoOf(from), to:isoOf(to), label:"Q" + qNum + " " + year};
+}
+const REPORT_MODES = [["day","Day"], ["week","Week"], ["month","Month"],
+  ["q1","Q1"], ["q2","Q2"], ["q3","Q3"], ["q4","Q4"]];
+function reportRangeFor(mode, offset){
+  if (mode === "day") return dayRange(offset);
+  if (mode === "week") return weekRange(offset);
+  if (mode === "month") return monthRange(offset);
+  return quarterRange(+mode.slice(1), offset);
+}
 function reportRowsFor(userId, from, to){
   const out = [];
   DB.issues.forEach(m => (m.editions || []).forEach(edId => {
@@ -2971,7 +3040,7 @@ function reportRowsFor(userId, from, to){
   out.sort((a, b) => a.calDate.localeCompare(b.calDate));
   return out;
 }
-let reportMode = "week", reportOffset = 0, reportOpenUser = null;
+let reportMode = "day", reportOffset = 0, reportOpenUser = null;
 function repUserHTML(u){
   const who = whoIs(u.p.id, (u.p.name || u.p.email || ""));
   const segs = Object.keys(u.byCat).map(cat => ({cat, mins:u.byCat[cat],
@@ -2996,7 +3065,7 @@ function repUserHTML(u){
     "</div></div></article>";
 }
 function renderReportsSection(container){
-  const range = reportMode === "week" ? weekRange(reportOffset) : monthRange(reportOffset);
+  const range = reportRangeFor(reportMode, reportOffset);
   const users = PROFILES.filter(p => (p.name || p.email || "").trim());
   const perUser = users.map(p => {
     const rows = reportRowsFor(p.id, range.from, range.to);
@@ -3009,8 +3078,8 @@ function renderReportsSection(container){
     '<section class="summary"><div class="ring-side"><h2>Reports</h2>' +
     "<p>How everyone’s time splits across categories — Local Pages and Extra today, more as other pages fill in.</p></div></section>" +
     '<div class="rep-toolbar"><div class="rep-modes">' +
-      '<button type="button" class="rep-mode' + (reportMode === "week" ? " on" : "") + '" data-m="week">Week</button>' +
-      '<button type="button" class="rep-mode' + (reportMode === "month" ? " on" : "") + '" data-m="month">Month</button>' +
+      REPORT_MODES.map(([k, label]) => '<button type="button" class="rep-mode' + (reportMode === k ? " on" : "") +
+        '" data-m="' + k + '">' + label + "</button>").join("") +
     "</div><div class=\"rep-nav\"><button type=\"button\" class=\"rep-arrow\" id=\"repPrev\">" + ARR_L + "</button>" +
       '<span class="rep-label">' + esc(range.label) + "</span>" +
       '<button type="button" class="rep-arrow" id="repNext">' + ARR_R + "</button>" +
@@ -3442,7 +3511,8 @@ function renderCalendarSection(container){
     openCtx(r.left, r.bottom + 6, [
       {label:"All categories", fn:() => { calFilterCat = ""; renderSection(); }}, {sep:true},
       {label:"Local Pages", fn:() => { calFilterCat = "local"; renderSection(); }},
-      {label:"Extra", fn:() => { calFilterCat = "extra"; renderSection(); }}
+      {label:"Extra", fn:() => { calFilterCat = "extra"; renderSection(); }},
+      {label:"Creative Well", fn:() => { calFilterCat = "creative"; renderSection(); }}
     ]);
   };
   container.querySelectorAll(".cal-tray-item").forEach(b => {
@@ -3467,7 +3537,7 @@ function renderSection(){
   else if (SECTION === "reports") renderReportsSection(sect);
   else if (SECTION === "magazines") placeholderSection(sect, "Magazines");
   else if (SECTION === "design") placeholderSection(sect, "Graphic Design");
-  else if (SECTION === "creative") placeholderSection(sect, "Creative Well");
+  else if (SECTION === "creative") renderCreativeSection(sect);
 }
 function tasksPage(userId, name){
   openPage((name || "Their") + "\u2019s tasks", body => {
@@ -4054,7 +4124,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v21 · 22 Sep";
+const APP_VERSION = "v22 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -4108,7 +4178,7 @@ async function loadAll(){
     tasks: tasks.data.sort(bySort).map(t => ({
       id:t.id, title:t.title, category:t.category || "extra", notes:t.notes || "",
       status:t.status || "todo", calDate:t.cal_date || "", startTime:t.start_time || "",
-      endTime:t.end_time || "", color:t.color || "", sort:t.sort || 0,
+      endTime:t.end_time || "", color:t.color || "", sort:t.sort || 0, stage:t.stage || "",
       createdBy:t.created_by || "", assignees: []
     })),
     issues: [], data: {},
@@ -4271,7 +4341,7 @@ async function pushTask(t){
   myTaskPush = Date.now();
   const row = {id:t.id, title:t.title, category:t.category || "extra", notes:t.notes || "",
                status:t.status || "todo", cal_date:t.calDate || null, start_time:t.startTime || null,
-               end_time:t.endTime || null, color:t.color || "", sort:t.sort || 0,
+               end_time:t.endTime || null, color:t.color || "", sort:t.sort || 0, stage:t.stage || "",
                created_by:t.createdBy || (ME && ME.id), updated_at:new Date().toISOString(), updated_by:ME && ME.id};
   const {error} = await sb.from("tasks").upsert(row);
   if (error){ console.error(error); setLive("off"); }
