@@ -21,7 +21,7 @@
   --acc:#7C64E8; --acc-soft:#EDE9FC;
   --danger:#E5757C; --danger-soft:#FBE7E8;
   --track:#E7E4F1;
-  --f-prog:#E8951A; --f-done:#2FBB76;
+  --f-prog:#E8951A; --f-done:#2FBB76; --f-done-soft:#E4F4EA; --p3-soft:#FAF0DE;
   --box:#FFFFFF; --line:#E9E6F1;
   --box-shadow:inset 0 0 0 1px var(--line);
   --shadow:0 10px 30px -22px rgba(33,30,46,.55);
@@ -36,7 +36,7 @@
     --acc:#A492FF; --acc-soft:#2A2450;
     --danger:#FF949A; --danger-soft:#3B2024;
     --track:#332F45;
-    --f-prog:#E8951A; --f-done:#2FBB76;
+    --f-prog:#E8951A; --f-done:#2FBB76; --f-done-soft:#1E3A2C; --p3-soft:#3A2E10;
     --box:#211E31; --line:#332F47;
     --box-shadow:inset 0 0 0 1px var(--line);
     --shadow:0 10px 30px -22px rgba(0,0,0,.9);
@@ -51,7 +51,7 @@
   --acc:#A492FF; --acc-soft:#2A2450;
   --danger:#FF949A; --danger-soft:#3B2024;
   --track:#332F45;
-  --f-prog:#E8951A; --f-done:#2FBB76;
+  --f-prog:#E8951A; --f-done:#2FBB76; --f-done-soft:#1E3A2C; --p3-soft:#3A2E10;
   --box:#211E31; --line:#332F47;
   --box-shadow:inset 0 0 0 1px var(--line);
   --shadow:0 10px 30px -22px rgba(0,0,0,.9);
@@ -68,7 +68,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.005em;text-wrap:balance;line-height:1.2}
-button{font:inherit;color:inherit;background:none;cursor:pointer;letter-spacing:inherit}
+button{font:inherit;color:inherit;background:none;cursor:pointer;letter-spacing:inherit;padding:0}
 input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:3px}
 
@@ -242,11 +242,11 @@ input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
 .step-label{font-size:14.5px;font-weight:300;color:var(--ink);min-width:0;transition:color .3s ease}
 .step.is-done .step-label{color:var(--ink-3)}
 .step-name{display:flex;align-items:center;gap:9px;min-width:0}
-.step-icon{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;flex:none;color:var(--ink-3);background:var(--sunk);transition:.15s ease}
+.step-icon{width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--ink-3);background:var(--sunk);transition:.15s ease}
 button.step-icon:hover{color:var(--ink);background:var(--acc-soft)}
 button.step-icon.empty{opacity:.5}
 span.step-icon{background:transparent}
-.material-symbols-outlined{font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 20;vertical-align:middle;line-height:1;display:block}
+.material-symbols-outlined{font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 20;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 
 
 .ctrls{display:flex;align-items:center;gap:10px}
@@ -440,10 +440,10 @@ span.step-icon{background:transparent}
 .colorpick button.nocol[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--track),0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
 .step-icon-pick{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:var(--sunk);border-radius:16px;padding:10px 16px;font-size:14px;font-weight:300;color:var(--ink-2);transition:.15s ease}
 .step-icon-pick:hover{background:var(--acc-soft)}
-.step-icon-pick .ic-prev{width:22px;height:22px;border-radius:999px;display:grid;place-items:center;flex:none;color:var(--ink-3)}
+.step-icon-pick .ic-prev{width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--ink-3)}
 .icon-search{margin-bottom:12px}
 .icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px;max-height:min(46vh,320px);overflow:auto;background:var(--sunk);border-radius:16px;padding:10px}
-.icon-opt{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2);transition:.12s ease}
+.icon-opt{width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);transition:.12s ease}
 .icon-opt:hover{background:var(--acc-soft);color:var(--ink)}
 .icon-opt.on{background:var(--acc);color:#fff}
 
@@ -588,7 +588,7 @@ body.dragging-now *{cursor:grabbing !important}
 .task-row{display:flex;align-items:center;gap:6px}
 .task-nav{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:8px;border-radius:14px;text-align:left}
 .task-nav:hover{background:var(--sunk)}
-.task-icon{width:26px;height:26px;border-radius:999px;display:grid;place-items:center;flex:none;background:var(--sunk);color:var(--ink-3)}
+.task-icon{width:26px;height:26px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--sunk);color:var(--ink-3)}
 .task-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .task-mid b{font-size:12.5px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .task-mid span{font-size:11px;color:var(--ink-3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -633,10 +633,18 @@ body.dragging-now *{cursor:grabbing !important}
 .team-row{width:100%;text-align:left}
 .team-row .chev{margin-left:auto;color:var(--ink-3);transform:rotate(-90deg);flex:none}
 .team-row .chev svg{width:14px;height:14px}
+.team-item{background:var(--box);border-radius:24px;box-shadow:var(--box-shadow);margin-bottom:10px}
+.team-item .team-row{padding:9px 14px}
+.team-item.open .team-row .chev{transform:rotate(0deg)}
+.team-item .pbody{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1)}
+.team-item.open .pbody{grid-template-rows:1fr}
+.team-item .pbody-in{overflow:hidden;min-height:0}
+.team-item .task-list{padding:2px 14px 14px}
+.sect-empty{color:var(--ink-3);font-size:14px;font-weight:300;margin:0}
 
 /* a face on every comment */
 .cmt-meta .av{width:20px;height:20px;font-size:9.5px;margin-right:-2px}
-.asg{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;flex:none;background:var(--sunk);color:var(--ink-3);transition:.15s ease;overflow:hidden;padding:0}
+.asg{width:28px;height:28px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--sunk);color:var(--ink-3);transition:.15s ease;overflow:hidden}
 .asg:hover{background:var(--acc-soft)}
 .asg:disabled{cursor:default}
 .asg:disabled:hover{background:var(--sunk)}
@@ -663,6 +671,14 @@ body.readonly .crumb{pointer-events:auto}
 .hist-empty{padding:26px 0;text-align:center;color:var(--ink-3);font-size:13px}
 
 </style>
+<script>
+(function(){
+  try {
+    var m = localStorage.getItem("lp-theme");
+    if (m === "light" || m === "dark") document.documentElement.setAttribute("data-theme", m);
+  } catch (e) {}
+})();
+</script>
 </head>
 <body>
 
@@ -705,7 +721,7 @@ body.readonly .crumb{pointer-events:auto}
   </div>
 </header>
 
-<div class="wrap">
+<div class="wrap" id="localSect">
   <section class="summary">
     <div class="ring-block">
       <div class="ring" id="bigRingWrap">
@@ -732,6 +748,8 @@ body.readonly .crumb{pointer-events:auto}
     <span id="ver"></span>
   </p>
 </div>
+
+<div class="wrap" id="sectWrap" hidden></div>
 
 <div class="scrim" id="scrim" hidden></div>
 <div class="scrim" id="scrim2" hidden></div>
@@ -765,9 +783,10 @@ const PERSON_COLORS = ["#E0413F","#2F6FE0","#2FA05F","#D9A61B","#E85B9E",
    underscores turned into spaces. */
 const ICON_NAMES = ["edit","draw","brush","format_paint","palette","content_cut","straighten","colorize","photo_camera","image","collections","videocam","movie","theaters","photo_library","mic","music_note","headphones","radio","podcasts","mail","send","drafts","inbox","outbox","forward_to_inbox","mark_email_read","markunread","chat","forum","sms","phone","call","contact_phone","support_agent","print","scanner","fax","translate","language","public","flag","place","location_on","map","pin_drop","explore","schedule","event","calendar_month","calendar_today","access_time","timer","alarm","hourglass_empty","hourglass_top","update","history","sync","refresh","autorenew","task_alt","check_circle","checklist","fact_check","rule","verified","pending","priority_high","warning","error","info","help","lightbulb","bolt","star","star_border","favorite","favorite_border","bookmark","bookmark_border","label","sell","redeem","card_giftcard","folder","folder_open","insert_drive_file","description","article","newspaper","menu_book","library_books","book","auto_stories","attach_file","link","share","save","save_alt","backup","restore","archive","delete_outline","inventory_2","lock","lock_open","key","shield","security","visibility","visibility_off","group","groups","person","people","supervisor_account","badge","group_work","handshake","work","business_center","school","store","shopping_cart","local_shipping","storefront","build","construction","engineering","science","biotech","medical_services","healing","local_hospital","computer","laptop","smartphone","tablet","tv","wifi","bluetooth","battery_full","cloud","cloud_upload","cloud_download","cloud_done","code","terminal","bug_report","extension","apps","widgets","dashboard","view_column","grid_view","list","table_chart","bar_chart","pie_chart","analytics","trending_up","campaign","notifications","notifications_active","celebration","emoji_events","thumb_up","thumb_down","home","apartment","meeting_room","chair","weekend","restaurant","local_cafe","cake","fastfood","directions_car","flight","train","hiking","sports_esports","wb_sunny","dark_mode","nightlight","umbrella","recycling","eco","park","pets"];
 function iconLabel(name){ return String(name || "").replace(/_/g, " "); }
-function iconGlyph(name, size){
+function iconGlyph(name, size, color){
   if (!name) return "";
-  return '<span class="material-symbols-outlined" style="font-size:' + (size || 16) + 'px">' + esc(name) + "</span>";
+  return '<span class="material-symbols-outlined" style="font-size:' + (size || 16) + "px" +
+    (color ? ";color:" + esc(color) : "") + '">' + esc(name) + "</span>";
 }
 function personColor(name){
   if (!name) return "";
@@ -978,6 +997,9 @@ const I_SIGNOUT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" st
 const I_MAG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.6c-1.3-.9-2.8-1.2-4.4-1V11c1.6-.2 3.1.1 4.4 1V3.6Z"/><path d="M8 3.6c1.3-.9 2.8-1.2 4.4-1V11c-1.6-.2-3.1.1-4.4 1V3.6Z"/></svg>';
 const I_DESIGN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a5.6 5.6 0 1 0 3.7 9.8c.4-.3.2-1-.3-1-.6 0-1-.5-1-1.1 0-.6.5-1.1 1.1-1.1H13a1.6 1.6 0 0 0 1.6-1.6c0-2.6-2.9-5-6.6-5Z"/><circle cx="5.4" cy="7.2" r=".7" fill="currentColor" stroke="none"/><circle cx="7.7" cy="5.3" r=".7" fill="currentColor" stroke="none"/><circle cx="10.2" cy="6.4" r=".7" fill="currentColor" stroke="none"/></svg>';
 const I_TEAM = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="5.2" r="2.1"/><path d="M1.7 13a4.2 4.2 0 0 1 8.2 0"/><path d="M10.3 3.6c1.1.2 1.9 1.2 1.9 2.4 0 1.1-.7 2.1-1.7 2.4"/><path d="M10.8 9.3c1.6.5 2.7 1.9 3.1 3.7"/></svg>';
+const I_SUN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="2.7"/><path d="M8 1.4v1.7M8 12.9v1.7M1.4 8h1.7M12.9 8h1.7M3.4 3.4l1.2 1.2M11.4 11.4l1.2 1.2M12.6 3.4l-1.2 1.2M4.6 11.4l-1.2 1.2"/></svg>';
+const I_MOON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.3 9.7A5.6 5.6 0 1 1 6.3 2.7a4.6 4.6 0 0 0 7 7Z"/></svg>';
+const I_MONITOR = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.7" y="2.6" width="12.6" height="8.3" rx="1.3"/><path d="M5.3 13.8h5.4M8 10.9v2.9"/></svg>';
 const GRIP = '<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="6" cy="4" r="1.25"/><circle cx="10" cy="4" r="1.25"/><circle cx="6" cy="8" r="1.25"/><circle cx="10" cy="8" r="1.25"/><circle cx="6" cy="12" r="1.25"/><circle cx="10" cy="12" r="1.25"/></svg>';
 const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.1"/><path d="M5.4 8.2l1.9 1.9 3.4-4"/></svg>';
 const CMT   = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 8c0 2.5-2.5 4.6-5.6 4.6-.7 0-1.4-.1-2-.3L2.8 13.4l1-2.4C3 10.2 2.4 9.2 2.4 8c0-2.5 2.5-4.6 5.6-4.6S13.6 5.5 13.6 8Z"/></svg>';
@@ -987,6 +1009,8 @@ const CMT_FILL = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.6 8c
 let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
           me:{name:""}, people:[], peopleColors:{}};
 let current = null;
+let SECTION = "local";   /* "local" | "magazines" | "design" | "team" */
+let teamOpenId = null;   /* which team member's task list is expanded */
 let open = new Set();
 const openPhase = new Set();
 /* which step comment boxes are open, as "edition|step". Kept out here
@@ -1608,9 +1632,14 @@ function phaseSheet(existing, at){
   sheet.querySelector("#phName").focus();
   sheet.querySelector("#phName").select();
 }
-function iconSheet(current, onPick){
+function iconSheet(current, currentColor, onPick){
+  const swatches = COLORS.map(c =>
+    '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
+    (currentColor === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
+    ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
   scrim2.innerHTML = '<div class="sheet narrow" role="dialog" aria-modal="true">' +
     "<h3>Choose an icon</h3>" +
+    '<div class="field"><label>Colour</label><div class="colorpick" id="icCol">' + swatches + "</div></div>" +
     '<div class="field icon-search"><input type="text" id="icSearch" placeholder="Search icons\u2026" autocomplete="off"></div>' +
     '<div class="icon-grid" id="icGrid"></div>' +
     '<div class="actions"><button type="button" class="btn ghostbtn" id="icNone">No icon</button>' +
@@ -1619,21 +1648,25 @@ function iconSheet(current, onPick){
   const sheet = scrim2.querySelector(".sheet");
   const grid = sheet.querySelector("#icGrid");
   const search = sheet.querySelector("#icSearch");
+  let col = currentColor || "";
   const draw = () => {
     const q = search.value.trim().toLowerCase();
     const list = q ? ICON_NAMES.filter(n => iconLabel(n).indexOf(q) >= 0) : ICON_NAMES;
     grid.innerHTML = list.length
       ? list.map(n => '<button type="button" class="icon-opt' + (n === current ? " on" : "") +
-          '" data-n="' + n + '" title="' + esc(iconLabel(n)) + '">' + iconGlyph(n, 19) + "</button>").join("")
+          '" data-n="' + n + '" title="' + esc(iconLabel(n)) + '">' + iconGlyph(n, 19, col) + "</button>").join("")
       : '<p class="pp-none">No icons match.</p>';
     grid.querySelectorAll("button[data-n]").forEach(b => {
-      b.onclick = () => { closeConfirm(); onPick(b.dataset.n); };
+      b.onclick = () => { closeConfirm(); onPick(b.dataset.n, col); };
     });
   };
+  sheet.querySelectorAll("#icCol button").forEach(b => {
+    b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#icCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); };
+  });
   search.oninput = draw;
   draw();
   sheet.querySelector("#icClose").onclick = closeConfirm;
-  sheet.querySelector("#icNone").onclick = () => { closeConfirm(); onPick(""); };
+  sheet.querySelector("#icNone").onclick = () => { closeConfirm(); onPick("", col); };
   setTimeout(() => search.focus(), 30);
 }
 function stepSheet(phaseId, existing, at){
@@ -1654,14 +1687,15 @@ function stepSheet(phaseId, existing, at){
 
   sheet.querySelector("[data-close]").onclick = closeSheet;
   let icon = existing ? (existing.icon || "") : "";
+  let iconColor = existing ? (existing.icon_color || "") : "";
   const iconBtn = sheet.querySelector("#stIconBtn");
   const paintIcon = () => {
     iconBtn.innerHTML = '<span class="ic-prev">' +
-      (icon ? iconGlyph(icon, 18) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
+      (icon ? iconGlyph(icon, 18, iconColor) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
       "</span><span>" + (icon ? iconLabel(icon) : "Choose an icon") + "</span>";
   };
   paintIcon();
-  iconBtn.onclick = () => iconSheet(icon, v => { icon = v; paintIcon(); });
+  iconBtn.onclick = () => iconSheet(icon, iconColor, (v, c) => { icon = v; iconColor = c; paintIcon(); });
   const typeSel = sheet.querySelector("#stType"), doneWrap = sheet.querySelector("#stDoneWrap");
   const syncType = () => { doneWrap.style.display = typeSel.value === "date" ? "none" : ""; };
   typeSel.onchange = syncType; syncType();
@@ -1673,9 +1707,9 @@ function stepSheet(phaseId, existing, at){
     const done = sheet.querySelector("#stDone").value.trim() || "Done";
     closeSheet();
     if (existing){
-      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon;
+      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon; existing.icon_color = iconColor;
     } else {
-      const s = {id:slug(label), phase:phaseId, label, type, done, icon};
+      const s = {id:slug(label), phase:phaseId, label, type, done, icon, icon_color:iconColor};
       let idx = typeof at === "number" ? at : -1;
       if (idx < 0){
         const list = stepsOf(phaseId);
@@ -2054,8 +2088,8 @@ function buildCard(ed, isFresh){
       row.dataset.flash = ed.id + "|" + s.id;   /* so a colleague's edit can glow here */
       const iconHTML = s.icon
         ? (CAN_EDIT
-            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15) + "</button>"
-            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15) + "</span>")
+            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15, s.icon_color) + "</button>"
+            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15, s.icon_color) + "</span>")
         : (CAN_EDIT
             ? '<button type="button" class="step-icon empty" title="Add an icon">' +
               '<span class="material-symbols-outlined" style="font-size:15px">add</span></button>'
@@ -2066,7 +2100,7 @@ function buildCard(ed, isFresh){
         const iconBtn = row.querySelector(".step-icon");
         if (iconBtn) iconBtn.onclick = e => {
           e.stopPropagation();
-          iconSheet(s.icon || "", v => { s.icon = v; save(); renderGrid(); });
+          iconSheet(s.icon || "", s.icon_color || "", (v, c) => { s.icon = v; s.icon_color = c; save(); renderGrid(); });
         };
       }
       row.oncontextmenu = e => {
@@ -2305,41 +2339,87 @@ function openPage(title, draw){
   draw(pageEl.querySelector("#pgBody"));
   return pageEl;
 }
-function underConstruction(name){
-  closeCtx();
-  const sheet = openSheet("<h3>" + esc(name) + "</h3>" +
-    '<p class="hint">This section is under construction \u2014 nothing lives here yet.</p>' +
-    '<div class="actions"><button type="button" class="btn primary" data-close>OK</button></div>');
-  sheet.querySelector("[data-close]").onclick = closeSheet;
+function goSection(name){
+  SECTION = name;
+  closeCtx(); closeTree();
+  renderSection();
+  window.scrollTo(0, 0);
 }
 function brandMenu(x, y){
   closeCtx();
   openCtx(x, y, [
-    {icon:I_GRID, label:"Local Pages"},
-    {icon:I_MAG, label:"Magazines", fn:() => underConstruction("Magazines")},
-    {icon:I_DESIGN, label:"Graphic Design", fn:() => underConstruction("Graphic Design")},
+    {icon:I_GRID, label:"Local Pages", fn:() => goSection("local")},
+    {icon:I_MAG, label:"Magazines", fn:() => goSection("magazines")},
+    {icon:I_DESIGN, label:"Graphic Design", fn:() => goSection("design")},
     {sep:true},
-    {icon:I_TEAM, label:"Team", fn:teamPage}
+    {icon:I_TEAM, label:"Team", fn:() => goSection("team")}
   ]);
 }
-function teamPage(){
-  openPage("Team", body => {
-    body.innerHTML = '<p class="hint">Everyone with an account. Open someone to see what\'s assigned ' +
-      'to them, in real time \u2014 any full-access teammate can edit it, same as your own.</p>' +
-      '<div id="teamList"></div>';
-    const list = body.querySelector("#teamList");
-    list.innerHTML = PROFILES.map((p, i) => {
-      const nm = (p.name || p.email || "").trim();
-      const me = ME && p.id === ME.id;
-      return '<button type="button" class="pp-row team-row" data-i="' + i + '">' + avatarHTML(nm, 30) +
-        "<div><div class='pp-name'>" + esc(nm) + (me ? " <span class='pp-sub'>\u00b7 you</span>" : "") + "</div>" +
-        "<div class='pp-sub'>" + esc(p.email || "") + "</div></div>" +
-        '<span class="chev">' + CHEV + "</span></button>";
-    }).join("");
-    list.querySelectorAll("[data-i]").forEach(b => {
-      b.onclick = () => { const p = PROFILES[+b.dataset.i]; tasksPage(p.id, (p.name || p.email || "").trim()); };
-    });
+function placeholderSection(container, name){
+  container.innerHTML =
+    '<section class="summary"><div class="ring-side"><h2>' + esc(name) + "</h2>" +
+    '<p>This section is under construction - nothing lives here yet.</p></div></section>';
+}
+function renderTeamSection(container){
+  container.innerHTML =
+    '<section class="summary"><div class="ring-side"><h2>Team</h2>' +
+    "<p>Everyone with an account. Click someone to see what's assigned to them, in real time - " +
+    "any full-access teammate can edit it, same as your own.</p></div></section>" +
+    '<p class="section-label">Members</p>' +
+    '<div id="teamList"></div>';
+  const list = container.querySelector("#teamList");
+  list.innerHTML = PROFILES.map((p, i) => {
+    const nm = (p.name || p.email || "").trim();
+    const me = ME && p.id === ME.id;
+    const isOpen = teamOpenId === p.id;
+    const tasks = isOpen ? myTasks(p.id) : [];
+    return '<div class="team-item' + (isOpen ? " open" : "") + '" data-i="' + i + '">' +
+      '<button type="button" class="pp-row team-row" data-i="' + i + '">' + avatarHTML(nm, 30) +
+      "<div><div class='pp-name'>" + esc(nm) + (me ? " <span class='pp-sub'>you</span>" : "") + "</div>" +
+      "<div class='pp-sub'>" + esc(p.email || "") + "</div></div>" +
+      '<span class="chev">' + CHEV + "</span></button>" +
+      '<div class="pbody"><div class="pbody-in"><div class="task-list">' +
+      (isOpen ? taskRowsHTML(tasks, true) : "") + "</div></div></div></div>";
+  }).join("");
+  list.querySelectorAll(".team-row[data-i]").forEach(b => {
+    b.onclick = () => {
+      const p = PROFILES[+b.dataset.i];
+      teamOpenId = teamOpenId === p.id ? null : p.id;
+      renderTeamSection(container);
+    };
   });
+  if (teamOpenId){
+    const openItem = list.querySelector(".team-item.open");
+    if (openItem){
+      const tasks = myTasks(teamOpenId);
+      wireTaskRows(openItem, tasks, () => goSection("local"));
+      openItem.querySelectorAll(".task-cal[data-cal]").forEach(host => {
+        const t = tasks[+host.dataset.cal];
+        const btn = dateButton(() => t.completedAt || "", iso => {
+          t.completedAt = iso;
+          const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
+          if (c && c.assignee && c.assignee[t.stepId]) c.assignee[t.stepId].completedAt = iso;
+          pushAssignment(t.monthId, t.edId, t.stepId, teamOpenId, iso || null);
+        });
+        host.appendChild(btn);
+      });
+    }
+  }
+}
+function renderSection(){
+  const local = document.getElementById("localSect");
+  const sect = document.getElementById("sectWrap");
+  const crumb = document.getElementById("crumb");
+  if (SECTION === "local"){
+    local.hidden = false; sect.hidden = true;
+    if (crumb) crumb.hidden = false;
+    return;
+  }
+  local.hidden = true; sect.hidden = false;
+  if (crumb) crumb.hidden = true;
+  if (SECTION === "team") renderTeamSection(sect);
+  else if (SECTION === "magazines") placeholderSection(sect, "Magazines");
+  else if (SECTION === "design") placeholderSection(sect, "Graphic Design");
 }
 function tasksPage(userId, name){
   openPage((name || "Their") + "\u2019s tasks", body => {
@@ -2783,6 +2863,29 @@ async function doSignOut(){
   await sb.auth.signOut();
   location.reload();
 }
+const THEME_KEY = "lp-theme";
+function currentTheme(){
+  try { const m = localStorage.getItem(THEME_KEY); return (m === "light" || m === "dark") ? m : "system"; }
+  catch (e) { return "system"; }
+}
+function applyTheme(mode){
+  const root = document.documentElement;
+  if (mode === "light" || mode === "dark") root.setAttribute("data-theme", mode);
+  else root.removeAttribute("data-theme");
+  try {
+    if (mode === "system") localStorage.removeItem(THEME_KEY);
+    else localStorage.setItem(THEME_KEY, mode);
+  } catch (e) {}
+}
+function themeMeta(mode){
+  if (mode === "light") return {icon:I_SUN,   label:"Theme: Light"};
+  if (mode === "dark")  return {icon:I_MOON,  label:"Theme: Dark"};
+  return {icon:I_MONITOR, label:"Theme: System"};
+}
+function cycleTheme(){
+  const cur = currentTheme();
+  applyTheme(cur === "system" ? "light" : cur === "light" ? "dark" : "system");
+}
 function openCog(){
   const r = document.getElementById("cog").getBoundingClientRect();
   const eds = currentEditions();
@@ -2806,18 +2909,20 @@ function openCog(){
     items.push({icon:I_GRID, label:"Reset phases and steps", fn:resetStructure});
   }
   items.push({sep:true});
+  { const tm = themeMeta(currentTheme()); items.push({icon:tm.icon, label:tm.label, fn:cycleTheme}); }
+  items.push({sep:true});
   items.push({icon:I_SIGNOUT, label:"Sign out", danger:true, fn:doSignOut});
   openCtx(r.right - 250, r.bottom + 8, items);
 }
 
 /* ============ boot ============ */
-function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); if (pageRedraw) pageRedraw(pageEl.querySelector("#pgBody")); }
+function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummary(); renderGrid(); if (pageRedraw) pageRedraw(pageEl.querySelector("#pgBody")); if (SECTION !== "local") renderSection(); }
 
 
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v12 · 22 Sep";
+const APP_VERSION = "v13 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2864,7 +2969,7 @@ async function loadAll(){
     })),
     phases: phases.data.sort(bySort).map(p => ({id:p.id, name:p.name, color:p.color || ""})),
     steps: steps.data.sort(bySort).map(s => ({
-      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || ""
+      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || "", icon_color:s.icon_color || ""
     })),
     issues: [], data: {},
     me: {name:(ME && ME.name) || ""},
@@ -2944,7 +3049,7 @@ async function pushStructure(){
       flag:e.flag || null, std:!!e.std, sort:i})));
     await sb.from("phases").upsert(DB.phases.map((p, i) => ({id:p.id, name:p.name, color:p.color || "", sort:i})));
     await sb.from("steps").upsert(DB.steps.map((s, i) => ({
-      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "", sort:i})));
+      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "", icon_color:s.icon_color || "", sort:i})));
     await sb.from("months").upsert(DB.issues.map((m, i) => ({
       id:m.id, folder_id:m.folder, label:m.label, submitted:m.submitted || null,
       color:m.color || "", sort:i})));
@@ -3472,7 +3577,7 @@ function taskRowsHTML(list, withDate){
   return list.map((t, i) => {
     const st = DB.steps.find(x => x.id === t.stepId);
     const label = st ? st.label : t.stepId;
-    const icon = st && st.icon ? iconGlyph(st.icon, 14)
+    const icon = st && st.icon ? iconGlyph(st.icon, 14, st.icon_color)
       : '<span class="material-symbols-outlined" style="font-size:14px">task_alt</span>';
     return '<div class="task-row' + (withDate ? ' wide' : "") + '" data-i="' + i + '">' +
       '<button type="button" class="task-nav"><span class="task-icon">' + icon + "</span>" +
