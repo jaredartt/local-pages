@@ -599,6 +599,65 @@ body.dragging-now *{cursor:grabbing !important}
 .task-pill{flex:none;font-size:10px;font-weight:500;letter-spacing:.02em;padding:4px 10px;border-radius:999px;background:var(--sunk);color:var(--ink-3)}
 .task-pill.done{background:var(--f-done-soft,#E4F4EA);color:var(--f-done)}
 .task-cat{flex:none;font-size:9.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--acc-soft);color:var(--ink-3)}
+.field textarea{width:100%;background:var(--sunk);border-radius:16px;padding:12px 16px;font-size:14px;font-weight:300;line-height:1.55;resize:vertical;min-height:64px;transition:background-color .2s ease}
+.field textarea:focus{outline:none;background:var(--acc-soft)}
+.field textarea::placeholder{color:var(--ink-3)}
+.field input[type="time"]{width:100%;background:var(--sunk);border-radius:16px;padding:10px 16px;font-size:14px;font-weight:300;color:var(--ink)}
+.field input[type="time"]:focus{outline:none;background:var(--acc-soft)}
+.asg-picklist{display:flex;flex-wrap:wrap;gap:8px;background:var(--sunk);border-radius:16px;padding:10px}
+.asg-pick{display:flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:400;color:var(--ink);transition:.15s ease}
+.asg-pick:hover{background:var(--box-shadow, var(--surface))}
+.asg-pick.on{background:var(--acc-soft)}
+.extra-toolbar{display:flex;justify-content:flex-end;margin-bottom:14px}
+.extra-toolbar .btn{display:inline-flex;align-items:center;gap:6px}
+.extra-group-h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--ink-3);margin:22px 4px 10px}
+.extra-group-h:first-child{margin-top:0}
+.extra-list{padding-bottom:20px}
+.extra-card{background:var(--box);border-radius:22px;box-shadow:var(--box-shadow);margin-bottom:10px}
+.extra-card.done{opacity:.7}
+.extra-card-main{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 16px}
+.extra-card-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.extra-card-mid b{font-size:14px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.extra-card-mid span{font-size:12px;color:var(--ink-3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.extra-noasg{flex:none;font-size:11px;color:var(--ink-3);font-style:italic}
+.extra-cmt-ct{flex:none;display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--ink-3)}
+.extra-cmt-ct svg{width:13px;height:13px;display:block}
+.rep-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.rep-modes{display:flex;background:var(--sunk);border-radius:999px;padding:3px}
+.rep-mode{padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:500;color:var(--ink-3);transition:.15s ease}
+.rep-mode.on{background:var(--surface);color:var(--ink);box-shadow:var(--box-shadow)}
+.rep-nav{display:flex;align-items:center;gap:10px}
+.rep-arrow{width:32px;height:32px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:var(--sunk);color:var(--ink-3);transition:.15s ease}
+.rep-arrow:hover{background:var(--acc-soft)}
+.rep-arrow svg{width:14px;height:14px}
+.rep-label{font-size:13.5px;font-weight:400;min-width:150px;text-align:center}
+.rep-today{font-size:11.5px;font-weight:500;color:var(--ink-3);padding:6px 12px;border-radius:999px;background:var(--sunk)}
+.rep-today:hover{background:var(--acc-soft);color:var(--ink)}
+.rep-list{display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
+.rep-card{background:var(--box);border-radius:24px;box-shadow:var(--box-shadow)}
+.rep-head{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 18px}
+.rep-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rep-mid b{font-size:14.5px;font-weight:400}
+.rep-mid span{font-size:12px;color:var(--ink-3);font-weight:300}
+.rep-bar{flex:none;width:130px;height:8px;border-radius:999px;overflow:hidden;display:flex;background:var(--sunk)}
+.rep-bar i{display:block;height:100%}
+.rep-card .chev{flex:none;transition:transform .2s ease;color:var(--ink-3)}
+.rep-card.open .chev{transform:rotate(180deg)}
+.rep-card .pbody{grid-template-rows:0fr}
+.rep-card.open .pbody{grid-template-rows:1fr}
+.rep-card .pbody-in{overflow:hidden;min-height:0}
+.rep-legend{display:flex;flex-wrap:wrap;gap:14px;padding:2px 18px 12px;font-size:12px;color:var(--ink-3)}
+.rep-legend span{display:inline-flex;align-items:center;gap:6px}
+.rep-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.rep-tasks{padding:0 18px 16px;display:flex;flex-direction:column;gap:2px}
+.rep-task{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;border-radius:14px;transition:.15s ease}
+.rep-task:hover{background:var(--sunk)}
+.rep-task b{flex:1;min-width:0;font-size:12.5px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rep-task > span:not(.task-cat){flex:none;font-size:11px;color:var(--ink-3);font-weight:300}
+.extra-redirect{display:flex;align-items:center;gap:8px;width:100%;padding:10px 4px;font-size:12.5px;font-weight:400;color:var(--acc, var(--ink-3))}
+.extra-redirect:hover{text-decoration:underline}
+
+
 .task-empty{font-size:12px;color:var(--ink-3);font-weight:300;padding:9px 2px}
 .task-row.wide{padding:2px 0}
 .task-cal{flex:none}
@@ -684,6 +743,70 @@ body.readonly .crumb{pointer-events:auto}
 .hist-row .t{font-size:11px;color:var(--ink-3);flex:none;font-variant-numeric:tabular-nums}
 .hist-empty{padding:26px 0;text-align:center;color:var(--ink-3);font-size:13px}
 
+
+/* ---------- team calendar ---------- */
+.cal-page{display:flex;flex-direction:column;gap:14px}
+.cal-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.cal-filters{display:flex;gap:8px;flex-wrap:wrap}
+.cal-filter-btn{font-size:12.5px;font-weight:500;color:var(--ink-2);padding:7px 14px;border-radius:999px;background:var(--sunk);transition:.15s ease}
+.cal-filter-btn:hover{background:var(--acc-soft);color:var(--ink)}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-arrow{width:32px;height:32px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:var(--sunk);color:var(--ink-3);transition:.15s ease}
+.cal-arrow:hover{background:var(--acc-soft)}
+.cal-arrow svg{width:14px;height:14px}
+.cal-month-btn{font-size:14px;font-weight:600;color:var(--ink);padding:6px 12px;border-radius:12px;transition:.15s ease}
+.cal-month-btn:hover{background:var(--sunk)}
+.cal-today{font-size:11.5px;font-weight:500;color:var(--ink-3);padding:6px 12px;border-radius:999px;background:var(--sunk)}
+.cal-today:hover{background:var(--acc-soft);color:var(--ink)}
+
+.cal-tray{background:var(--box);border-radius:20px;box-shadow:var(--box-shadow);padding:12px 16px}
+.cal-tray-label{margin:0 0 8px;font-size:11.5px;font-weight:500;color:var(--ink-3)}
+.cal-tray-list{display:flex;flex-wrap:wrap;gap:8px}
+.cal-tray-item{display:flex;align-items:center;gap:7px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--sunk);border-left:3px solid transparent;font-size:12.5px;font-weight:400;color:var(--ink);transition:.15s ease}
+.cal-tray-item:hover{background:var(--acc-soft)}
+
+.cal-grid{
+  display:grid;
+  grid-template-columns:56px repeat(5,1fr);
+  grid-template-rows:auto repeat(var(--cal-rows),48px);
+  background:var(--box);border-radius:20px;box-shadow:var(--box-shadow);
+  overflow:hidden;
+}
+.cal-corner{background:var(--surface)}
+.cal-daycol-head{
+  background:var(--surface);padding:10px 6px;text-align:center;
+  font-size:11px;font-weight:500;color:var(--ink-3);
+  border-left:1px solid var(--line);
+}
+.cal-daycol-head b{display:block;font-size:15px;font-weight:600;color:var(--ink);margin-top:2px}
+.cal-daycol-head.today{color:var(--acc)}
+.cal-daycol-head.today b{color:var(--acc)}
+.cal-hourlabels{display:grid;grid-template-rows:repeat(var(--cal-rows),48px);background:var(--surface)}
+.cal-hour-label{font-size:10.5px;color:var(--ink-3);text-align:right;padding:0 8px;transform:translateY(-6px)}
+.cal-daycol{
+  position:relative;border-left:1px solid var(--line);
+  background-image:repeating-linear-gradient(to bottom, transparent, transparent 47px, var(--line) 47px, var(--line) 48px);
+}
+.cal-daycol.today{background-color:var(--acc-soft)}
+
+.cal-task{
+  position:absolute;left:3px;right:3px;z-index:1;
+  border-radius:10px;border-left:3px solid var(--acc);
+  padding:5px 8px;overflow:hidden;cursor:grab;
+  display:flex;flex-direction:column;gap:1px;
+  box-shadow:0 4px 14px -8px rgba(33,30,46,.4);
+  user-select:none;
+}
+.cal-task:active{cursor:grabbing}
+.cal-task-cat{font-size:8.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.cal-task b{font-size:12px;font-weight:500;color:var(--ink);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-task-time{font-size:10px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.cal-task .asg-stack{margin-top:2px}
+.cal-task .asg-stack .av{width:16px;height:16px;font-size:7.5px;margin-left:-6px}
+.cal-task .asg-stack .av:first-child{margin-left:0}
+.cal-resize{position:absolute;left:0;right:0;bottom:0;height:8px;cursor:ns-resize}
+
+.ac-who{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:400;color:var(--ink);padding:2px 0}
 </style>
 <script>
 (function(){
@@ -1030,11 +1153,15 @@ const I_SETTINGS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" s
 const I_MAG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.6c-1.3-.9-2.8-1.2-4.4-1V11c1.6-.2 3.1.1 4.4 1V3.6Z"/><path d="M8 3.6c1.3-.9 2.8-1.2 4.4-1V11c-1.6-.2-3.1.1-4.4 1V3.6Z"/></svg>';
 const I_DESIGN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a5.6 5.6 0 1 0 3.7 9.8c.4-.3.2-1-.3-1-.6 0-1-.5-1-1.1 0-.6.5-1.1 1.1-1.1H13a1.6 1.6 0 0 0 1.6-1.6c0-2.6-2.9-5-6.6-5Z"/><circle cx="5.4" cy="7.2" r=".7" fill="currentColor" stroke="none"/><circle cx="7.7" cy="5.3" r=".7" fill="currentColor" stroke="none"/><circle cx="10.2" cy="6.4" r=".7" fill="currentColor" stroke="none"/></svg>';
 const I_TEAM = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="5.2" r="2.1"/><path d="M1.7 13a4.2 4.2 0 0 1 8.2 0"/><path d="M10.3 3.6c1.1.2 1.9 1.2 1.9 2.4 0 1.1-.7 2.1-1.7 2.4"/><path d="M10.8 9.3c1.6.5 2.7 1.9 3.1 3.7"/></svg>';
+const I_EXTRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="2.4" width="11.2" height="11.2" rx="3.2"/><path d="M8 5.4v5.2M5.4 8h5.2"/></svg>';
+const I_REPORTS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 13V7.4M8 13V3.2M12.4 13V9.6"/><path d="M2.4 13h11.2"/></svg>';
 const SECTION_META = {
   local:     {label:"Local Pages",    fallback:LOGO},
   magazines: {label:"Magazines",      fallback:I_MAG},
   design:    {label:"Graphic Design", fallback:I_DESIGN},
-  team:      {label:"Team",           fallback:I_TEAM}
+  team:      {label:"Team",           fallback:I_TEAM},
+  extra:     {label:"Extra",          fallback:I_EXTRA},
+  reports:   {label:"Reports",        fallback:I_REPORTS}
 };
 function sectionMeta(id){
   const s = (DB.sections && DB.sections[id]) || null;
@@ -1078,12 +1205,9 @@ let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
           me:{name:""}, people:[], peopleColors:{}, sections:{},
           memberTasks:[], memberSteps:[]};
 let current = null;
-let SECTION = "local";   /* "local" | "magazines" | "design" | "team" */
-let teamOpenId = null;   /* which team member's task list is expanded */
+let SECTION = "local";   /* "local" | "magazines" | "design" | "team" | "extra" | "reports" */
 let open = new Set();
 const openPhase = new Set();
-/* which member's personal-task groups are expanded, as task ids */
-const openMemberTask = new Set();
 /* which step comment boxes are open, as "edition|step". Kept out here
    because a re-render throws the DOM away, and an open note closing
    itself mid-sentence is worse than the render being a frame slower. */
@@ -1798,290 +1922,14 @@ function stepSheet(phaseId, existing, at){
   sheet.querySelector("#stName").focus();
 }
 
-/* ============ personal (per-member) tasks ============
-   Independent of any folder/month/edition: each team member can keep
-   their own phase-like groups of customizable steps. Same shapes as
-   the main grid's phases/steps, just scoped to one person instead of
-   shared across the calendar, and nothing is preset by default. */
-function tasksOfMember(uid){ return DB.memberTasks.filter(t => t.userId === uid); }
-function memberStepsOf(taskId){ return DB.memberSteps.filter(s => s.taskId === taskId); }
-
-function memberTaskMenu(task, x, y){
-  closeCtx();
-  openCtx(x, y, [
-    {label:"Add step to " + task.name, fn:() => memberStepSheet(task.id, null)},
-    {label:"Rename or recolour", fn:() => memberTaskSheet(task.userId, task)},
-    {swatches:true, value:task.color, fn:c => { task.color = c; save(); renderTeamRefresh(); }},
-    {sep:true},
-    {label:"Delete task", danger:true, fn:() => {
-      const n = memberStepsOf(task.id).length;
-      confirmAsk("Delete " + task.name + "?",
-        n ? "Its " + n + " step" + (n > 1 ? "s" : "") + " go with it. You'll get a moment to undo."
-          : "It's empty. You'll get a moment to undo.",
-        "Delete task", () => {
-          undoable(task.name + " deleted", () => {
-            DB.memberSteps = DB.memberSteps.filter(s => s.taskId !== task.id);
-            DB.memberTasks = DB.memberTasks.filter(t => t.id !== task.id);
-            save(); renderTeamRefresh();
-          });
-        });
-    }}
-  ]);
-}
-function memberStepMenu(step, x, y){
-  closeCtx();
-  openCtx(x, y, [
-    {label:"Edit step", fn:() => memberStepSheet(step.taskId, step)},
-    {label:"Add step below", fn:() => memberStepSheet(step.taskId, null, DB.memberSteps.indexOf(step) + 1)},
-    {sep:true},
-    {label:"Delete step", danger:true, fn:() => {
-      confirmAsk("Delete " + step.label + "?", "You'll get a moment to undo.", "Delete step", () => {
-        undoable(step.label + " deleted", () => {
-          DB.memberSteps = DB.memberSteps.filter(s => s.id !== step.id);
-          save(); renderTeamRefresh();
-        });
-      });
-    }}
-  ]);
-}
-function memberTaskSheet(uid, existing, at){
-  const start = existing ? existing.color : COLORS[(tasksOfMember(uid).length % (COLORS.length - 1)) + 1].id;
-  const swatches = COLORS.map(c =>
-    '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
-    (start === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
-    ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
-
-  const sheet = openSheet(
-    "<h3>" + (existing ? "Edit task" : "New task") + "</h3>" +
-    "<p class='hint'>A group for their own steps - nothing here is shared with the main grid.</p>" +
-    '<div class="field"><label for="mtName">Name</label><input type="text" id="mtName" value="' +
-      esc(existing ? existing.name : "") + '" placeholder="Onboarding"></div>' +
-    '<div class="field"><label>Colour</label><div class="colorpick" id="mtCol">' + swatches + "</div></div>" +
-    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
-      (existing ? "Save" : "Create task") + "</button></div>");
-
-  sheet.querySelector("[data-close]").onclick = closeSheet;
-  let col = start;
-  sheet.querySelectorAll("#mtCol button").forEach(b => {
-    b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#mtCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); };
-  });
-  const commit = () => {
-    const name = sheet.querySelector("#mtName").value.trim();
-    if (!name){ sheet.querySelector("#mtName").focus(); return; }
-    closeSheet();
-    if (existing){ existing.name = name; existing.color = col; }
-    else {
-      const t = {id:slug(name), userId:uid, name, color:col};
-      DB.memberTasks.splice(typeof at === "number" ? at : DB.memberTasks.length, 0, t);
-      openMemberTask.add(t.id);
-    }
-    save(); renderTeamRefresh();
-  };
-  sheet.querySelector("[data-save]").onclick = commit;
-  sheet.querySelector("#mtName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
-  sheet.querySelector("#mtName").focus();
-  sheet.querySelector("#mtName").select();
-}
-function memberStepSheet(taskId, existing, at){
-  const isDate = existing ? existing.type === "date" : false;
-  const sheet = openSheet(
-    "<h3>" + (existing ? "Edit step" : "New step") + "</h3>" +
-    '<div class="field"><label for="mstName">Name</label><input type="text" id="mstName" value="' +
-      esc(existing ? existing.label : "") + '" placeholder="Read the handbook"></div>' +
-    '<div class="field"><label>Icon</label><button type="button" class="step-icon-pick" id="mstIconBtn"></button></div>' +
-    '<div class="field"><label for="mstType">Type</label><select class="sel" id="mstType">' +
-      '<option value="status"' + (isDate ? "" : " selected") + '>Progress slider</option>' +
-      '<option value="date"' + (isDate ? " selected" : "") + ">Date</option></select></div>" +
-    '<div class="field" id="mstDoneWrap"><label for="mstDone">Word when finished</label><input type="text" id="mstDone" value="' +
-      esc(existing ? (existing.done || "Done") : "Done") + '" placeholder="Done"></div>' +
-    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
-      (existing ? "Save" : "Create step") + "</button></div>");
-
-  sheet.querySelector("[data-close]").onclick = closeSheet;
-  let icon = existing ? (existing.icon || "") : "";
-  const iconBtn = sheet.querySelector("#mstIconBtn");
-  const paintIcon = () => {
-    iconBtn.innerHTML = '<span class="ic-prev">' +
-      (icon ? iconGlyph(icon, 18) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
-      "</span><span>" + (icon ? iconLabel(icon) : "Choose an icon") + "</span>";
-  };
-  paintIcon();
-  iconBtn.onclick = () => iconSheet(icon, "", (v) => { icon = v; paintIcon(); }, {noColor:true});
-  const typeSel = sheet.querySelector("#mstType"), doneWrap = sheet.querySelector("#mstDoneWrap");
-  const syncType = () => { doneWrap.style.display = typeSel.value === "date" ? "none" : ""; };
-  typeSel.onchange = syncType; syncType();
-
-  const commit = () => {
-    const label = sheet.querySelector("#mstName").value.trim();
-    if (!label){ sheet.querySelector("#mstName").focus(); return; }
-    const type = typeSel.value;
-    const done = sheet.querySelector("#mstDone").value.trim() || "Done";
-    closeSheet();
-    if (existing){
-      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon;
-    } else {
-      const s = {id:slug(label), taskId, label, type, done, icon, progress:0, dateValue:""};
-      let idx = typeof at === "number" ? at : -1;
-      if (idx < 0){
-        const list = memberStepsOf(taskId);
-        idx = list.length ? DB.memberSteps.indexOf(list[list.length - 1]) + 1 : DB.memberSteps.length;
-      }
-      DB.memberSteps.splice(idx, 0, s);
-    }
-    save(); renderTeamRefresh();
-  };
-  sheet.querySelector("[data-save]").onclick = commit;
-  sheet.querySelector("#mstName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
-  sheet.querySelector("#mstName").focus();
-}
-function applyMemberTaskOrder(uid, ids){
-  const map = {};
-  DB.memberTasks.forEach(t => { map[t.id] = t; });
-  const mine = ids.map(id => map[id]).filter(Boolean);
-  const rest = DB.memberTasks.filter(t => t.userId !== uid);
-  DB.memberTasks = rest.concat(mine);
-  save(); renderTeamRefresh();
-}
-function applyMemberStepOrder(taskId, ids){
-  const slots = [], map = {};
-  DB.memberSteps.forEach((s, i) => { if (s.taskId === taskId){ slots.push(i); map[s.id] = s; } });
-  ids.forEach((id, k) => { if (map[id] && slots[k] !== undefined) DB.memberSteps[slots[k]] = map[id]; });
-  save(); renderTeamRefresh();
-}
-function renderMemberTasks(container, uid){
-  if (!container) return;
-  const tasks = tasksOfMember(uid);
-  if (!tasks.length && !CAN_EDIT){ container.innerHTML = ""; return; }
-  container.innerHTML = "";
-  const label = document.createElement("p");
-  label.className = "section-label"; label.textContent = "Personal tasks";
-  container.appendChild(label);
-  const pad = document.createElement("div");
-  pad.className = "body-pad";
-
-  tasks.forEach(task => {
-    const box = document.createElement("section");
-    box.className = "phase-box" + (openMemberTask.has(task.id) ? "" : " shut");
-    box.dataset.id = task.id;
-    box.style.setProperty("--phc", phaseColor(task));
-
-    const phead = document.createElement("div");
-    phead.className = "phase-head";
-    phead.setAttribute("role", "button");
-    phead.tabIndex = 0;
-    phead.setAttribute("aria-expanded", String(openMemberTask.has(task.id)));
-    phead.innerHTML = '<span class="grip-slot"></span><span class="dot"></span><h4>' + esc(task.name) + "</h4>" +
-      '<span class="pchev">' + CHEV + "</span>";
-    const toggle = () => {
-      const willOpen = box.classList.contains("shut");
-      box.classList.toggle("shut", !willOpen);
-      phead.setAttribute("aria-expanded", String(willOpen));
-      willOpen ? openMemberTask.add(task.id) : openMemberTask.delete(task.id);
-    };
-    phead.onclick = toggle;
-    phead.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); } };
-    phead.oncontextmenu = e => { if (!CAN_EDIT) return; e.preventDefault(); e.stopPropagation(); memberTaskMenu(task, e.clientX, e.clientY); };
-    if (CAN_EDIT) phead.querySelector(".grip-slot").replaceWith(gripFor(box));
-    else phead.querySelector(".grip-slot").remove();
-    box.appendChild(phead);
-
-    const pbody = document.createElement("div"); pbody.className = "pbody";
-    const pin = document.createElement("div"); pin.className = "pbody-in";
-    const list = document.createElement("div"); list.className = "steps";
-
-    memberStepsOf(task.id).forEach(s => {
-      const row = document.createElement("div");
-      row.className = "step type-" + s.type;
-      row.dataset.id = s.id;
-      const iconHTML = s.icon
-        ? (CAN_EDIT
-            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15) + "</button>"
-            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15) + "</span>")
-        : (CAN_EDIT
-            ? '<button type="button" class="step-icon empty" title="Add an icon">' +
-              '<span class="material-symbols-outlined" style="font-size:15px">add</span></button>'
-            : "");
-      row.innerHTML = '<span class="step-name">' + iconHTML + '<span class="step-label">' + esc(s.label) + "</span></span>";
-      if (CAN_EDIT) row.appendChild(gripFor(row));
-      if (CAN_EDIT){
-        const iconBtn = row.querySelector(".step-icon");
-        if (iconBtn) iconBtn.onclick = e => {
-          e.stopPropagation();
-          iconSheet(s.icon || "", "", (v) => { s.icon = v; save(); renderTeamRefresh(); }, {noColor:true});
-        };
-      }
-      row.oncontextmenu = e => {
-        if (!CAN_EDIT) return;
-        e.preventDefault(); e.stopPropagation(); memberStepMenu(s, e.clientX, e.clientY);
-      };
-
-      const ctrls = document.createElement("div"); ctrls.className = "ctrls";
-      if (s.type === "status"){
-        const stateEl = document.createElement("span"); stateEl.className = "state";
-        const rng = document.createElement("input");
-        rng.type = "range"; rng.className = "rng";
-        rng.min = "0"; rng.max = "100"; rng.step = "5";
-        rng.value = String(s.progress || 0);
-        rng.setAttribute("aria-label", s.label + " progress");
-        if (!CAN_EDIT) rng.disabled = true;
-        const pctEl = document.createElement("span"); pctEl.className = "pctlab";
-        const paint = v => {
-          const st = stateOf(v);
-          stateEl.textContent = stateWord(s, v);
-          stateEl.dataset.s = st;
-          pctEl.textContent = v + "%";
-          rng.style.setProperty("--p", v + "%");
-          rng.style.setProperty("--fill", st === 2 ? "var(--f-done)" : "var(--f-prog)");
-          rng.setAttribute("aria-valuetext", v + "% - " + stateWord(s, v));
-          row.classList.toggle("is-done", v >= 100);
-        };
-        paint(s.progress || 0);
-        rng.oninput = () => { s.progress = Number(rng.value); paint(s.progress); };
-        rng.onchange = () => { save(); };
-        ctrls.appendChild(stateEl); ctrls.appendChild(rng); ctrls.appendChild(pctEl);
-      } else {
-        const d = dateButton(() => s.dateValue || "", iso => { s.dateValue = iso; save(); });
-        d.setAttribute("aria-label", s.label);
-        if (!CAN_EDIT) d.disabled = true;
-        ctrls.appendChild(d);
-      }
-      row.appendChild(ctrls);
-      list.appendChild(row);
-    });
-
-    if (CAN_EDIT){
-      const addS = document.createElement("button");
-      addS.type = "button"; addS.className = "addstep";
-      addS.textContent = "+ Add step";
-      addS.onclick = () => memberStepSheet(task.id, null);
-      list.appendChild(addS);
-      makeSortable(list, ".step", ids => applyMemberStepOrder(task.id, ids));
-    } else if (!memberStepsOf(task.id).length){
-      const none = document.createElement("p");
-      none.className = "pp-none"; none.textContent = "Nothing added yet.";
-      list.appendChild(none);
-    }
-
-    pin.appendChild(list); pbody.appendChild(pin); box.appendChild(pbody);
-    pad.appendChild(box);
-  });
-
-  container.appendChild(pad);
-  if (CAN_EDIT){
-    makeSortable(pad, ".phase-box", ids => applyMemberTaskOrder(uid, ids));
-    const addT = document.createElement("button");
-    addT.type = "button"; addT.className = "addphase";
-    addT.textContent = "+ Add task";
-    addT.onclick = () => memberTaskSheet(uid, null);
-    pad.appendChild(addT);
-  }
-}
-function renderTeamRefresh(){
-  if (SECTION !== "team" || !teamOpenId) return;
-  const sect = document.getElementById("sectWrap");
-  const item = sect && sect.querySelector('.team-item[data-id="' + teamOpenId + '"].open');
-  if (item) renderMemberTasks(item.querySelector(".member-tasks"), teamOpenId);
-}
+/* Round 5: the old per-member "personal tasks" family (tasksOfMember,
+   memberStepsOf, memberTaskMenu, memberStepMenu, memberTaskSheet,
+   memberStepSheet, applyMemberTaskOrder, applyMemberStepOrder,
+   renderMemberTasks, renderTeamRefresh) lived here -- deleted along
+   with the Team-as-accordion rebuild below. Independent tasks now
+   live on the Extra page (see renderExtraSection/taskSheet), with
+   multiple assignees and a real category tag instead of being
+   scoped to one person. */
 
 /* ============ comments ============ */
 function ensureName(cb){
@@ -2183,7 +2031,7 @@ function commentBox(getArr, placeholder, onChange, ctx){
             () => {
               gone.forEach(g => {
                 a2.push(g);
-                if (ctx) pushComment(g, ctx.month, ctx.edition, ctx.step);
+                if (ctx) pushComment(g, ctx.month, ctx.edition, ctx.step, ctx.task);
               });
               a2.sort((x, y) => String(x.at).localeCompare(String(y.at)));
               paint(); if (onChange) onChange();
@@ -2211,7 +2059,7 @@ function commentBox(getArr, placeholder, onChange, ctx){
       ta.value = ""; paint(); if (onChange) onChange();
 
       if (!ctx) return;
-      const why = await pushComment(entry, ctx.month, ctx.edition, ctx.step);
+      const why = await pushComment(entry, ctx.month, ctx.edition, ctx.step, ctx.task);
       if (why){
         /* it never reached the database, so take it back off screen and
            hand the words back rather than letting a reload eat them */
@@ -2490,6 +2338,7 @@ function buildCard(ed, isFresh){
         paint(c.status[s.id] || 0);
         rng.oninput = () => {
           const v = Number(rng.value);
+          if (v !== (cell(ed.id).status[s.id] || 0)) playSound("tick");
           cell(ed.id).status[s.id] = v;
           paint(v); refreshEdition(ed, true); renderSummary();
         };
@@ -2717,7 +2566,9 @@ function brandMenu(x, y){
     {icon:sectionIconHTML("magazines", 15), label:"Magazines", fn:() => goSection("magazines")},
     {icon:sectionIconHTML("design", 15), label:"Graphic Design", fn:() => goSection("design")},
     {sep:true},
-    {icon:sectionIconHTML("team", 15), label:"Team", fn:() => goSection("team")}
+    {icon:sectionIconHTML("team", 15), label:"Team", fn:() => goSection("team")},
+    {icon:sectionIconHTML("extra", 15), label:"Extra", fn:() => goSection("extra")},
+    {icon:sectionIconHTML("reports", 15), label:"Reports", fn:() => goSection("reports")}
   ]);
 }
 function placeholderSection(container, name){
@@ -2725,70 +2576,620 @@ function placeholderSection(container, name){
     '<section class="summary"><div class="ring-side"><h2>' + esc(name) + "</h2>" +
     '<p>This section is under construction - nothing lives here yet.</p></div></section>';
 }
-function renderTeamSection(container){
+function tasksSorted(){ return DB.tasks.slice().sort((a, b) => (a.sort || 0) - (b.sort || 0)); }
+/* One card in the Extra list. */
+function extraCardHTML(t){
+  const whos = t.assignees.map(id => whoIs(id, ""));
+  const shown = whos.slice(0, 4);
+  const stack = whos.length
+    ? '<span class="asg-stack">' + shown.map(w => avatarOf(w, 24)).join("") +
+      (whos.length > shown.length ? '<span class="asg-more">+' + (whos.length - shown.length) + "</span>" : "") + "</span>"
+    : '<span class="extra-noasg">Unassigned</span>';
+  const cmts = (DB.taskComments[t.id] || []).length;
+  return '<article class="extra-card' + (t.status === "done" ? " done" : "") + '" data-id="' + t.id + '">' +
+    '<button type="button" class="extra-card-main">' +
+      '<span class="task-icon">' + (t.status === "done" ? CHECK : '<span class="material-symbols-outlined" style="font-size:15px">task_alt</span>') + "</span>" +
+      '<span class="extra-card-mid"><b>' + esc(t.title || "Untitled task") + "</b><span>" +
+        (t.notes ? esc(t.notes.length > 70 ? t.notes.slice(0, 70) + "…" : t.notes) : "No notes yet") +
+      "</span></span>" +
+      '<span class="task-cat">Extra</span>' +
+      (cmts ? '<span class="extra-cmt-ct">' + CMT_FILL + cmts + "</span>" : "") +
+      stack +
+      '<span class="task-pill' + (t.status === "done" ? " done" : "") + '">' + (t.status === "done" ? "Done" : "To do") + "</span>" +
+    "</button></article>";
+}
+function renderExtraSection(container){
+  const list = tasksSorted();
+  const todo = list.filter(t => t.status !== "done"), done = list.filter(t => t.status === "done");
   container.innerHTML =
-    '<section class="summary"><div class="ring-side"><h2>Team</h2>' +
-    "<p>Everyone with an account. Click someone to see what's assigned to them, in real time - " +
-    "any full-access teammate can edit it, same as your own.</p></div></section>" +
-    '<p class="section-label">Members</p>' +
-    '<div id="teamList"></div>';
-  const list = container.querySelector("#teamList");
-  list.innerHTML = PROFILES.map((p, i) => {
-    const nm = (p.name || p.email || "").trim();
-    const me = ME && p.id === ME.id;
-    const isOpen = teamOpenId === p.id;
-    const tasks = isOpen ? myTasks(p.id) : [];
-    return '<div class="team-item' + (isOpen ? " open" : "") + '" data-i="' + i + '" data-id="' + esc(p.id) + '">' +
-      '<button type="button" class="pp-row team-row" data-i="' + i + '">' + avatarHTML(nm, 30) +
-      "<div><div class='pp-name'>" + esc(nm) + (me ? " <span class='pp-sub'>you</span>" : "") + "</div>" +
-      "<div class='pp-sub'>" + esc(p.email || "") + "</div></div>" +
-      '<span class="chev">' + CHEV + "</span></button>" +
-      '<div class="pbody"><div class="pbody-in"><div class="task-list">' +
-      (isOpen ? taskRowsHTML(tasks, true) : "") + '</div><div class="member-tasks"></div></div></div></div>';
-  }).join("");
-  list.querySelectorAll(".team-row[data-i]").forEach(b => {
-    b.onclick = () => toggleTeamItem(container, PROFILES[+b.dataset.i]);
-  });
-  if (teamOpenId) wireOpenTeamItem(container);
-}
-/* Toggling a member only flips classes + fills that one row's task list,
-   rather than rebuilding the whole #teamList - a full rebuild would
-   recreate the row already in its open state, so the CSS grid-row
-   transition would never get to play. */
-function toggleTeamItem(container, p){
-  const list = container.querySelector("#teamList");
-  const prevOpen = list.querySelector(".team-item.open");
-  if (prevOpen) prevOpen.classList.remove("open");
-  if (teamOpenId === p.id){
-    teamOpenId = null;
-    return;
-  }
-  teamOpenId = p.id;
-  const item = list.querySelector('.team-item[data-id="' + p.id + '"]');
-  if (!item) return;
-  const taskList = item.querySelector(".task-list");
-  taskList.innerHTML = taskRowsHTML(myTasks(p.id), true);
-  item.classList.add("open");
-  wireOpenTeamItem(container);
-}
-function wireOpenTeamItem(container){
-  const list = container.querySelector("#teamList");
-  const openItem = list.querySelector(".team-item.open");
-  if (!openItem) return;
-  const tasks = myTasks(teamOpenId);
-  wireTaskRows(openItem, tasks, () => goSection("local"));
-  openItem.querySelectorAll(".task-cal[data-cal]").forEach(host => {
-    const t = tasks[+host.dataset.cal];
-    const btn = dateButton(() => t.completedAt || "", iso => {
-      t.completedAt = iso;
-      const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
-      const a = c && c.assignee && (c.assignee[t.stepId] || []).find(x => x.userId === teamOpenId);
-      if (a) a.completedAt = iso;
-      pushAssignment(t.monthId, t.edId, t.stepId, teamOpenId, iso || null);
+    '<section class="summary"><div class="ring-side"><h2>Extra</h2>' +
+    "<p>Tasks that don’t belong to any Local Pages edition — create one, put whoever’s on it, and track it here." +
+    (CAN_EDIT ? "" : " Read-only — ask a full-access teammate for changes.") + "</p></div></section>" +
+    (CAN_EDIT ? '<div class="extra-toolbar"><button type="button" class="btn primary" id="exNew">' +
+      '<span class="material-symbols-outlined" style="font-size:16px">add</span>New task</button></div>' : "") +
+    '<div class="extra-list" id="exList">' +
+      (list.length ? "" : '<p class="sect-empty">Nothing here yet' + (CAN_EDIT ? " — add the first task above." : ".") + "</p>") +
+      (todo.length ? '<p class="extra-group-h">To do · ' + todo.length + "</p>" + todo.map(extraCardHTML).join("") : "") +
+      (done.length ? '<p class="extra-group-h">Done · ' + done.length + "</p>" + done.map(extraCardHTML).join("") : "") +
+    "</div>";
+  const newBtn = container.querySelector("#exNew");
+  if (newBtn) newBtn.onclick = () => taskSheet(null);
+  container.querySelectorAll(".extra-card").forEach(card => {
+    const t = list.find(x => x.id === card.dataset.id);
+    if (!t) return;
+    card.querySelector(".extra-card-main").onclick = () => taskSheet(t);
+    card.addEventListener("contextmenu", e => {
+      if (!CAN_EDIT) return;
+      e.preventDefault();
+      openCtx(e.clientX, e.clientY, [
+        {icon:CHECK, label:t.status === "done" ? "Mark as to do" : "Mark as done",
+         fn:() => { t.status = t.status === "done" ? "todo" : "done"; pushTask(t); playSound("complete"); renderSection(); }},
+        {sep:true},
+        {icon:XMARK, label:"Delete task", danger:true, fn:() => deleteTask(t)}
+      ]);
     });
-    host.appendChild(btn);
   });
-  renderMemberTasks(openItem.querySelector(".member-tasks"), teamOpenId);
+}
+function deleteTask(t){
+  confirmAsk("Delete “" + esc(t.title || "this task") + "”?",
+    "Its comments and assignments go with it. You'll get a moment to undo.", "Delete task", () => {
+    undoable("Task deleted", () => {
+      DB.tasks = DB.tasks.filter(x => x.id !== t.id);
+      dropTask(t.id);
+      renderSection();
+    }, () => {
+      DB.tasks.push(t);
+      pushTask(t);
+      t.assignees.forEach(id => pushTaskAssignee(t.id, id));
+      renderSection();
+    });
+  });
+}
+/* Create or edit one Extra task: title, any number of assignees, an
+   optional calendar slot (so it can also show up on the Team calendar),
+   notes, and -- once it exists -- a full comment thread, exactly like
+   any step in Local Pages. */
+function taskSheet(existing){
+  const isNew = !existing;
+  const t = existing || {id:"tk-" + newId(), title:"", category:"extra", notes:"", status:"todo",
+                          calDate:"", startTime:"", endTime:"", color:"", sort:DB.tasks.length,
+                          createdBy:ME && ME.id, assignees:[]};
+  const selAssignees = new Set(t.assignees);
+  const sheet = openSheet(
+    "<h3>" + (isNew ? "New task" : "Edit task") + "</h3>" +
+    '<div class="field"><label for="txTitle">Title</label><input type="text" id="txTitle" maxlength="120" value="' +
+      esc(t.title) + '" placeholder="Design the September poster"></div>' +
+    '<div class="field"><label>Assigned to</label><div class="asg-picklist" id="txAsg"></div></div>' +
+    '<div class="two">' +
+      '<div class="field"><label>Calendar date</label><div id="txDateWrap"></div></div>' +
+      '<div class="field"><label>&nbsp;</label><button type="button" class="btn ghostbtn" id="txStatus" style="width:100%"></button></div>' +
+    "</div>" +
+    '<div class="two">' +
+      '<div class="field"><label for="txStart">Start time</label><input type="time" id="txStart" value="' + esc(t.startTime || "") + '"></div>' +
+      '<div class="field"><label for="txEnd">End time</label><input type="time" id="txEnd" value="' + esc(t.endTime || "") + '"></div>' +
+    "</div>" +
+    '<div class="field"><label for="txNotes">Notes</label><textarea id="txNotes" rows="3" placeholder="What’s this task about?">' +
+      esc(t.notes) + "</textarea></div>" +
+    (isNew ? "" : '<p class="pf-sec">Comments</p><div id="txComments"></div>') +
+    '<div class="actions">' +
+      (isNew ? "" : '<button type="button" class="btn danger" id="txDelete">Delete</button>') +
+      '<button type="button" class="btn ghostbtn" data-close>Cancel</button>' +
+      '<button type="button" class="btn primary" id="txSave">' + (isNew ? "Create task" : "Save") + "</button></div>");
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  if (!CAN_EDIT) sheet.querySelectorAll("input,textarea,button").forEach(el => { if (!el.hasAttribute("data-close")) el.disabled = true; });
+
+  const asgWrap = sheet.querySelector("#txAsg");
+  const paintAsgPick = () => {
+    const named = PROFILES.filter(p => (p.name || p.email || "").trim());
+    asgWrap.innerHTML = named.length ? named.map(p => {
+      const nm = (p.name || p.email || "").trim();
+      const who = {name:nm, avatar:p.avatar || "", color:userColorHex(p)};
+      const on = selAssignees.has(p.id);
+      return '<button type="button" class="asg-pick' + (on ? " on" : "") + '" data-u="' + p.id + '">' +
+        avatarOf(who, 24) + "<span>" + esc(nm) + (ME && p.id === ME.id ? " · you" : "") + "</span></button>";
+    }).join("") : '<p class="hint">No accounts yet.</p>';
+    asgWrap.querySelectorAll("button[data-u]").forEach(b => {
+      b.onclick = () => {
+        const id = b.dataset.u;
+        if (selAssignees.has(id)) selAssignees.delete(id); else selAssignees.add(id);
+        playSound("select"); paintAsgPick();
+      };
+    });
+  };
+  paintAsgPick();
+
+  sheet.querySelector("#txDateWrap").appendChild(
+    dateButton(() => t.calDate || "", iso => { t.calDate = iso; }));
+
+  const statusBtn = sheet.querySelector("#txStatus");
+  let status = t.status;
+  const paintStatus = () => {
+    statusBtn.textContent = status === "done" ? "✓ Done — click to reopen" : "Mark as done";
+    statusBtn.classList.toggle("primary", status === "done");
+  };
+  paintStatus();
+  statusBtn.onclick = () => { status = status === "done" ? "todo" : "done"; paintStatus(); playSound(status === "done" ? "complete" : "select"); };
+
+  if (!isNew){
+    const cbox = commentBox(() => (DB.taskComments[t.id] = DB.taskComments[t.id] || []),
+      "Add a comment…", null, {task:t.id, stepLabel:t.title || "this task"});
+    sheet.querySelector("#txComments").appendChild(cbox.el);
+    sheet.querySelector("#txDelete").onclick = () => { closeSheet(); deleteTask(t); };
+  }
+
+  const commit = () => {
+    const title = sheet.querySelector("#txTitle").value.trim();
+    if (!title){ sheet.querySelector("#txTitle").focus(); return; }
+    t.title = title;
+    t.notes = sheet.querySelector("#txNotes").value.trim();
+    t.startTime = sheet.querySelector("#txStart").value || "";
+    t.endTime = sheet.querySelector("#txEnd").value || "";
+    t.status = status;
+    const prevAssignees = new Set(t.assignees);
+    t.assignees = Array.from(selAssignees);
+    closeSheet();
+    if (isNew) DB.tasks.push(t);
+    pushTask(t);
+    t.assignees.filter(id => !prevAssignees.has(id)).forEach(id => pushTaskAssignee(t.id, id));
+    Array.from(prevAssignees).filter(id => !selAssignees.has(id)).forEach(id => dropTaskAssignee(t.id, id));
+    playSound(isNew ? "complete" : "select");
+    renderSection();
+  };
+  sheet.querySelector("#txSave").onclick = commit;
+  sheet.querySelector("#txTitle").focus();
+}
+
+/* ============ reports ============
+   Per-person time-by-category, week by week or month by month.
+   Only tasks that have actually been placed on the calendar (a
+   cal_date, from either a Local Pages assignment or an Extra task)
+   count towards a period -- nothing is guessed from completion alone. */
+const CATEGORY_LABEL = {local:"Local Pages", magazines:"Magazines", design:"Graphic Design", extra:"Extra"};
+const CATEGORY_COLOR = {local:"#2F8FE0", magazines:"#EE8B22", design:"#8158E0", extra:"#33A96B"};
+function taskMinutes(startTime, endTime){
+  if (!startTime || !endTime) return 60;
+  const [sh, sm] = startTime.split(":").map(Number), [eh, em] = endTime.split(":").map(Number);
+  const mins = (eh * 60 + em) - (sh * 60 + sm);
+  return mins > 0 ? mins : 60;
+}
+function fmtHrs(mins){
+  const h = Math.floor(mins / 60), m = mins % 60;
+  if (!h) return m + "m";
+  return h + "h" + (m ? " " + m + "m" : "");
+}
+function mondayOf(d){
+  const x = new Date(d); const day = (x.getDay() + 6) % 7;
+  x.setDate(x.getDate() - day); x.setHours(0, 0, 0, 0);
+  return x;
+}
+function weekRange(offset){
+  const from = mondayOf(new Date());
+  from.setDate(from.getDate() + offset * 7);
+  const to = new Date(from); to.setDate(to.getDate() + 6);
+  const fmt = d => d.toLocaleDateString("en-GB", {day:"numeric", month:"short"});
+  const thisYear = new Date().getFullYear();
+  const label = fmt(from) + " – " + fmt(to) + (from.getFullYear() !== thisYear ? ", " + from.getFullYear() : "");
+  return {from:isoOf(from), to:isoOf(to), label};
+}
+function monthRange(offset){
+  const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + offset);
+  const from = new Date(base.getFullYear(), base.getMonth(), 1);
+  const to = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+  return {from:isoOf(from), to:isoOf(to), label:MONTH_NAMES[base.getMonth()] + " " + base.getFullYear()};
+}
+function reportRowsFor(userId, from, to){
+  const out = [];
+  DB.issues.forEach(m => (m.editions || []).forEach(edId => {
+    const c = DB.data[m.id] && DB.data[m.id][edId];
+    if (!c || !c.assignee) return;
+    Object.keys(c.assignee).forEach(stepId => {
+      (c.assignee[stepId] || []).forEach(a => {
+        if (a.userId !== userId || !a.calDate || a.calDate < from || a.calDate > to) return;
+        const st = DB.steps.find(x => x.id === stepId);
+        out.push({title:st ? st.label : stepId, category:"local", calDate:a.calDate,
+                   minutes:taskMinutes(a.startTime, a.endTime),
+                   nav:() => { goSection("local"); goToStep(m.id, edId, stepId); }});
+      });
+    });
+  }));
+  DB.tasks.forEach(t => {
+    if (!t.assignees.includes(userId) || !t.calDate || t.calDate < from || t.calDate > to) return;
+    out.push({title:t.title || "Untitled task", category:t.category || "extra", calDate:t.calDate,
+               minutes:taskMinutes(t.startTime, t.endTime),
+               nav:() => { goSection("extra"); taskSheet(t); }});
+  });
+  out.sort((a, b) => a.calDate.localeCompare(b.calDate));
+  return out;
+}
+let reportMode = "week", reportOffset = 0, reportOpenUser = null;
+function repUserHTML(u){
+  const who = whoIs(u.p.id, (u.p.name || u.p.email || ""));
+  const segs = Object.keys(u.byCat).map(cat => ({cat, mins:u.byCat[cat],
+    pct: u.total ? Math.round(u.byCat[cat] / u.total * 100) : 0})).sort((a, b) => b.mins - a.mins);
+  const open = reportOpenUser === u.p.id;
+  return '<article class="rep-card' + (open ? " open" : "") + '" data-u="' + u.p.id + '">' +
+    '<button type="button" class="rep-head">' + avatarOf(who, 30) +
+      '<span class="rep-mid"><b>' + esc(who.name || "Someone") + "</b><span>" +
+        (u.total ? fmtHrs(u.total) + " across " + u.rows.length + (u.rows.length === 1 ? " task" : " tasks") : "Nothing logged this period") +
+      "</span></span>" +
+      (u.total ? '<span class="rep-bar">' + segs.map(s => '<i style="width:' + s.pct + '%;background:' +
+        (CATEGORY_COLOR[s.cat] || "#8B86A8") + '"></i>').join("") + "</span>" : "") +
+      '<span class="chev">' + CHEV + "</span>" +
+    "</button>" +
+    '<div class="pbody"><div class="pbody-in">' +
+      (u.total ? '<div class="rep-legend">' + segs.map(s => '<span><i style="background:' +
+        (CATEGORY_COLOR[s.cat] || "#8B86A8") + '"></i>' + esc(CATEGORY_LABEL[s.cat] || s.cat) + " · " + s.pct + "%</span>").join("") + "</div>" : "") +
+      '<div class="rep-tasks">' + (u.rows.length ? u.rows.map((r, i) =>
+        '<button type="button" class="rep-task" data-i="' + i + '"><span class="task-cat">' + esc(CATEGORY_LABEL[r.category] || r.category) +
+        "</span><b>" + esc(r.title) + "</b><span>" + shortDate(r.calDate) + "</span><span>" + fmtHrs(r.minutes) + "</span></button>"
+      ).join("") : '<p class="task-empty">Nothing scheduled on the calendar this period.</p>') + "</div>" +
+    "</div></div></article>";
+}
+function renderReportsSection(container){
+  const range = reportMode === "week" ? weekRange(reportOffset) : monthRange(reportOffset);
+  const users = PROFILES.filter(p => (p.name || p.email || "").trim());
+  const perUser = users.map(p => {
+    const rows = reportRowsFor(p.id, range.from, range.to);
+    const byCat = {}; let total = 0;
+    rows.forEach(r => { byCat[r.category] = (byCat[r.category] || 0) + r.minutes; total += r.minutes; });
+    return {p, rows, byCat, total};
+  }).sort((a, b) => b.total - a.total);
+
+  container.innerHTML =
+    '<section class="summary"><div class="ring-side"><h2>Reports</h2>' +
+    "<p>How everyone’s time splits across categories — Local Pages and Extra today, more as other pages fill in.</p></div></section>" +
+    '<div class="rep-toolbar"><div class="rep-modes">' +
+      '<button type="button" class="rep-mode' + (reportMode === "week" ? " on" : "") + '" data-m="week">Week</button>' +
+      '<button type="button" class="rep-mode' + (reportMode === "month" ? " on" : "") + '" data-m="month">Month</button>' +
+    "</div><div class=\"rep-nav\"><button type=\"button\" class=\"rep-arrow\" id=\"repPrev\">" + ARR_L + "</button>" +
+      '<span class="rep-label">' + esc(range.label) + "</span>" +
+      '<button type="button" class="rep-arrow" id="repNext">' + ARR_R + "</button>" +
+      (reportOffset !== 0 ? '<button type="button" class="rep-today" id="repToday">Today</button>' : "") +
+    "</div></div>" +
+    '<div class="rep-list">' + (perUser.length ? perUser.map(repUserHTML).join("") : '<p class="sect-empty">No accounts yet.</p>') + "</div>";
+
+  container.querySelectorAll(".rep-mode").forEach(b => {
+    b.onclick = () => { if (reportMode === b.dataset.m) return; reportMode = b.dataset.m; reportOffset = 0; playSound("select"); renderSection(); };
+  });
+  container.querySelector("#repPrev").onclick = () => { reportOffset--; playSound("select"); renderSection(); };
+  container.querySelector("#repNext").onclick = () => { reportOffset++; playSound("select"); renderSection(); };
+  const todayBtn = container.querySelector("#repToday");
+  if (todayBtn) todayBtn.onclick = () => { reportOffset = 0; playSound("select"); renderSection(); };
+  container.querySelectorAll(".rep-card").forEach(card => {
+    const uid = card.dataset.u;
+    const u = perUser.find(x => x.p.id === uid);
+    card.querySelector(".rep-head").onclick = () => {
+      reportOpenUser = reportOpenUser === uid ? null : uid;
+      playSound(reportOpenUser ? "open" : "close");
+      renderSection();
+    };
+    card.querySelectorAll(".rep-task[data-i]").forEach(b => {
+      b.onclick = () => { const r = u.rows[+b.dataset.i]; if (r && r.nav) r.nav(); };
+    });
+  });
+}
+
+/* ============ team calendar ============
+   Replaces the old member-accordion Team page entirely. One week at a
+   time, Monday-Friday, hourly rows from CAL_START_HOUR to CAL_END_HOUR.
+   Two kinds of thing can land on it: a Local Pages grid assignment
+   (one row per assignee already, from `assignments.cal_date/start_time/
+   end_time`) and an Extra task (`tasks`, which already carries its own
+   date/time from taskSheet). Both are normalised into one flat "cal
+   item" shape by calAllItems() so the grid, the drag code and the
+   filters don't need to know which kind they're looking at. */
+const CAL_START_HOUR = 7, CAL_END_HOUR = 22;   /* 7:00 .. 22:00, 15 hourly rows */
+const CAL_ROW_PX = 48;
+const CAL_DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+let calWeekStart = "";     /* ISO date of the Monday currently shown; set on first render */
+let calFilterUser = "";    /* "" = everyone */
+let calFilterCat = "";     /* "" = every category */
+
+function addDays(iso, n){ const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return isoOf(d); }
+function calWeekDates(mondayIso){ const out = []; for (let i = 0; i < 5; i++) out.push(addDays(mondayIso, i)); return out; }
+function hexToRgba(hex, a){
+  const m = /^#([0-9a-f]{6})$/i.exec(hex || "");
+  if (!m) return "rgba(139,134,168," + a + ")";
+  const n = parseInt(m[1], 16);
+  return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+}
+function calAllItems(){
+  const out = [];
+  DB.issues.forEach(m => (m.editions || []).forEach(edId => {
+    const c = DB.data[m.id] && DB.data[m.id][edId];
+    if (!c || !c.assignee) return;
+    Object.keys(c.assignee).forEach(stepId => {
+      (c.assignee[stepId] || []).forEach(a => {
+        if (!a.userId) return;
+        const st = DB.steps.find(x => x.id === stepId);
+        out.push({kind:"assignment", key:m.id + "|" + edId + "|" + stepId + "|" + a.userId,
+                   monthId:m.id, edId, stepId, userId:a.userId,
+                   title:st ? st.label : stepId, category:"local",
+                   calDate:a.calDate || "", startTime:a.startTime || "", endTime:a.endTime || "",
+                   assignees:[a.userId], where:stepWhere(m.id, edId, stepId)});
+      });
+    });
+  }));
+  DB.tasks.forEach(t => {
+    out.push({kind:"task", key:t.id, task:t,
+               title:t.title || "Untitled task", category:t.category || "extra",
+               calDate:t.calDate || "", startTime:t.startTime || "", endTime:t.endTime || "",
+               assignees:t.assignees.slice(), where:"Extra"});
+  });
+  return out;
+}
+function calItemColor(it){
+  const p = it.assignees.length && PROFILES.find(x => x.id === it.assignees[0]);
+  return p ? userColorHex(p) : "#8B86A8";
+}
+function calMatchesFilter(it){
+  if (calFilterUser && it.assignees.indexOf(calFilterUser) < 0) return false;
+  if (calFilterCat && it.category !== calFilterCat) return false;
+  return true;
+}
+function calOpenItem(it){
+  if (it.kind === "task") taskSheet(it.task);
+  else assignmentCalSheet(it);
+}
+async function pushAssignmentSchedule(monthId, edId, stepId, userId, calDate, startTime, endTime){
+  if (!CAN_EDIT) return;
+  myTaskPush = Date.now();
+  const {error} = await sb.from("assignments")
+    .update({cal_date:calDate || null, start_time:startTime || null, end_time:endTime || null,
+             updated_at:new Date().toISOString(), updated_by:ME && ME.id})
+    .eq("month_id", monthId).eq("edition_id", edId).eq("step_id", stepId).eq("user_id", userId);
+  if (error){ console.error(error); setLive("off"); }
+}
+function calCommitItem(it, calDate, startTime, endTime){
+  it.calDate = calDate; it.startTime = startTime; it.endTime = endTime;
+  if (it.kind === "task"){
+    it.task.calDate = calDate; it.task.startTime = startTime; it.task.endTime = endTime;
+    pushTask(it.task);
+  } else {
+    const c = DB.data[it.monthId] && DB.data[it.monthId][it.edId];
+    const a = c && c.assignee && (c.assignee[it.stepId] || []).find(x => x.userId === it.userId);
+    if (a){ a.calDate = calDate; a.startTime = startTime; a.endTime = endTime; }
+    pushAssignmentSchedule(it.monthId, it.edId, it.stepId, it.userId, calDate, startTime, endTime);
+  }
+}
+/* Editor for a grid-step calendar item -- deliberately lighter than the
+   full step editor: who it's for and the structural bits (name, type)
+   stay something you change from Local Pages. What the calendar owns is
+   when it happens, and its comments (shared with Local Pages -- same
+   thread, same commentBox). */
+function assignmentCalSheet(it){
+  const st = DB.steps.find(x => x.id === it.stepId);
+  const who = whoIs(it.userId, "");
+  const ed = DB.editions.find(x => x.id === it.edId);
+  const sheet = openSheet(
+    "<h3>" + esc(st ? st.label : "Step") + "</h3>" +
+    '<p class="hint">' + esc(it.where || "") + "</p>" +
+    '<div class="field"><label>Assigned to</label><div class="ac-who">' + avatarOf(who, 24) +
+      "<span>" + esc(who.name || "Someone") + "</span></div></div>" +
+    '<div class="two"><div class="field"><label>Category</label><span class="task-cat">Local Pages</span></div>' +
+      '<div class="field"><label>Calendar date</label><div id="acDateWrap"></div></div></div>' +
+    '<div class="two">' +
+      '<div class="field"><label for="acStart">Start</label><input type="time" id="acStart" value="' + esc(it.startTime || "") + '"></div>' +
+      '<div class="field"><label for="acEnd">End</label><input type="time" id="acEnd" value="' + esc(it.endTime || "") + '"></div>' +
+    "</div>" +
+    '<p class="pf-sec">Comments</p><div id="acComments"></div>' +
+    '<div class="actions">' +
+      (it.calDate ? '<button type="button" class="btn ghostbtn" id="acUnschedule">Remove from calendar</button>' : "") +
+      '<button type="button" class="btn ghostbtn" data-close>Close</button>' +
+      '<button type="button" class="btn primary" id="acSave">Save</button>' +
+    "</div>");
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  let calDate = it.calDate || todayISO();
+  sheet.querySelector("#acDateWrap").appendChild(dateButton(() => calDate, iso => { calDate = iso || todayISO(); }));
+
+  const cbox = commentBox(() => {
+    const c = DB.data[it.monthId] && DB.data[it.monthId][it.edId];
+    if (!c) return null;
+    return (c.notes[it.stepId] = c.notes[it.stepId] || []);
+  }, "Add a comment…", null,
+    {month:it.monthId, edition:it.edId, step:it.stepId, stepLabel:st ? st.label : "", edName:ed ? ed.name : ""});
+  sheet.querySelector("#acComments").appendChild(cbox.el);
+
+  sheet.querySelector("#acSave").onclick = () => {
+    const startTime = sheet.querySelector("#acStart").value || "";
+    const endTime = sheet.querySelector("#acEnd").value || "";
+    closeSheet();
+    calCommitItem(it, calDate, startTime, endTime);
+    playSound("select");
+    renderSection();
+  };
+  const unschedBtn = sheet.querySelector("#acUnschedule");
+  if (unschedBtn) unschedBtn.onclick = () => {
+    closeSheet();
+    calCommitItem(it, "", "", "");
+    playSound("close");
+    renderSection();
+  };
+}
+function calSnap(px){ return Math.round(px / 12) * 12; }  /* 12px = 15min at 48px/hour */
+function calYToTime(y){
+  const total = (CAL_END_HOUR - CAL_START_HOUR) * CAL_ROW_PX;
+  y = Math.max(0, Math.min(y, total));
+  const mins = Math.round(y / CAL_ROW_PX * 60 / 15) * 15;
+  const h = CAL_START_HOUR + Math.floor(mins / 60), m = mins % 60;
+  return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+}
+function calTimeToY(hhmm){
+  const parts = (hhmm || "").split(":");
+  const h = +parts[0] || 0, m = +parts[1] || 0;
+  return ((h - CAL_START_HOUR) * 60 + m) / 60 * CAL_ROW_PX;
+}
+function startCalMove(e, el, it){
+  if (!CAN_EDIT || e.button !== 0) return;
+  e.preventDefault();
+  const grid = document.getElementById("calGrid");
+  const cols = Array.from(grid.querySelectorAll(".cal-daycol"));
+  const total = (CAL_END_HOUR - CAL_START_HOUR) * CAL_ROW_PX;
+  const startY = e.clientY, startTop = parseFloat(el.style.top), height = parseFloat(el.style.height);
+  let targetCol = el.parentElement, moved = false, lastTop = startTop;
+  const onMove = ev => {
+    const dy = ev.clientY - startY;
+    if (Math.abs(dy) > 4) moved = true;
+    if (!moved) return;
+    let newTop = calSnap(startTop + dy);
+    newTop = Math.max(0, Math.min(newTop, total - height));
+    if (newTop !== lastTop){ lastTop = newTop; playSound("drag"); }
+    el.style.top = newTop + "px";
+    const under = cols.find(c => { const r = c.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX < r.right; });
+    if (under && under !== targetCol){ targetCol = under; targetCol.appendChild(el); }
+  };
+  const onUp = () => {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    if (!moved){ calOpenItem(it); return; }
+    const top = parseFloat(el.style.top);
+    const startTime = calYToTime(top), endTime = calYToTime(top + height);
+    calCommitItem(it, targetCol.dataset.date, startTime, endTime);
+    playSound("select");
+    renderSection();
+  };
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+}
+function startCalResize(e, el, it){
+  if (!CAN_EDIT || e.button !== 0) return;
+  e.preventDefault(); e.stopPropagation();
+  const total = (CAL_END_HOUR - CAL_START_HOUR) * CAL_ROW_PX;
+  const startY = e.clientY, top = parseFloat(el.style.top), startHeight = parseFloat(el.style.height);
+  let lastH = startHeight;
+  const onMove = ev => {
+    const dy = ev.clientY - startY;
+    let newH = calSnap(startHeight + dy);
+    newH = Math.max(24, Math.min(newH, total - top));
+    if (newH !== lastH){ lastH = newH; playSound("drag"); }
+    el.style.height = newH + "px";
+  };
+  const onUp = () => {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    const height = parseFloat(el.style.height);
+    calCommitItem(it, it.calDate, calYToTime(top), calYToTime(top + height));
+    playSound("select");
+    renderSection();
+  };
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+}
+function calBlockEl(it){
+  const el = document.createElement("div");
+  el.className = "cal-task";
+  const top = calTimeToY(it.startTime), bottom = calTimeToY(it.endTime);
+  el.style.top = Math.max(0, top) + "px";
+  el.style.height = Math.max(24, bottom - top) + "px";
+  const color = calItemColor(it);
+  el.style.background = hexToRgba(color, 0.16);
+  el.style.borderLeftColor = color;
+  const whos = it.assignees.map(id => whoIs(id, ""));
+  el.innerHTML =
+    '<span class="cal-task-cat" style="color:' + color + '">' + esc(CATEGORY_LABEL[it.category] || it.category) + "</span>" +
+    "<b>" + esc(it.title) + "</b>" +
+    '<span class="cal-task-time">' + esc(it.startTime) + "–" + esc(it.endTime) + "</span>" +
+    (whos.length ? '<span class="asg-stack">' + whos.slice(0, 3).map(w => avatarOf(w, 16)).join("") + "</span>" : "") +
+    '<span class="cal-resize" title="Drag to resize"></span>';
+  el.title = it.title + (whos.length ? " · " + whos.map(w => w.name || "someone").join(", ") : "");
+  el.addEventListener("mousedown", e => { if (!e.target.closest(".cal-resize")) startCalMove(e, el, it); });
+  el.querySelector(".cal-resize").addEventListener("mousedown", e => startCalResize(e, el, it));
+  return el;
+}
+function calGridHTML(dates){
+  const rows = CAL_END_HOUR - CAL_START_HOUR;
+  const today = todayISO();
+  let html = '<div class="cal-grid" id="calGrid" style="--cal-rows:' + rows + '">' +
+    '<div class="cal-corner" style="grid-column:1;grid-row:1"></div>';
+  dates.forEach((d, i) => {
+    const dt = new Date(d + "T12:00:00");
+    html += '<div class="cal-daycol-head' + (d === today ? " today" : "") + '" style="grid-column:' + (i + 2) + '">' +
+      CAL_DAY_NAMES[i] + ' <b>' + dt.getDate() + "</b></div>";
+  });
+  html += '<div class="cal-hourlabels" style="grid-column:1;grid-row:2/-1">';
+  for (let h = CAL_START_HOUR; h < CAL_END_HOUR; h++) html += '<div class="cal-hour-label">' + h + ":00</div>";
+  html += "</div>";
+  dates.forEach((d, i) => {
+    html += '<div class="cal-daycol' + (d === today ? " today" : "") + '" data-d="' + i + '" data-date="' + d +
+      '" style="grid-column:' + (i + 2) + ';grid-row:2/-1"></div>';
+  });
+  html += "</div>";
+  return html;
+}
+function calTrayHTML(items){
+  return '<div class="cal-tray"><p class="cal-tray-label">Unscheduled · click one to give it a time</p>' +
+    '<div class="cal-tray-list">' + items.map(it => {
+      const whos = it.assignees.map(id => whoIs(id, ""));
+      const color = calItemColor(it);
+      return '<button type="button" class="cal-tray-item" data-k="' + esc(it.key) + '" style="border-color:' + color + '">' +
+        (whos.length ? avatarOf(whos[0], 18) : '<span class="material-symbols-outlined" style="font-size:14px">person_add</span>') +
+        "<span>" + esc(it.title) + "</span>" +
+        '<span class="task-cat">' + esc(CATEGORY_LABEL[it.category] || it.category) + "</span></button>";
+    }).join("") + "</div></div>";
+}
+function renderCalendarSection(container){
+  if (!calWeekStart) calWeekStart = isoOf(mondayOf(new Date()));
+  const dates = calWeekDates(calWeekStart);
+  const monday = new Date(calWeekStart + "T12:00:00");
+  const monthLabel = MONTH_NAMES[monday.getMonth()] + " " + monday.getFullYear();
+  const items = calAllItems().filter(calMatchesFilter);
+  const scheduled = items.filter(it => it.calDate && it.startTime && it.endTime && dates.indexOf(it.calDate) >= 0);
+  const unscheduled = items.filter(it => it.assignees.length && (!it.calDate || !it.startTime || !it.endTime));
+  const users = PROFILES.filter(p => (p.name || p.email || "").trim());
+
+  container.innerHTML =
+    '<div class="cal-page">' +
+    '<div class="cal-topbar"><div class="cal-filters">' +
+      '<button type="button" class="cal-filter-btn" id="calFUser">' +
+        (calFilterUser ? esc(((users.find(u => u.id === calFilterUser) || {}).name) || "Someone") : "Everyone") + "</button>" +
+      '<button type="button" class="cal-filter-btn" id="calFCat">' +
+        (calFilterCat ? esc(CATEGORY_LABEL[calFilterCat] || calFilterCat) : "All categories") + "</button>" +
+    "</div><div class=\"cal-nav\">" +
+      '<button type="button" class="cal-arrow" id="calPrev">' + ARR_L + "</button>" +
+      '<button type="button" class="cal-month-btn" id="calMonthBtn">' + esc(monthLabel) + "</button>" +
+      '<button type="button" class="cal-arrow" id="calNext">' + ARR_R + "</button>" +
+    "</div>" +
+    (calWeekStart !== isoOf(mondayOf(new Date())) ? '<button type="button" class="cal-today" id="calToday">Today</button>' : "") +
+    "</div>" +
+    (unscheduled.length ? calTrayHTML(unscheduled) : "") +
+    calGridHTML(dates) +
+    "</div>";
+
+  const gridEl = container.querySelector("#calGrid");
+  dates.forEach((d, di) => {
+    const col = gridEl.querySelector('.cal-daycol[data-d="' + di + '"]');
+    scheduled.filter(it => it.calDate === d).sort((a, b) => a.startTime.localeCompare(b.startTime))
+      .forEach(it => col.appendChild(calBlockEl(it)));
+  });
+
+  container.querySelector("#calPrev").onclick = () => { calWeekStart = addDays(calWeekStart, -7); playSound("select"); renderSection(); };
+  container.querySelector("#calNext").onclick = () => { calWeekStart = addDays(calWeekStart, 7); playSound("select"); renderSection(); };
+  const todayBtn = container.querySelector("#calToday");
+  if (todayBtn) todayBtn.onclick = () => { calWeekStart = isoOf(mondayOf(new Date())); playSound("select"); renderSection(); };
+  container.querySelector("#calMonthBtn").onclick = e => {
+    openDP(e.currentTarget, calWeekStart, iso => {
+      if (!iso) return;
+      calWeekStart = isoOf(mondayOf(new Date(iso + "T12:00:00")));
+      renderSection();
+    });
+  };
+  container.querySelector("#calFUser").onclick = e => {
+    const r = e.currentTarget.getBoundingClientRect();
+    openCtx(r.left, r.bottom + 6, [{label:"Everyone", fn:() => { calFilterUser = ""; renderSection(); }}, {sep:true}]
+      .concat(users.map(p => ({icon:avatarOf(whoIs(p.id, ""), 20), label:(p.name || p.email || "").trim(),
+        fn:() => { calFilterUser = p.id; renderSection(); }}))));
+  };
+  container.querySelector("#calFCat").onclick = e => {
+    const r = e.currentTarget.getBoundingClientRect();
+    openCtx(r.left, r.bottom + 6, [
+      {label:"All categories", fn:() => { calFilterCat = ""; renderSection(); }}, {sep:true},
+      {label:"Local Pages", fn:() => { calFilterCat = "local"; renderSection(); }},
+      {label:"Extra", fn:() => { calFilterCat = "extra"; renderSection(); }}
+    ]);
+  };
+  container.querySelectorAll(".cal-tray-item").forEach(b => {
+    b.onclick = () => { const it = unscheduled.find(x => x.key === b.dataset.k); if (it) calOpenItem(it); };
+  });
 }
 function renderSection(){
   paintBrand();
@@ -2802,7 +3203,9 @@ function renderSection(){
   }
   local.hidden = true; sect.hidden = false;
   if (crumb) crumb.hidden = true;
-  if (SECTION === "team") renderTeamSection(sect);
+  if (SECTION === "team") renderCalendarSection(sect);
+  else if (SECTION === "extra") renderExtraSection(sect);
+  else if (SECTION === "reports") renderReportsSection(sect);
   else if (SECTION === "magazines") placeholderSection(sect, "Magazines");
   else if (SECTION === "design") placeholderSection(sect, "Graphic Design");
 }
@@ -3395,7 +3798,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v16 · 22 Sep";
+const APP_VERSION = "v18 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -3427,12 +3830,12 @@ async function loadAll(){
   setLive("busy");
   const q = t => sb.from(t).select("*");
   const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections,
-         memberTasks, memberSteps] =
+         tasks, taskAssignees] =
     await Promise.all(["folders","months","editions","month_editions","phases","steps",
                        "entries","comments","profiles","assignments","sections",
-                       "member_tasks","member_steps"].map(q));
+                       "tasks","task_assignees"].map(q));
   const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections,
-               memberTasks, memberSteps].find(r => r.error);
+               tasks, taskAssignees].find(r => r.error);
   if (bad){ setLive("off"); throw bad.error; }
 
   const bySort = (a, b) => (a.sort || 0) - (b.sort || 0);
@@ -3446,16 +3849,22 @@ async function loadAll(){
     steps: steps.data.sort(bySort).map(s => ({
       id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || ""
     })),
-    memberTasks: memberTasks.data.sort(bySort).map(t => ({id:t.id, userId:t.user_id, name:t.name, color:t.color || ""})),
-    memberSteps: memberSteps.data.sort(bySort).map(s => ({
-      id:s.id, taskId:s.task_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || "",
-      progress:s.progress || 0, dateValue:s.date_value || ""
+    tasks: tasks.data.sort(bySort).map(t => ({
+      id:t.id, title:t.title, category:t.category || "extra", notes:t.notes || "",
+      status:t.status || "todo", calDate:t.cal_date || "", startTime:t.start_time || "",
+      endTime:t.end_time || "", color:t.color || "", sort:t.sort || 0,
+      createdBy:t.created_by || "", assignees: []
     })),
     issues: [], data: {},
     me: {name:(ME && ME.name) || ""},
     people: [], peopleColors: {}, peopleAvatars: {},
-    sections: {}
+    sections: {}, taskComments: {},
+    memberTasks: [], memberSteps: []   /* dead since Round 5 (see the Extra page); kept as empty arrays so the not-yet-rebuilt Team accordion code doesn't crash */
   };
+  taskAssignees.data.forEach(r => {
+    const t = db.tasks.find(x => x.id === r.task_id);
+    if (t) t.assignees.push(r.user_id);
+  });
   sections.data.forEach(r => { db.sections[r.id] = {icon:r.icon || "", icon_color:r.icon_color || ""}; });
 
   PROFILES = profiles.data.slice().sort((a, b) => (a.color_index || 0) - (b.color_index || 0));
@@ -3492,7 +3901,8 @@ async function loadAll(){
     const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
     if (!cell || !r.user_id) return;
     (cell.assignee[r.step_id] = cell.assignee[r.step_id] || []).push(
-      {userId:r.user_id, completedAt:r.completed_at || ""});
+      {userId:r.user_id, completedAt:r.completed_at || "",
+       calDate:r.cal_date || "", startTime:r.start_time || "", endTime:r.end_time || ""});
   });
   comments.data.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(r => {
     const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
@@ -3505,6 +3915,11 @@ async function loadAll(){
     if (r.step_id){ (cell.notes[r.step_id] = cell.notes[r.step_id] || []).push(entry); }
     else cell.note.push(entry);
   });
+  comments.data.filter(r => r.task_id).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(r => {
+    const entry = {id:r.id, by:r.author_name || "", byId:r.author || "",
+                   parent:r.parent_id || null, at:r.created_at, text:r.body};
+    (db.taskComments[r.task_id] = db.taskComments[r.task_id] || []).push(entry);
+  });
 
   DB = db;
   if (!current || !DB.issues.some(i => i.id === current))
@@ -3515,6 +3930,7 @@ async function loadAll(){
 /* ---------- writing ---------- */
 let pushTimer = null, pushing = false;
 let myStructurePush = 0;   /* when we last wrote structure, to ignore our own echo */
+let myTaskPush = 0;       /* same idea, for the tasks / task_assignees tables */
 function queueStructurePush(){
   if (!CAN_EDIT) return;
   clearTimeout(pushTimer);
@@ -3536,12 +3952,6 @@ async function pushStructure(){
     await sb.from("months").upsert(DB.issues.map((m, i) => ({
       id:m.id, folder_id:m.folder, label:m.label, submitted:m.submitted || null,
       color:m.color || "", sort:i})));
-    await sb.from("member_tasks").upsert(DB.memberTasks.map((t, i) => ({
-      id:t.id, user_id:t.userId, name:t.name, color:t.color || "", sort:i})));
-    await sb.from("member_steps").upsert(DB.memberSteps.map((s, i) => ({
-      id:s.id, task_id:s.taskId, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "",
-      progress:s.progress || 0, date_value:s.dateValue || "", sort:i})));
-
     const wanted = [];
     DB.issues.forEach(m => m.editions.forEach((eid, i) => wanted.push({month_id:m.id, edition_id:eid, sort:i})));
     await sb.from("month_editions").upsert(wanted);
@@ -3555,8 +3965,6 @@ async function pushStructure(){
     await keep("editions", DB.editions.map(e => e.id));
     await keep("phases",   DB.phases.map(p => p.id));
     await keep("steps",    DB.steps.map(s => s.id));
-    await keep("member_tasks", DB.memberTasks.map(t => t.id));
-    await keep("member_steps", DB.memberSteps.map(s => s.id));
 
     const all = await sb.from("month_editions").select("month_id,edition_id");
     if (!all.error){
@@ -3596,6 +4004,38 @@ async function dropAssignment(monthId, edId, stepId, userId){
   if (!CAN_EDIT) return;
   const {error} = await sb.from("assignments").delete()
     .eq("month_id", monthId).eq("edition_id", edId).eq("step_id", stepId).eq("user_id", userId);
+  if (error) console.error(error);
+}
+/* ---------- tasks (the "Extra" page + calendar items) ----------
+   A flat table, not reconciled wholesale like phases/steps -- each task
+   is written the moment it changes, the same way assignments/comments
+   already are. task_assignees is a small join table synced alongside. */
+async function pushTask(t){
+  if (!CAN_EDIT) return;
+  myTaskPush = Date.now();
+  const row = {id:t.id, title:t.title, category:t.category || "extra", notes:t.notes || "",
+               status:t.status || "todo", cal_date:t.calDate || null, start_time:t.startTime || null,
+               end_time:t.endTime || null, color:t.color || "", sort:t.sort || 0,
+               created_by:t.createdBy || (ME && ME.id), updated_at:new Date().toISOString(), updated_by:ME && ME.id};
+  const {error} = await sb.from("tasks").upsert(row);
+  if (error){ console.error(error); setLive("off"); }
+}
+async function dropTask(id){
+  if (!CAN_EDIT) return;
+  myTaskPush = Date.now();
+  const {error} = await sb.from("tasks").delete().eq("id", id);
+  if (error) console.error(error);
+}
+async function pushTaskAssignee(taskId, userId){
+  if (!CAN_EDIT) return;
+  myTaskPush = Date.now();
+  const {error} = await sb.from("task_assignees").upsert({task_id:taskId, user_id:userId});
+  if (error) console.error(error);
+}
+async function dropTaskAssignee(taskId, userId){
+  if (!CAN_EDIT) return;
+  myTaskPush = Date.now();
+  const {error} = await sb.from("task_assignees").delete().eq("task_id", taskId).eq("user_id", userId);
   if (error) console.error(error);
 }
 /* The first time a step you're assigned to lands on "done", stamp today
@@ -3664,10 +4104,11 @@ function assignMenu(x, y, edId, stepId, onDone){
 /* Returns null when the comment is safely stored, or a plain-English
    reason when it is not. Somebody's words must never disappear just
    because a write failed, so every caller checks. */
-async function pushComment(entry, monthId, edId, stepId){
+async function pushComment(entry, monthId, edId, stepId, taskId){
   if (!CAN_EDIT) return "You have read-only access, so comments can't be saved.";
   const row = {
-    id:entry.id, month_id:monthId, edition_id:edId, step_id:stepId || null,
+    id:entry.id, month_id:monthId || null, edition_id:edId || null, step_id:stepId || null,
+    task_id:taskId || null,
     body:entry.text, author:entry.byId || (ME && ME.id), author_name:entry.by,
     parent_id:entry.parent || null, created_at:entry.at};
   let {error} = await sb.from("comments").upsert(row);
@@ -3710,12 +4151,11 @@ function scheduleReload(){
       return;
     }
     const keepOpen = new Set(open), keepPhase = new Set(openPhase),
-          keepNoting = new Set(noting), keepMemberTask = new Set(openMemberTask), y = window.scrollY;
+          keepNoting = new Set(noting), y = window.scrollY;
     try { await loadAll(); } catch(e){ setLive("off"); return; }
     open = keepOpen;
     openPhase.clear(); keepPhase.forEach(k => openPhase.add(k));
     noting.clear();   keepNoting.forEach(k => noting.add(k));
-    openMemberTask.clear(); keepMemberTask.forEach(k => openMemberTask.add(k));
     renderAll();
     window.scrollTo(0, y);
   }, 500);
@@ -3732,9 +4172,10 @@ function mine(payload){
   if (payload.table === "assignments") return row.updated_by === ME.id;
   if (payload.table === "sections")    return row.updated_by === ME.id;
   if (payload.table === "comments") return row.author === ME.id;
+  if (payload.table === "tasks") return row.updated_by === ME.id || Date.now() - myTaskPush < 4000;
+  if (payload.table === "task_assignees") return Date.now() - myTaskPush < 4000;
   /* structural tables carry no author, so lean on our own push clock */
-  if (["folders","months","editions","month_editions","phases","steps",
-       "member_tasks","member_steps"].indexOf(payload.table) >= 0)
+  if (["folders","months","editions","month_editions","phases","steps"].indexOf(payload.table) >= 0)
     return Date.now() - myStructurePush < 4000;
   return false;
 }
