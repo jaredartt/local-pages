@@ -439,6 +439,9 @@ span.step-icon{background:transparent}
 .colorpick button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
 .colorpick button.nocol{box-shadow:inset 0 0 0 2px var(--track)}
 .colorpick button.nocol[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--track),0 0 0 2px var(--sunk),0 0 0 4px var(--ink-3)}
+.vol-row{display:flex;align-items:center;gap:12px;background:var(--sunk);border-radius:16px;padding:10px 16px}
+.vol-row .material-symbols-outlined{font-size:19px;color:var(--ink-3);flex:none}
+.vol-row input[type="range"]{flex:1;accent-color:var(--ink-3)}
 .step-icon-pick{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:var(--sunk);border-radius:16px;padding:10px 16px;font-size:14px;font-weight:300;color:var(--ink-2);transition:.15s ease}
 .step-icon-pick:hover{background:var(--acc-soft)}
 .step-icon-pick .ic-prev{width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--ink-3)}
@@ -595,6 +598,7 @@ body.dragging-now *{cursor:grabbing !important}
 .task-mid span{font-size:11px;color:var(--ink-3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .task-pill{flex:none;font-size:10px;font-weight:500;letter-spacing:.02em;padding:4px 10px;border-radius:999px;background:var(--sunk);color:var(--ink-3)}
 .task-pill.done{background:var(--f-done-soft,#E4F4EA);color:var(--f-done)}
+.task-cat{flex:none;font-size:9.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--acc-soft);color:var(--ink-3)}
 .task-empty{font-size:12px;color:var(--ink-3);font-weight:300;padding:9px 2px}
 .task-row.wide{padding:2px 0}
 .task-cal{flex:none}
@@ -650,6 +654,15 @@ body.dragging-now *{cursor:grabbing !important}
 .asg:disabled{cursor:default}
 .asg:disabled:hover{background:var(--sunk)}
 .asg .av{width:26px;height:26px;font-size:10.5px}
+.asg.multi{width:auto;min-width:28px;padding:0 8px 0 2px;border-radius:14px}
+.asg-stack{display:flex;align-items:center}
+.asg-stack .av{margin-left:-9px;box-shadow:0 0 0 2px var(--box, var(--surface))}
+.asg-stack .av:first-child{margin-left:0}
+.asg-more{font-size:10px;font-weight:600;color:var(--ink-3);margin-left:4px}
+.asg-opt{position:relative}
+.asg-opt.on{background:var(--acc-soft)}
+.asg-opt .asg-check{margin-left:auto;flex:none;color:var(--f-done)}
+.asg-opt .asg-check svg{width:15px;height:15px;display:block}
 
 .live{width:7px;height:7px;border-radius:50%;background:var(--f-done);flex:none;transition:background-color .3s ease}
 .live.off{background:var(--danger)}
@@ -777,6 +790,24 @@ const COLORS = [
 /* one colour per person, handed out in the order they first appear */
 const PERSON_COLORS = ["#E0413F","#2F6FE0","#2FA05F","#D9A61B","#E85B9E",
                        "#38AEE8","#EE7C22","#8158E0","#17A398","#7CA82B"];
+/* the seven colours a person can pick for themselves, from the
+   profile sheet -- shown on their avatar and, everywhere that avatar's
+   colour is used, on their tasks (soft/low-opacity background on the
+   Team calendar). "" (auto) means "no explicit pick", which falls back
+   to PERSON_COLORS above, in join order. */
+const USER_COLORS = [
+  {id:"red",     v:"#E0413F"},
+  {id:"blue",    v:"#2F6FE0"},
+  {id:"orange",  v:"#EE8B22"},
+  {id:"green",   v:"#33A96B"},
+  {id:"brown",   v:"#8B5E3C"},
+  {id:"purple",  v:"#8158E0"},
+  {id:"skyblue", v:"#38AEE8"}
+];
+function userColorHex(p){
+  if (p && p.color){ const c = USER_COLORS.find(x => x.id === p.color); if (c) return c.v; }
+  return PERSON_COLORS[((p && p.color_index) || 0) % PERSON_COLORS.length];
+}
 
 /* a small curated slice of Google's free Material Symbols library --
    enough to cover a production checklist without shipping the whole
@@ -813,8 +844,7 @@ function whoIs(id, fallbackName){
   if (!p) return {name:fallbackName || "", avatar:personAvatar(fallbackName),
                   color:personColor(fallbackName)};
   const nm = (p.name || p.email || "").trim();
-  return {name:nm, avatar:p.avatar || "",
-          color:PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length]};
+  return {name:nm, avatar:p.avatar || "", color:userColorHex(p)};
 }
 /* Same as avatarHTML, but from an already-resolved person. */
 function avatarOf(who, size){
@@ -996,6 +1026,7 @@ const I_DOWN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strok
 const I_UP   = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10.4V2.8"/><path d="M5 5.8 8 2.8l3 3"/><path d="M2.8 12.8h10.4"/></svg>';
 const I_TABLE= '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2.3" y="3" width="11.4" height="10" rx="1.6"/><path d="M2.3 6.6h11.4M6.4 6.6V13"/></svg>';
 const I_SIGNOUT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 2.6H3.6a1 1 0 0 0-1 1v8.8a1 1 0 0 0 1 1h3"/><path d="M10.8 5.2 13.6 8l-2.8 2.8"/><path d="M13.4 8H6"/></svg>';
+const I_SETTINGS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.1"/><path d="M8 2.4v1.5M8 12.1v1.5M13.6 8h-1.5M3.9 8H2.4M11.8 4.2l-1 1.1M5.2 10.7l-1 1.1M11.8 11.8l-1-1.1M5.2 5.3l-1-1.1"/></svg>';
 const I_MAG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.6c-1.3-.9-2.8-1.2-4.4-1V11c1.6-.2 3.1.1 4.4 1V3.6Z"/><path d="M8 3.6c1.3-.9 2.8-1.2 4.4-1V11c-1.6-.2-3.1.1-4.4 1V3.6Z"/></svg>';
 const I_DESIGN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a5.6 5.6 0 1 0 3.7 9.8c.4-.3.2-1-.3-1-.6 0-1-.5-1-1.1 0-.6.5-1.1 1.1-1.1H13a1.6 1.6 0 0 0 1.6-1.6c0-2.6-2.9-5-6.6-5Z"/><circle cx="5.4" cy="7.2" r=".7" fill="currentColor" stroke="none"/><circle cx="7.7" cy="5.3" r=".7" fill="currentColor" stroke="none"/><circle cx="10.2" cy="6.4" r=".7" fill="currentColor" stroke="none"/></svg>';
 const I_TEAM = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.8" cy="5.2" r="2.1"/><path d="M1.7 13a4.2 4.2 0 0 1 8.2 0"/><path d="M10.3 3.6c1.1.2 1.9 1.2 1.9 2.4 0 1.1-.7 2.1-1.7 2.4"/><path d="M10.8 9.3c1.6.5 2.7 1.9 3.1 3.7"/></svg>';
@@ -2499,12 +2530,19 @@ function buildCard(ed, isFresh){
       asg.type = "button"; asg.className = "asg";
       if (!CAN_EDIT) asg.disabled = true;
       const paintAsg = () => {
-        const a = (cell(ed.id).assignee || {})[s.id];
-        const who = a && a.userId ? whoIs(a.userId, "") : null;
-        asg.classList.toggle("empty", !who);
-        asg.innerHTML = who ? avatarOf(who, 24)
-          : '<span class="material-symbols-outlined" style="font-size:14px">person_add</span>';
-        asg.title = who ? "Assigned to " + (who.name || "someone") + (CAN_EDIT ? " · click to change" : "")
+        const list = (cell(ed.id).assignee || {})[s.id] || [];
+        const whos = list.filter(a => a.userId).map(a => whoIs(a.userId, ""));
+        asg.classList.toggle("empty", !whos.length);
+        asg.classList.toggle("multi", whos.length > 1);
+        if (!whos.length){
+          asg.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">person_add</span>';
+        } else {
+          const shown = whos.slice(0, 3);
+          asg.innerHTML = '<span class="asg-stack">' + shown.map(w => avatarOf(w, 24)).join("") +
+            (whos.length > shown.length ? '<span class="asg-more">+' + (whos.length - shown.length) + "</span>" : "") + "</span>";
+        }
+        asg.title = whos.length
+          ? "Assigned: " + whos.map(w => w.name || "someone").join(", ") + (CAN_EDIT ? " · click to change" : "")
           : (CAN_EDIT ? "Assign someone" : "Nobody assigned");
       };
       paintAsg();
@@ -2636,7 +2674,7 @@ function refreshEdition(ed, silent){
 /* ============ sheets / menus ============ */
 const scrim = document.getElementById("scrim");
 const scrim2 = document.getElementById("scrim2");
-function closeSheet(){ scrim.hidden = true; scrim.innerHTML = ""; }
+function closeSheet(){ if (!scrim.hidden) playSound("close"); scrim.hidden = true; scrim.innerHTML = ""; }
 function closeConfirm(){ scrim2.hidden = true; scrim2.innerHTML = ""; }
 scrim.addEventListener("click", e => { if (e.target === scrim) closeSheet(); });
 scrim2.addEventListener("click", e => { if (e.target === scrim2) closeConfirm(); });
@@ -2744,7 +2782,8 @@ function wireOpenTeamItem(container){
     const btn = dateButton(() => t.completedAt || "", iso => {
       t.completedAt = iso;
       const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
-      if (c && c.assignee && c.assignee[t.stepId]) c.assignee[t.stepId].completedAt = iso;
+      const a = c && c.assignee && (c.assignee[t.stepId] || []).find(x => x.userId === teamOpenId);
+      if (a) a.completedAt = iso;
       pushAssignment(t.monthId, t.edId, t.stepId, teamOpenId, iso || null);
     });
     host.appendChild(btn);
@@ -2781,7 +2820,8 @@ function tasksPage(userId, name){
       const btn = dateButton(() => t.completedAt || "", iso => {
         t.completedAt = iso;
         const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
-        if (c && c.assignee && c.assignee[t.stepId]) c.assignee[t.stepId].completedAt = iso;
+        const a = c && c.assignee && (c.assignee[t.stepId] || []).find(x => x.userId === userId);
+        if (a) a.completedAt = iso;
         pushAssignment(t.monthId, t.edId, t.stepId, userId, iso || null);
       });
       host.appendChild(btn);
@@ -2796,6 +2836,7 @@ function showErr(sheet, msg){
 function openSheet(html){
   scrim.innerHTML = '<div class="sheet" role="dialog" aria-modal="true">' + html + "</div>";
   scrim.hidden = false;
+  playSound("open");
   return scrim.querySelector(".sheet");
 }
 
@@ -2803,8 +2844,9 @@ const ctxEl = document.createElement("div");
 ctxEl.className = "ctx"; ctxEl.hidden = true;
 ctxEl.setAttribute("role", "menu");
 document.body.appendChild(ctxEl);
-function closeCtx(){ if (!ctxEl.hidden){ ctxEl.hidden = true; ctxEl.innerHTML = ""; } }
+function closeCtx(){ if (!ctxEl.hidden){ ctxEl.hidden = true; ctxEl.innerHTML = ""; playSound("close"); } }
 function openCtx(x, y, items){
+  playSound("open");
   ctxEl.innerHTML = items.map((it, i) => {
     if (it.sep) return '<div class="sep"></div>';
     if (it.swatches) return '<div class="sw-row" data-i="' + i + '">' + COLORS.map(c =>
@@ -2820,7 +2862,7 @@ function openCtx(x, y, items){
   ctxEl.style.left = Math.max(10, Math.min(x, window.innerWidth - W - 10)) + "px";
   ctxEl.style.top  = Math.max(10, Math.min(y, window.innerHeight - H - 10)) + "px";
   ctxEl.querySelectorAll("button[data-i]").forEach(b => {
-    b.onclick = e => { e.stopPropagation(); const fn = items[+b.dataset.i].fn; closeCtx(); if (fn) requestAnimationFrame(fn); };
+    b.onclick = e => { e.stopPropagation(); const fn = items[+b.dataset.i].fn; playSound("select"); closeCtx(); if (fn) requestAnimationFrame(fn); };
   });
   ctxEl.querySelectorAll(".sw-row").forEach(row => {
     const it = items[+row.dataset.i];
@@ -3209,6 +3251,58 @@ async function doSignOut(){
   await sb.auth.signOut();
   location.reload();
 }
+/* ============ sound effects ============
+   Tiny synthesised blips via the Web Audio API -- nothing loaded from
+   the network, so there's no asset file to ship or go stale. Each
+   "kind" has a small handful of candidate tones; playSound() picks one
+   at random every time so a repeated action (dragging a slider, say)
+   doesn't turn into the same beep over and over. */
+const SOUND_KEY = "lp-sound-vol";
+function soundVolume(){
+  try { const v = parseFloat(localStorage.getItem(SOUND_KEY)); return isNaN(v) ? 0.55 : Math.min(1, Math.max(0, v)); }
+  catch(e){ return 0.55; }
+}
+function setSoundVolume(v){
+  try { localStorage.setItem(SOUND_KEY, String(Math.min(1, Math.max(0, v)))); } catch(e){}
+}
+let _actx = null;
+function actx(){
+  if (_actx) return _actx;
+  try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ _actx = null; }
+  return _actx;
+}
+const SOUND_TONES = {
+  open:     [660, 784, 880],
+  close:    [520, 466, 392],
+  complete: [523, 659, 784, 988],
+  tick:     [1046, 1180, 1320, 1400],
+  select:   [740, 830, 880],
+  drag:     [660, 700, 740],
+  delete:   [392, 349, 311]
+};
+function playSound(kind){
+  const vol = soundVolume();
+  if (vol <= 0) return;
+  const ctx = actx();
+  if (!ctx) return;
+  if (ctx.state === "suspended") ctx.resume();
+  const freqs = SOUND_TONES[kind] || SOUND_TONES.select;
+  const f = freqs[Math.floor(Math.random() * freqs.length)] * (0.97 + Math.random() * 0.06);
+  const t0 = ctx.currentTime;
+  const dur = kind === "tick" || kind === "drag" ? 0.05 : kind === "complete" ? 0.18 : 0.13;
+  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.type = kind === "complete" ? "triangle" : "sine";
+  osc.frequency.setValueAtTime(f, t0);
+  if (kind === "complete") osc.frequency.exponentialRampToValueAtTime(f * 1.5, t0 + 0.09);
+  if (kind === "close" || kind === "delete") osc.frequency.exponentialRampToValueAtTime(f * 0.8, t0 + dur);
+  const peak = (kind === "tick" || kind === "drag" ? 0.1 : 0.16) * vol;
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.007);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.02);
+}
+
 const THEME_KEY = "lp-theme";
 function currentTheme(){
   try { const m = localStorage.getItem(THEME_KEY); return (m === "light" || m === "dark") ? m : "system"; }
@@ -3231,6 +3325,38 @@ function themeMeta(mode){
 function cycleTheme(){
   const cur = currentTheme();
   applyTheme(cur === "system" ? "light" : cur === "light" ? "dark" : "system");
+}
+/* One home for app-wide preferences: theme (now a real drop-down,
+   not a click-to-cycle toggle) and the sound-effects volume. */
+function settingsSheet(){
+  closeCtx();
+  const sheet = openSheet(
+    "<h3>Settings</h3>" +
+    '<div class="field"><label for="setTheme">Theme</label>' +
+      '<select class="sel" id="setTheme">' +
+        '<option value="system">System</option>' +
+        '<option value="light">Light</option>' +
+        '<option value="dark">Dark</option>' +
+      "</select></div>" +
+    '<div class="field"><label for="setVol">Sound effects</label>' +
+      '<div class="vol-row"><span class="material-symbols-outlined" id="setVolIcon"></span>' +
+      '<input type="range" id="setVol" min="0" max="100" step="5"></div></div>' +
+    '<div class="actions"><button class="btn primary" data-close>Done</button></div>');
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+
+  const themeSel = sheet.querySelector("#setTheme");
+  themeSel.value = currentTheme();
+  themeSel.onchange = () => { applyTheme(themeSel.value); playSound("select"); };
+
+  const volEl = sheet.querySelector("#setVol"), volIcon = sheet.querySelector("#setVolIcon");
+  volEl.value = String(Math.round(soundVolume() * 100));
+  const paintVolIcon = () => {
+    const v = Number(volEl.value);
+    volIcon.textContent = v <= 0 ? "volume_off" : v < 50 ? "volume_down" : "volume_up";
+  };
+  paintVolIcon();
+  volEl.oninput = () => { setSoundVolume(volEl.value / 100); paintVolIcon(); };
+  volEl.onchange = () => playSound("tick");
 }
 function openCog(){
   const r = document.getElementById("cog").getBoundingClientRect();
@@ -3256,7 +3382,7 @@ function openCog(){
     items.push({icon:I_GRID, label:"Reset phases and steps", fn:resetStructure});
   }
   items.push({sep:true});
-  { const tm = themeMeta(currentTheme()); items.push({icon:tm.icon, label:tm.label, fn:cycleTheme}); }
+  items.push({icon:I_SETTINGS, label:"Settings", fn:settingsSheet});
   items.push({sep:true});
   items.push({icon:I_SIGNOUT, label:"Sign out", danger:true, fn:doSignOut});
   openCtx(r.right - 250, r.bottom + 8, items);
@@ -3269,7 +3395,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v15 · 22 Sep";
+const APP_VERSION = "v16 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -3337,7 +3463,7 @@ async function loadAll(){
     const nm = (p.name || p.email || "").trim();
     if (!nm) return;
     db.people.push(nm);
-    db.peopleColors[nm.toLowerCase()] = PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length];
+    db.peopleColors[nm.toLowerCase()] = userColorHex(p);
     if (p.avatar) db.peopleAvatars[nm.toLowerCase()] = p.avatar;
   });
 
@@ -3365,7 +3491,8 @@ async function loadAll(){
   assignments.data.forEach(r => {
     const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
     if (!cell || !r.user_id) return;
-    cell.assignee[r.step_id] = {userId:r.user_id, completedAt:r.completed_at || ""};
+    (cell.assignee[r.step_id] = cell.assignee[r.step_id] || []).push(
+      {userId:r.user_id, completedAt:r.completed_at || ""});
   });
   comments.data.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at))).forEach(r => {
     const cell = db.data[r.month_id] && db.data[r.month_id][r.edition_id];
@@ -3459,17 +3586,17 @@ async function pushEntry(monthId, edId, stepId, patch){
    row from `entries` on purpose: everyone still shares one done/not-done
    state for the step itself, this just tags a face onto it. */
 async function pushAssignment(monthId, edId, stepId, userId, completedAt){
-  if (!CAN_EDIT) return;
-  if (!userId){
-    const {error} = await sb.from("assignments").delete()
-      .eq("month_id", monthId).eq("edition_id", edId).eq("step_id", stepId);
-    if (error) console.error(error);
-    return;
-  }
+  if (!CAN_EDIT || !userId) return;
   const row = {month_id:monthId, edition_id:edId, step_id:stepId, user_id:userId,
                completed_at:completedAt || null, updated_at:new Date().toISOString(), updated_by:ME && ME.id};
-  const {error} = await sb.from("assignments").upsert(row, {onConflict:"month_id,edition_id,step_id"});
+  const {error} = await sb.from("assignments").upsert(row, {onConflict:"month_id,edition_id,step_id,user_id"});
   if (error){ console.error(error); setLive("off"); }
+}
+async function dropAssignment(monthId, edId, stepId, userId){
+  if (!CAN_EDIT) return;
+  const {error} = await sb.from("assignments").delete()
+    .eq("month_id", monthId).eq("edition_id", edId).eq("step_id", stepId).eq("user_id", userId);
+  if (error) console.error(error);
 }
 /* The first time a step you're assigned to lands on "done", stamp today
    as when you wrapped it up. It only fires once -- after that the date
@@ -3478,43 +3605,61 @@ async function pushAssignment(monthId, edId, stepId, userId, completedAt){
 function maybeAutoComplete(edId, stepId, isDone){
   if (!isDone || !CAN_EDIT) return;
   const c = cell(edId);
-  const a = c.assignee && c.assignee[stepId];
-  if (!a || !a.userId || a.completedAt) return;
-  a.completedAt = todayISO();
-  pushAssignment(current, edId, stepId, a.userId, a.completedAt);
+  const list = (c.assignee && c.assignee[stepId]) || [];
+  let stamped = false;
+  list.forEach(a => {
+    if (!a.userId || a.completedAt) return;
+    a.completedAt = todayISO();
+    pushAssignment(current, edId, stepId, a.userId, a.completedAt);
+    stamped = true;
+  });
+  if (stamped) playSound("complete");
 }
-function setAssignee(edId, stepId, userId, onDone){
+/* Any number of people (0, 1, 2, ...) can be on a step -- toggling adds
+   or removes one row rather than replacing a single slot. */
+function toggleAssignee(edId, stepId, userId, onDone){
   const c = cell(edId);
   if (!c.assignee) c.assignee = {};
-  if (!userId){
-    delete c.assignee[stepId];
-    pushAssignment(current, edId, stepId, null, null);
+  const list = c.assignee[stepId] = c.assignee[stepId] || [];
+  const idx = list.findIndex(a => a.userId === userId);
+  if (idx >= 0){
+    list.splice(idx, 1);
+    dropAssignment(current, edId, stepId, userId);
   } else {
-    const prev = c.assignee[stepId];
-    c.assignee[stepId] = {userId, completedAt: prev ? prev.completedAt : ""};
-    pushAssignment(current, edId, stepId, userId, c.assignee[stepId].completedAt);
+    list.push({userId, completedAt:""});
+    pushAssignment(current, edId, stepId, userId, "");
   }
   if (onDone) onDone();
 }
-/* The little "who's on this" menu that opens from the avatar next to a
-   step's comment button -- and, unassigned, from the empty placeholder. */
+/* The little "who's on this" menu that opens from the avatar(s) next to
+   a step's comment button. Unlike a normal dropdown it stays open while
+   you tick multiple people -- it only closes when you click elsewhere. */
 function assignMenu(x, y, edId, stepId, onDone){
-  closeCtx();
-  const cur = (cell(edId).assignee || {})[stepId];
-  const items = [];
-  if (cur && cur.userId){
-    items.push({icon:XMARK, label:"Unassign", danger:true, fn:() => setAssignee(edId, stepId, null, onDone)});
-    items.push({sep:true});
-  }
-  PROFILES.forEach(p => {
+  const list = (cell(edId).assignee || {})[stepId] || [];
+  const ids = new Set(list.map(a => a.userId));
+  const named = PROFILES.filter(p => (p.name || p.email || "").trim());
+  playSound("open");
+  ctxEl.innerHTML = (named.length ? named.map(p => {
     const nm = (p.name || p.email || "").trim();
-    if (!nm) return;
-    const who = {name:nm, avatar:p.avatar || "", color:PERSON_COLORS[(p.color_index || 0) % PERSON_COLORS.length]};
-    items.push({icon:avatarOf(who, 22), label:nm + (ME && p.id === ME.id ? " · you" : ""),
-                fn:() => setAssignee(edId, stepId, p.id, onDone)});
+    const who = {name:nm, avatar:p.avatar || "", color:userColorHex(p)};
+    const on = ids.has(p.id);
+    return '<button type="button" role="menuitemcheckbox" aria-checked="' + on + '" data-u="' + p.id +
+      '" class="asg-opt' + (on ? " on" : "") + '"><span class="mi">' + avatarOf(who, 22) + "</span><span>" +
+      esc(nm) + (ME && p.id === ME.id ? " · you" : "") + "</span>" +
+      (on ? '<span class="asg-check">' + CHECK + "</span>" : "") + "</button>";
+  }).join("") : '<button type="button" disabled>No accounts yet</button>');
+  ctxEl.hidden = false;
+  const W = ctxEl.offsetWidth, H = ctxEl.offsetHeight;
+  ctxEl.style.left = Math.max(10, Math.min(x, window.innerWidth - W - 10)) + "px";
+  ctxEl.style.top  = Math.max(10, Math.min(y, window.innerHeight - H - 10)) + "px";
+  ctxEl.querySelectorAll("button[data-u]").forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      playSound("select");
+      toggleAssignee(edId, stepId, b.dataset.u, onDone);
+      assignMenu(x, y, edId, stepId, onDone);   /* repaint checked state, stays open */
+    };
   });
-  if (!items.length) items.push({label:"No accounts yet"});
-  openCtx(x, y, items);
 }
 /* Returns null when the comment is safely stored, or a plain-English
    reason when it is not. Somebody's words must never disappear just
@@ -3681,10 +3826,11 @@ async function pushEveryAssignment(){
     const c = DB.data[m.id] && DB.data[m.id][eid];
     if (!c || !c.assignee) return;
     Object.keys(c.assignee).forEach(stepId => {
-      const a = c.assignee[stepId];
-      if (!a || !a.userId) return;
-      rows.push({month_id:m.id, edition_id:eid, step_id:stepId, user_id:a.userId,
-                 completed_at:a.completedAt || null, updated_by:ME && ME.id});
+      (c.assignee[stepId] || []).forEach(a => {
+        if (!a || !a.userId) return;
+        rows.push({month_id:m.id, edition_id:eid, step_id:stepId, user_id:a.userId,
+                   completed_at:a.completedAt || null, updated_by:ME && ME.id});
+      });
     });
   }));
   for (let i = 0; i < rows.length; i += 200){
@@ -3929,8 +4075,8 @@ function myTasks(userId){
       const c = DB.data[m.id] && DB.data[m.id][edId];
       if (!c || !c.assignee) return;
       Object.keys(c.assignee).forEach(stepId => {
-        const a = c.assignee[stepId];
-        if (!a || a.userId !== userId) return;
+        const a = (c.assignee[stepId] || []).find(x => x.userId === userId);
+        if (!a) return;
         const st = DB.steps.find(x => x.id === stepId);
         if (!st) return;
         const done = st.type === "status" ? (c.status[stepId] || 0) >= 100 : !!c.dates[stepId];
@@ -3951,6 +4097,7 @@ function taskRowsHTML(list, withDate){
     return '<div class="task-row' + (withDate ? ' wide' : "") + '" data-i="' + i + '">' +
       '<button type="button" class="task-nav"><span class="task-icon">' + icon + "</span>" +
       '<span class="task-mid"><b>' + esc(label) + "</b><span>" + esc(stepWhere(t.monthId, t.edId, t.stepId)) + "</span></span>" +
+      '<span class="task-cat">Local Pages</span>' +
       '<span class="task-pill' + (t.done ? " done" : "") + '">' + (t.done ? "Done" : "In process") + "</span></button>" +
       (withDate ? '<span class="task-cal" data-cal="' + i + '"></span>' : "") +
       "</div>";
@@ -4028,7 +4175,7 @@ async function afterSignIn(session){
     gateMsg("Signed in, but the database refused to load your profile: " + error.message, "bad");
     return;
   }
-  ME = data || {id:session.user.id, name:session.user.email.split("@")[0], is_admin:false, color_index:0};
+  ME = data || {id:session.user.id, name:session.user.email.split("@")[0], is_admin:false, color_index:0, color:""};
   CAN_EDIT = !!ME.is_admin;
   document.body.classList.toggle("readonly", !CAN_EDIT);
 
@@ -4101,6 +4248,7 @@ function profileSheet(){
     '<div class="field"><label for="pfName">Display name</label>' +
       '<div class="pf-name-row"><input type="text" id="pfName" maxlength="40">' +
       '<button type="button" class="btn primary" id="pfSave">Save</button></div></div>' +
+    '<div class="field"><label>Your colour</label><div class="colorpick" id="pfCol"></div></div>' +
     '<p class="pf-sec">My tasks</p>' +
     '<div class="pf-tasks" id="pfTasks"></div>' +
     '<button type="button" class="btn ghostbtn pf-viewall" id="pfViewAll">View all tasks</button>');
@@ -4109,13 +4257,24 @@ function profileSheet(){
   const hintEl = sheet.querySelector("#pfHint");
   const nameEl = sheet.querySelector("#pfName");
   nameEl.value = ME.name || "";
+  let pendingColor = ME.color || "";
+  const colWrap = sheet.querySelector("#pfCol");
+  const paintCol = () => {
+    colWrap.innerHTML = '<button type="button" class="' + (pendingColor ? "" : "nocol") +
+      '" data-c="" aria-pressed="' + (!pendingColor) + '" aria-label="Auto"></button>' +
+      USER_COLORS.map(c => '<button type="button" data-c="' + c.id + '" aria-pressed="' +
+        (pendingColor === c.id) + '" style="background:' + c.v + '" aria-label="' + c.id + '"></button>').join("");
+    colWrap.querySelectorAll("button").forEach(b => {
+      b.onclick = () => { pendingColor = b.dataset.c; paintCol(); paintAv(); playSound("select"); };
+    });
+  };
 
   const file = document.createElement("input");
   file.type = "file"; file.accept = "image/*"; file.hidden = true;
   sheet.appendChild(file);
 
   const paintAv = () => {
-    const col = personColor(ME.name) || PERSON_COLORS[(ME.color_index || 0) % PERSON_COLORS.length];
+    const col = userColorHex(Object.assign({}, ME, {color:pendingColor})) || personColor(ME.name);
     avEl.style.background = pending ? "" : col;
     avEl.innerHTML = (pending ? '<img src="' + esc(pending) + '" alt="">' :
         esc((nameEl.value || "?").trim().slice(0, 1).toUpperCase())) +
@@ -4127,6 +4286,7 @@ function profileSheet(){
     if (clr) clr.onclick = () => { pending = ""; paintAv(); };
   };
   paintAv();
+  paintCol();
 
   avEl.onclick = () => file.click();
   nameEl.oninput = () => { if (!pending) paintAv(); };
@@ -4151,7 +4311,7 @@ function profileSheet(){
     const btn = sheet.querySelector("#pfSave");
     btn.disabled = true; btn.textContent = "Saving…";
     const {error} = await sb.from("profiles")
-      .update({name:nm, avatar:pending}).eq("id", ME.id);
+      .update({name:nm, avatar:pending, color:pendingColor}).eq("id", ME.id);
     if (error){
       btn.disabled = false; btn.textContent = "Save";
       hintEl.textContent = error.message.indexOf("avatar") >= 0
@@ -4159,11 +4319,13 @@ function profileSheet(){
         : error.message;
       return;
     }
-    ME.name = nm; ME.avatar = pending;
+    ME.name = nm; ME.avatar = pending; ME.color = pendingColor;
     DB.me.name = nm;
     DB.peopleAvatars[nm.toLowerCase()] = pending;
+    DB.peopleColors[nm.toLowerCase()] = userColorHex(ME);
     closeSheet();
     paintWhoami();
+    playSound("complete");
     beat();                      /* so the new name shows on my face right away */
     scheduleReload();
   };
