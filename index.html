@@ -803,7 +803,7 @@ body.readonly .crumb{pointer-events:auto}
 .cal-grid{
   display:grid;
   grid-template-columns:56px repeat(5,1fr);
-  grid-template-rows:auto repeat(var(--cal-rows),48px);
+  grid-template-rows:auto repeat(var(--cal-rows),var(--cal-row-h,48px));
   background:var(--box);border-radius:20px;box-shadow:var(--box-shadow);
   overflow:hidden;
 }
@@ -816,11 +816,11 @@ body.readonly .crumb{pointer-events:auto}
 .cal-daycol-head b{display:block;font-size:15px;font-weight:600;color:var(--ink);margin-top:2px}
 .cal-daycol-head.today{color:var(--acc)}
 .cal-daycol-head.today b{color:var(--acc)}
-.cal-hourlabels{display:grid;grid-template-rows:repeat(var(--cal-rows),48px);background:var(--surface)}
+.cal-hourlabels{display:grid;grid-template-rows:repeat(var(--cal-rows),var(--cal-row-h,48px));background:var(--surface)}
 .cal-hour-label{font-size:10.5px;color:var(--ink-3);text-align:right;padding:0 8px;transform:translateY(-6px)}
 .cal-daycol{
   position:relative;border-left:1px solid var(--line);
-  background-image:repeating-linear-gradient(to bottom, transparent, transparent 47px, var(--line) 47px, var(--line) 48px);
+  background-image:repeating-linear-gradient(to bottom, transparent, transparent calc(var(--cal-row-h,48px) - 1px), var(--line) calc(var(--cal-row-h,48px) - 1px), var(--line) var(--cal-row-h,48px));
 }
 .cal-daycol.today{background-color:var(--acc-soft)}
 
@@ -833,6 +833,7 @@ body.readonly .crumb{pointer-events:auto}
   user-select:none;
 }
 .cal-task:active{cursor:grabbing}
+.cal-task.dragging-free{z-index:140;pointer-events:none;box-shadow:0 16px 36px -10px rgba(33,30,46,.55);transform:scale(1.02);transition:none}
 .cal-task-cat{font-size:8.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .cal-task b{font-size:12px;font-weight:500;color:var(--ink);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cal-task-time{font-size:10px;color:var(--ink-2);font-variant-numeric:tabular-nums}
@@ -3127,7 +3128,7 @@ function renderReportsSection(container){
    filters don't need to know which kind they're looking at. */
 const CAL_START_HOUR = 7, CAL_END_HOUR = 18;   /* 7:00 .. 18:00, 11 hourly rows -- kept
    short on purpose so a day's overlaps and the drag handles have room to work in */
-const CAL_ROW_PX = 48;
+let CAL_ROW_PX = 48;   /* recomputed per render by calFitRowHeight() so the grid fills available height */
 const CAL_DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 let calWeekStart = "";     /* ISO date of the Monday currently shown; set on first render */
 let calFilterUser = "";    /* "" = everyone */
@@ -3272,7 +3273,7 @@ function assignmentCalSheet(it){
     renderSection();
   };
 }
-function calSnap(px){ return Math.round(px / 12) * 12; }  /* 12px = 15min at 48px/hour */
+function calSnap(px){ const q = CAL_ROW_PX / 4; return Math.round(px / q) * q; }  /* snap to 15min, whatever the current row height */
 function calYToTime(y){
   const total = (CAL_END_HOUR - CAL_START_HOUR) * CAL_ROW_PX;
   y = Math.max(0, Math.min(y, total));
@@ -3292,11 +3293,23 @@ function startCalMove(e, el, it){
   const cols = Array.from(grid.querySelectorAll(".cal-daycol"));
   const total = (CAL_END_HOUR - CAL_START_HOUR) * CAL_ROW_PX;
   const startY = e.clientY, startTop = parseFloat(el.style.top), height = parseFloat(el.style.height);
+  const elRect = el.getBoundingClientRect();
+  const grabDX = e.clientX - elRect.left, grabDY = e.clientY - elRect.top, freeWidth = elRect.width;
   let targetCol = el.parentElement, moved = false, lastTop = startTop, dropZone = null, overDropZone = false;
   const onMove = ev => {
     const dy = ev.clientY - startY;
     if (Math.abs(dy) > 4 && !moved){
       moved = true;
+      /* detach to the viewport so the block can actually follow the cursor
+         out of the grid, instead of staying position:absolute inside
+         .cal-grid{overflow:hidden} where it just gets clipped while the
+         "drop here" strip floats disconnected above it */
+      el.classList.add("dragging-free");
+      el.style.position = "fixed";
+      el.style.width = freeWidth + "px";
+      el.style.left = (ev.clientX - grabDX) + "px";
+      el.style.top = (ev.clientY - grabDY) + "px";
+      document.body.appendChild(el);
       /* the "drop here to make it timeless" strip only exists while a
          drag is actually happening -- floats just above the grid, no
          matter whether the tray itself is showing right now */
@@ -3310,12 +3323,15 @@ function startCalMove(e, el, it){
       document.body.appendChild(dropZone);
     }
     if (!moved) return;
+    el.style.left = (ev.clientX - grabDX) + "px";
+    el.style.top = (ev.clientY - grabDY) + "px";
+    /* scheduling math is unaffected by the free-floating visual position --
+       it only ever depended on the cursor's delta from where the drag
+       started, same as before */
     let newTop = calSnap(startTop + dy);
-    newTop = Math.max(0, Math.min(newTop, total - height));
-    if (newTop !== lastTop) lastTop = newTop;
-    el.style.top = newTop + "px";
+    lastTop = Math.max(0, Math.min(newTop, total - height));
     const under = cols.find(c => { const r = c.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX < r.right; });
-    if (under && under !== targetCol){ targetCol = under; targetCol.appendChild(el); }
+    if (under) targetCol = under;
     if (dropZone){
       const dz = dropZone.getBoundingClientRect();
       overDropZone = ev.clientY >= dz.top - 20 && ev.clientY <= dz.bottom;
@@ -3327,13 +3343,13 @@ function startCalMove(e, el, it){
     document.removeEventListener("mouseup", onUp);
     if (dropZone) dropZone.remove();
     if (!moved){ calOpenItem(it); return; }
+    el.remove(); /* renderSection() below rebuilds the grid from scratch */
     if (overDropZone){
       calCommitItem(it, "", "", "");
       renderSection();
       return;
     }
-    const top = parseFloat(el.style.top);
-    const startTime = calYToTime(top), endTime = calYToTime(top + height);
+    const startTime = calYToTime(lastTop), endTime = calYToTime(lastTop + height);
     calCommitItem(it, targetCol.dataset.date, startTime, endTime);
     renderSection();
   };
@@ -3510,10 +3526,18 @@ function calLayoutDay(items){
   if (cluster.length) flush();
   return out;
 }
+/* Sizes each hour row so the grid reaches down near the bottom of the
+   viewport (with a margin) instead of stopping at a fixed 48px/hour --
+   measured from wherever the grid actually starts, so it adapts to
+   whatever's above it (filters, the unscheduled tray, etc). */
+function calFitRowHeight(gridTop, rows){
+  const avail = window.innerHeight - gridTop - 24; /* bottom margin */
+  return Math.max(40, Math.min(110, Math.floor(avail / rows)));
+}
 function calGridHTML(dates){
   const rows = CAL_END_HOUR - CAL_START_HOUR;
   const today = todayISO();
-  let html = '<div class="cal-grid" id="calGrid" style="--cal-rows:' + rows + '">' +
+  let html = '<div class="cal-grid" id="calGrid" style="--cal-rows:' + rows + ';--cal-row-h:' + CAL_ROW_PX + 'px">' +
     '<div class="cal-corner" style="grid-column:1;grid-row:1"></div>';
   dates.forEach((d, i) => {
     const dt = new Date(d + "T12:00:00");
@@ -3570,6 +3594,10 @@ function renderCalendarSection(container){
     "</div>";
 
   const gridEl = container.querySelector("#calGrid");
+  const calRows = CAL_END_HOUR - CAL_START_HOUR;
+  const rowH = calFitRowHeight(gridEl.getBoundingClientRect().top, calRows);
+  CAL_ROW_PX = rowH;
+  gridEl.style.setProperty("--cal-row-h", rowH + "px");
   dates.forEach((d, di) => {
     const col = gridEl.querySelector('.cal-daycol[data-d="' + di + '"]');
     const laidOut = calLayoutDay(scheduled.filter(it => it.calDate === d));
@@ -3698,6 +3726,12 @@ document.addEventListener("click", e => {
 });
 window.addEventListener("scroll", () => { closeCtx(); closeTree(); }, true);
 window.addEventListener("resize", () => { closeCtx(); closeTree(); });
+let calResizeTimer = null;
+window.addEventListener("resize", () => {
+  if (SECTION !== "team") return;
+  clearTimeout(calResizeTimer);
+  calResizeTimer = setTimeout(() => renderSection(), 180);
+});
 
 function promptSheet(title, hint, fields, action, onSave, validate){
   const body = fields.map((f, i) =>
@@ -4214,7 +4248,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v23 · 22 Sep";
+const APP_VERSION = "v24 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
