@@ -1044,12 +1044,15 @@ const CMT_FILL = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.6 8c
 
 /* ============ data ============ */
 let DB = {folders:[], issues:[], editions:[], phases:[], steps:[], data:{},
-          me:{name:""}, people:[], peopleColors:{}, sections:{}};
+          me:{name:""}, people:[], peopleColors:{}, sections:{},
+          memberTasks:[], memberSteps:[]};
 let current = null;
 let SECTION = "local";   /* "local" | "magazines" | "design" | "team" */
 let teamOpenId = null;   /* which team member's task list is expanded */
 let open = new Set();
 const openPhase = new Set();
+/* which member's personal-task groups are expanded, as task ids */
+const openMemberTask = new Set();
 /* which step comment boxes are open, as "edition|step". Kept out here
    because a re-render throws the DOM away, and an open note closing
    itself mid-sentence is worse than the render being a frame slower. */
@@ -1669,14 +1672,15 @@ function phaseSheet(existing, at){
   sheet.querySelector("#phName").focus();
   sheet.querySelector("#phName").select();
 }
-function iconSheet(current, currentColor, onPick){
-  const swatches = COLORS.map(c =>
+function iconSheet(current, currentColor, onPick, opts){
+  const noColor = !!(opts && opts.noColor);
+  const swatches = noColor ? "" : COLORS.map(c =>
     '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
     (currentColor === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
     ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
   scrim2.innerHTML = '<div class="sheet narrow" role="dialog" aria-modal="true">' +
     "<h3>Choose an icon</h3>" +
-    '<div class="field"><label>Colour</label><div class="colorpick" id="icCol">' + swatches + "</div></div>" +
+    (noColor ? "" : '<div class="field"><label>Colour</label><div class="colorpick" id="icCol">' + swatches + "</div></div>") +
     '<div class="field icon-search"><input type="text" id="icSearch" placeholder="Search icons\u2026" autocomplete="off"></div>' +
     '<div class="icon-grid" id="icGrid"></div>' +
     '<div class="actions"><button type="button" class="btn ghostbtn" id="icNone">No icon</button>' +
@@ -1685,7 +1689,7 @@ function iconSheet(current, currentColor, onPick){
   const sheet = scrim2.querySelector(".sheet");
   const grid = sheet.querySelector("#icGrid");
   const search = sheet.querySelector("#icSearch");
-  let col = currentColor || "";
+  let col = noColor ? "" : (currentColor || "");
   const draw = () => {
     const q = search.value.trim().toLowerCase();
     const list = q ? ICON_NAMES.filter(n => iconLabel(n).indexOf(q) >= 0) : ICON_NAMES;
@@ -1697,9 +1701,11 @@ function iconSheet(current, currentColor, onPick){
       b.onclick = () => { closeConfirm(); onPick(b.dataset.n, col); };
     });
   };
-  sheet.querySelectorAll("#icCol button").forEach(b => {
-    b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#icCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); };
-  });
+  if (!noColor){
+    sheet.querySelectorAll("#icCol button").forEach(b => {
+      b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#icCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); };
+    });
+  }
   search.oninput = draw;
   draw();
   sheet.querySelector("#icClose").onclick = closeConfirm;
@@ -1724,15 +1730,14 @@ function stepSheet(phaseId, existing, at){
 
   sheet.querySelector("[data-close]").onclick = closeSheet;
   let icon = existing ? (existing.icon || "") : "";
-  let iconColor = existing ? (existing.icon_color || "") : "";
   const iconBtn = sheet.querySelector("#stIconBtn");
   const paintIcon = () => {
     iconBtn.innerHTML = '<span class="ic-prev">' +
-      (icon ? iconGlyph(icon, 18, iconColor) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
+      (icon ? iconGlyph(icon, 18) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
       "</span><span>" + (icon ? iconLabel(icon) : "Choose an icon") + "</span>";
   };
   paintIcon();
-  iconBtn.onclick = () => iconSheet(icon, iconColor, (v, c) => { icon = v; iconColor = c; paintIcon(); });
+  iconBtn.onclick = () => iconSheet(icon, "", (v) => { icon = v; paintIcon(); }, {noColor:true});
   const typeSel = sheet.querySelector("#stType"), doneWrap = sheet.querySelector("#stDoneWrap");
   const syncType = () => { doneWrap.style.display = typeSel.value === "date" ? "none" : ""; };
   typeSel.onchange = syncType; syncType();
@@ -1744,9 +1749,9 @@ function stepSheet(phaseId, existing, at){
     const done = sheet.querySelector("#stDone").value.trim() || "Done";
     closeSheet();
     if (existing){
-      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon; existing.icon_color = iconColor;
+      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon;
     } else {
-      const s = {id:slug(label), phase:phaseId, label, type, done, icon, icon_color:iconColor};
+      const s = {id:slug(label), phase:phaseId, label, type, done, icon};
       let idx = typeof at === "number" ? at : -1;
       if (idx < 0){
         const list = stepsOf(phaseId);
@@ -1760,6 +1765,291 @@ function stepSheet(phaseId, existing, at){
   sheet.querySelector("[data-save]").onclick = commit;
   sheet.querySelector("#stName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
   sheet.querySelector("#stName").focus();
+}
+
+/* ============ personal (per-member) tasks ============
+   Independent of any folder/month/edition: each team member can keep
+   their own phase-like groups of customizable steps. Same shapes as
+   the main grid's phases/steps, just scoped to one person instead of
+   shared across the calendar, and nothing is preset by default. */
+function tasksOfMember(uid){ return DB.memberTasks.filter(t => t.userId === uid); }
+function memberStepsOf(taskId){ return DB.memberSteps.filter(s => s.taskId === taskId); }
+
+function memberTaskMenu(task, x, y){
+  closeCtx();
+  openCtx(x, y, [
+    {label:"Add step to " + task.name, fn:() => memberStepSheet(task.id, null)},
+    {label:"Rename or recolour", fn:() => memberTaskSheet(task.userId, task)},
+    {swatches:true, value:task.color, fn:c => { task.color = c; save(); renderTeamRefresh(); }},
+    {sep:true},
+    {label:"Delete task", danger:true, fn:() => {
+      const n = memberStepsOf(task.id).length;
+      confirmAsk("Delete " + task.name + "?",
+        n ? "Its " + n + " step" + (n > 1 ? "s" : "") + " go with it. You'll get a moment to undo."
+          : "It's empty. You'll get a moment to undo.",
+        "Delete task", () => {
+          undoable(task.name + " deleted", () => {
+            DB.memberSteps = DB.memberSteps.filter(s => s.taskId !== task.id);
+            DB.memberTasks = DB.memberTasks.filter(t => t.id !== task.id);
+            save(); renderTeamRefresh();
+          });
+        });
+    }}
+  ]);
+}
+function memberStepMenu(step, x, y){
+  closeCtx();
+  openCtx(x, y, [
+    {label:"Edit step", fn:() => memberStepSheet(step.taskId, step)},
+    {label:"Add step below", fn:() => memberStepSheet(step.taskId, null, DB.memberSteps.indexOf(step) + 1)},
+    {sep:true},
+    {label:"Delete step", danger:true, fn:() => {
+      confirmAsk("Delete " + step.label + "?", "You'll get a moment to undo.", "Delete step", () => {
+        undoable(step.label + " deleted", () => {
+          DB.memberSteps = DB.memberSteps.filter(s => s.id !== step.id);
+          save(); renderTeamRefresh();
+        });
+      });
+    }}
+  ]);
+}
+function memberTaskSheet(uid, existing, at){
+  const start = existing ? existing.color : COLORS[(tasksOfMember(uid).length % (COLORS.length - 1)) + 1].id;
+  const swatches = COLORS.map(c =>
+    '<button type="button" class="' + (c.v ? "" : "nocol") + '" data-c="' + c.id + '" aria-pressed="' +
+    (start === c.id) + '" ' + (c.v ? 'style="background:' + c.v + '"' : "") +
+    ' aria-label="' + (c.id || "no colour") + '"></button>').join("");
+
+  const sheet = openSheet(
+    "<h3>" + (existing ? "Edit task" : "New task") + "</h3>" +
+    "<p class='hint'>A group for their own steps - nothing here is shared with the main grid.</p>" +
+    '<div class="field"><label for="mtName">Name</label><input type="text" id="mtName" value="' +
+      esc(existing ? existing.name : "") + '" placeholder="Onboarding"></div>' +
+    '<div class="field"><label>Colour</label><div class="colorpick" id="mtCol">' + swatches + "</div></div>" +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
+      (existing ? "Save" : "Create task") + "</button></div>");
+
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  let col = start;
+  sheet.querySelectorAll("#mtCol button").forEach(b => {
+    b.onclick = () => { col = b.dataset.c; sheet.querySelectorAll("#mtCol button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); };
+  });
+  const commit = () => {
+    const name = sheet.querySelector("#mtName").value.trim();
+    if (!name){ sheet.querySelector("#mtName").focus(); return; }
+    closeSheet();
+    if (existing){ existing.name = name; existing.color = col; }
+    else {
+      const t = {id:slug(name), userId:uid, name, color:col};
+      DB.memberTasks.splice(typeof at === "number" ? at : DB.memberTasks.length, 0, t);
+      openMemberTask.add(t.id);
+    }
+    save(); renderTeamRefresh();
+  };
+  sheet.querySelector("[data-save]").onclick = commit;
+  sheet.querySelector("#mtName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
+  sheet.querySelector("#mtName").focus();
+  sheet.querySelector("#mtName").select();
+}
+function memberStepSheet(taskId, existing, at){
+  const isDate = existing ? existing.type === "date" : false;
+  const sheet = openSheet(
+    "<h3>" + (existing ? "Edit step" : "New step") + "</h3>" +
+    '<div class="field"><label for="mstName">Name</label><input type="text" id="mstName" value="' +
+      esc(existing ? existing.label : "") + '" placeholder="Read the handbook"></div>' +
+    '<div class="field"><label>Icon</label><button type="button" class="step-icon-pick" id="mstIconBtn"></button></div>' +
+    '<div class="field"><label for="mstType">Type</label><select class="sel" id="mstType">' +
+      '<option value="status"' + (isDate ? "" : " selected") + '>Progress slider</option>' +
+      '<option value="date"' + (isDate ? " selected" : "") + ">Date</option></select></div>" +
+    '<div class="field" id="mstDoneWrap"><label for="mstDone">Word when finished</label><input type="text" id="mstDone" value="' +
+      esc(existing ? (existing.done || "Done") : "Done") + '" placeholder="Done"></div>' +
+    '<div class="actions"><button class="btn ghostbtn" data-close>Cancel</button><button class="btn primary" data-save>' +
+      (existing ? "Save" : "Create step") + "</button></div>");
+
+  sheet.querySelector("[data-close]").onclick = closeSheet;
+  let icon = existing ? (existing.icon || "") : "";
+  const iconBtn = sheet.querySelector("#mstIconBtn");
+  const paintIcon = () => {
+    iconBtn.innerHTML = '<span class="ic-prev">' +
+      (icon ? iconGlyph(icon, 18) : '<span class="material-symbols-outlined" style="font-size:18px;opacity:.45">add</span>') +
+      "</span><span>" + (icon ? iconLabel(icon) : "Choose an icon") + "</span>";
+  };
+  paintIcon();
+  iconBtn.onclick = () => iconSheet(icon, "", (v) => { icon = v; paintIcon(); }, {noColor:true});
+  const typeSel = sheet.querySelector("#mstType"), doneWrap = sheet.querySelector("#mstDoneWrap");
+  const syncType = () => { doneWrap.style.display = typeSel.value === "date" ? "none" : ""; };
+  typeSel.onchange = syncType; syncType();
+
+  const commit = () => {
+    const label = sheet.querySelector("#mstName").value.trim();
+    if (!label){ sheet.querySelector("#mstName").focus(); return; }
+    const type = typeSel.value;
+    const done = sheet.querySelector("#mstDone").value.trim() || "Done";
+    closeSheet();
+    if (existing){
+      existing.label = label; existing.type = type; existing.done = done; existing.icon = icon;
+    } else {
+      const s = {id:slug(label), taskId, label, type, done, icon, progress:0, dateValue:""};
+      let idx = typeof at === "number" ? at : -1;
+      if (idx < 0){
+        const list = memberStepsOf(taskId);
+        idx = list.length ? DB.memberSteps.indexOf(list[list.length - 1]) + 1 : DB.memberSteps.length;
+      }
+      DB.memberSteps.splice(idx, 0, s);
+    }
+    save(); renderTeamRefresh();
+  };
+  sheet.querySelector("[data-save]").onclick = commit;
+  sheet.querySelector("#mstName").onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); commit(); } };
+  sheet.querySelector("#mstName").focus();
+}
+function applyMemberTaskOrder(uid, ids){
+  const map = {};
+  DB.memberTasks.forEach(t => { map[t.id] = t; });
+  const mine = ids.map(id => map[id]).filter(Boolean);
+  const rest = DB.memberTasks.filter(t => t.userId !== uid);
+  DB.memberTasks = rest.concat(mine);
+  save(); renderTeamRefresh();
+}
+function applyMemberStepOrder(taskId, ids){
+  const slots = [], map = {};
+  DB.memberSteps.forEach((s, i) => { if (s.taskId === taskId){ slots.push(i); map[s.id] = s; } });
+  ids.forEach((id, k) => { if (map[id] && slots[k] !== undefined) DB.memberSteps[slots[k]] = map[id]; });
+  save(); renderTeamRefresh();
+}
+function renderMemberTasks(container, uid){
+  if (!container) return;
+  const tasks = tasksOfMember(uid);
+  if (!tasks.length && !CAN_EDIT){ container.innerHTML = ""; return; }
+  container.innerHTML = "";
+  const label = document.createElement("p");
+  label.className = "section-label"; label.textContent = "Personal tasks";
+  container.appendChild(label);
+  const pad = document.createElement("div");
+  pad.className = "body-pad";
+
+  tasks.forEach(task => {
+    const box = document.createElement("section");
+    box.className = "phase-box" + (openMemberTask.has(task.id) ? "" : " shut");
+    box.dataset.id = task.id;
+    box.style.setProperty("--phc", phaseColor(task));
+
+    const phead = document.createElement("div");
+    phead.className = "phase-head";
+    phead.setAttribute("role", "button");
+    phead.tabIndex = 0;
+    phead.setAttribute("aria-expanded", String(openMemberTask.has(task.id)));
+    phead.innerHTML = '<span class="grip-slot"></span><span class="dot"></span><h4>' + esc(task.name) + "</h4>" +
+      '<span class="pchev">' + CHEV + "</span>";
+    const toggle = () => {
+      const willOpen = box.classList.contains("shut");
+      box.classList.toggle("shut", !willOpen);
+      phead.setAttribute("aria-expanded", String(willOpen));
+      willOpen ? openMemberTask.add(task.id) : openMemberTask.delete(task.id);
+    };
+    phead.onclick = toggle;
+    phead.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); } };
+    phead.oncontextmenu = e => { if (!CAN_EDIT) return; e.preventDefault(); e.stopPropagation(); memberTaskMenu(task, e.clientX, e.clientY); };
+    if (CAN_EDIT) phead.querySelector(".grip-slot").replaceWith(gripFor(box));
+    else phead.querySelector(".grip-slot").remove();
+    box.appendChild(phead);
+
+    const pbody = document.createElement("div"); pbody.className = "pbody";
+    const pin = document.createElement("div"); pin.className = "pbody-in";
+    const list = document.createElement("div"); list.className = "steps";
+
+    memberStepsOf(task.id).forEach(s => {
+      const row = document.createElement("div");
+      row.className = "step type-" + s.type;
+      row.dataset.id = s.id;
+      const iconHTML = s.icon
+        ? (CAN_EDIT
+            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15) + "</button>"
+            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15) + "</span>")
+        : (CAN_EDIT
+            ? '<button type="button" class="step-icon empty" title="Add an icon">' +
+              '<span class="material-symbols-outlined" style="font-size:15px">add</span></button>'
+            : "");
+      row.innerHTML = '<span class="step-name">' + iconHTML + '<span class="step-label">' + esc(s.label) + "</span></span>";
+      if (CAN_EDIT) row.appendChild(gripFor(row));
+      if (CAN_EDIT){
+        const iconBtn = row.querySelector(".step-icon");
+        if (iconBtn) iconBtn.onclick = e => {
+          e.stopPropagation();
+          iconSheet(s.icon || "", "", (v) => { s.icon = v; save(); renderTeamRefresh(); }, {noColor:true});
+        };
+      }
+      row.oncontextmenu = e => {
+        if (!CAN_EDIT) return;
+        e.preventDefault(); e.stopPropagation(); memberStepMenu(s, e.clientX, e.clientY);
+      };
+
+      const ctrls = document.createElement("div"); ctrls.className = "ctrls";
+      if (s.type === "status"){
+        const stateEl = document.createElement("span"); stateEl.className = "state";
+        const rng = document.createElement("input");
+        rng.type = "range"; rng.className = "rng";
+        rng.min = "0"; rng.max = "100"; rng.step = "5";
+        rng.value = String(s.progress || 0);
+        rng.setAttribute("aria-label", s.label + " progress");
+        if (!CAN_EDIT) rng.disabled = true;
+        const pctEl = document.createElement("span"); pctEl.className = "pctlab";
+        const paint = v => {
+          const st = stateOf(v);
+          stateEl.textContent = stateWord(s, v);
+          stateEl.dataset.s = st;
+          pctEl.textContent = v + "%";
+          rng.style.setProperty("--p", v + "%");
+          rng.style.setProperty("--fill", st === 2 ? "var(--f-done)" : "var(--f-prog)");
+          rng.setAttribute("aria-valuetext", v + "% - " + stateWord(s, v));
+          row.classList.toggle("is-done", v >= 100);
+        };
+        paint(s.progress || 0);
+        rng.oninput = () => { s.progress = Number(rng.value); paint(s.progress); };
+        rng.onchange = () => { save(); };
+        ctrls.appendChild(stateEl); ctrls.appendChild(rng); ctrls.appendChild(pctEl);
+      } else {
+        const d = dateButton(() => s.dateValue || "", iso => { s.dateValue = iso; save(); });
+        d.setAttribute("aria-label", s.label);
+        if (!CAN_EDIT) d.disabled = true;
+        ctrls.appendChild(d);
+      }
+      row.appendChild(ctrls);
+      list.appendChild(row);
+    });
+
+    if (CAN_EDIT){
+      const addS = document.createElement("button");
+      addS.type = "button"; addS.className = "addstep";
+      addS.textContent = "+ Add step";
+      addS.onclick = () => memberStepSheet(task.id, null);
+      list.appendChild(addS);
+      makeSortable(list, ".step", ids => applyMemberStepOrder(task.id, ids));
+    } else if (!memberStepsOf(task.id).length){
+      const none = document.createElement("p");
+      none.className = "pp-none"; none.textContent = "Nothing added yet.";
+      list.appendChild(none);
+    }
+
+    pin.appendChild(list); pbody.appendChild(pin); box.appendChild(pbody);
+    pad.appendChild(box);
+  });
+
+  container.appendChild(pad);
+  if (CAN_EDIT){
+    makeSortable(pad, ".phase-box", ids => applyMemberTaskOrder(uid, ids));
+    const addT = document.createElement("button");
+    addT.type = "button"; addT.className = "addphase";
+    addT.textContent = "+ Add task";
+    addT.onclick = () => memberTaskSheet(uid, null);
+    pad.appendChild(addT);
+  }
+}
+function renderTeamRefresh(){
+  if (SECTION !== "team" || !teamOpenId) return;
+  const sect = document.getElementById("sectWrap");
+  const item = sect && sect.querySelector('.team-item[data-id="' + teamOpenId + '"].open');
+  if (item) renderMemberTasks(item.querySelector(".member-tasks"), teamOpenId);
 }
 
 /* ============ comments ============ */
@@ -2125,8 +2415,8 @@ function buildCard(ed, isFresh){
       row.dataset.flash = ed.id + "|" + s.id;   /* so a colleague's edit can glow here */
       const iconHTML = s.icon
         ? (CAN_EDIT
-            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15, s.icon_color) + "</button>"
-            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15, s.icon_color) + "</span>")
+            ? '<button type="button" class="step-icon" title="Change icon">' + iconGlyph(s.icon, 15) + "</button>"
+            : '<span class="step-icon" title="' + esc(iconLabel(s.icon)) + '">' + iconGlyph(s.icon, 15) + "</span>")
         : (CAN_EDIT
             ? '<button type="button" class="step-icon empty" title="Add an icon">' +
               '<span class="material-symbols-outlined" style="font-size:15px">add</span></button>'
@@ -2137,7 +2427,7 @@ function buildCard(ed, isFresh){
         const iconBtn = row.querySelector(".step-icon");
         if (iconBtn) iconBtn.onclick = e => {
           e.stopPropagation();
-          iconSheet(s.icon || "", s.icon_color || "", (v, c) => { s.icon = v; s.icon_color = c; save(); renderGrid(); });
+          iconSheet(s.icon || "", "", (v) => { s.icon = v; save(); renderGrid(); }, {noColor:true});
         };
       }
       row.oncontextmenu = e => {
@@ -2410,38 +2700,56 @@ function renderTeamSection(container){
     const me = ME && p.id === ME.id;
     const isOpen = teamOpenId === p.id;
     const tasks = isOpen ? myTasks(p.id) : [];
-    return '<div class="team-item' + (isOpen ? " open" : "") + '" data-i="' + i + '">' +
+    return '<div class="team-item' + (isOpen ? " open" : "") + '" data-i="' + i + '" data-id="' + esc(p.id) + '">' +
       '<button type="button" class="pp-row team-row" data-i="' + i + '">' + avatarHTML(nm, 30) +
       "<div><div class='pp-name'>" + esc(nm) + (me ? " <span class='pp-sub'>you</span>" : "") + "</div>" +
       "<div class='pp-sub'>" + esc(p.email || "") + "</div></div>" +
       '<span class="chev">' + CHEV + "</span></button>" +
       '<div class="pbody"><div class="pbody-in"><div class="task-list">' +
-      (isOpen ? taskRowsHTML(tasks, true) : "") + "</div></div></div></div>";
+      (isOpen ? taskRowsHTML(tasks, true) : "") + '</div><div class="member-tasks"></div></div></div></div>';
   }).join("");
   list.querySelectorAll(".team-row[data-i]").forEach(b => {
-    b.onclick = () => {
-      const p = PROFILES[+b.dataset.i];
-      teamOpenId = teamOpenId === p.id ? null : p.id;
-      renderTeamSection(container);
-    };
+    b.onclick = () => toggleTeamItem(container, PROFILES[+b.dataset.i]);
   });
-  if (teamOpenId){
-    const openItem = list.querySelector(".team-item.open");
-    if (openItem){
-      const tasks = myTasks(teamOpenId);
-      wireTaskRows(openItem, tasks, () => goSection("local"));
-      openItem.querySelectorAll(".task-cal[data-cal]").forEach(host => {
-        const t = tasks[+host.dataset.cal];
-        const btn = dateButton(() => t.completedAt || "", iso => {
-          t.completedAt = iso;
-          const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
-          if (c && c.assignee && c.assignee[t.stepId]) c.assignee[t.stepId].completedAt = iso;
-          pushAssignment(t.monthId, t.edId, t.stepId, teamOpenId, iso || null);
-        });
-        host.appendChild(btn);
-      });
-    }
+  if (teamOpenId) wireOpenTeamItem(container);
+}
+/* Toggling a member only flips classes + fills that one row's task list,
+   rather than rebuilding the whole #teamList - a full rebuild would
+   recreate the row already in its open state, so the CSS grid-row
+   transition would never get to play. */
+function toggleTeamItem(container, p){
+  const list = container.querySelector("#teamList");
+  const prevOpen = list.querySelector(".team-item.open");
+  if (prevOpen) prevOpen.classList.remove("open");
+  if (teamOpenId === p.id){
+    teamOpenId = null;
+    return;
   }
+  teamOpenId = p.id;
+  const item = list.querySelector('.team-item[data-id="' + p.id + '"]');
+  if (!item) return;
+  const taskList = item.querySelector(".task-list");
+  taskList.innerHTML = taskRowsHTML(myTasks(p.id), true);
+  item.classList.add("open");
+  wireOpenTeamItem(container);
+}
+function wireOpenTeamItem(container){
+  const list = container.querySelector("#teamList");
+  const openItem = list.querySelector(".team-item.open");
+  if (!openItem) return;
+  const tasks = myTasks(teamOpenId);
+  wireTaskRows(openItem, tasks, () => goSection("local"));
+  openItem.querySelectorAll(".task-cal[data-cal]").forEach(host => {
+    const t = tasks[+host.dataset.cal];
+    const btn = dateButton(() => t.completedAt || "", iso => {
+      t.completedAt = iso;
+      const c = DB.data[t.monthId] && DB.data[t.monthId][t.edId];
+      if (c && c.assignee && c.assignee[t.stepId]) c.assignee[t.stepId].completedAt = iso;
+      pushAssignment(t.monthId, t.edId, t.stepId, teamOpenId, iso || null);
+    });
+    host.appendChild(btn);
+  });
+  renderMemberTasks(openItem.querySelector(".member-tasks"), teamOpenId);
 }
 function renderSection(){
   paintBrand();
@@ -2926,11 +3234,12 @@ function cycleTheme(){
 }
 function openCog(){
   const r = document.getElementById("cog").getBoundingClientRect();
-  const eds = currentEditions();
+  const isLocal = SECTION === "local";
+  const eds = isLocal ? currentEditions() : [];
   const allDone = eds.length > 0 && eds.every(e => pct(e.id) >= 1);
   closeCtx();
   const items = [];
-  if (CAN_EDIT){
+  if (CAN_EDIT && isLocal){
     items.push({icon:allDone ? I_UNDO : I_CHECK,
       label:allDone ? "Clear every edition" : "Mark every edition finished",
       fn:toggleAllEditions});
@@ -2939,8 +3248,8 @@ function openCog(){
   if (CAN_EDIT) items.push({icon:I_USER, label:"People", fn:peopleSheet});
   items.push({icon:I_CLOCK, label:"History", fn:historySheet});
   items.push({icon:I_DOWN,  label:"Download backup (.json)", fn:exportJSON});
-  items.push({icon:I_TABLE, label:"Download for Excel (.csv)", fn:exportCSV});
-  if (CAN_EDIT){
+  if (isLocal) items.push({icon:I_TABLE, label:"Download for Excel (.csv)", fn:exportCSV});
+  if (CAN_EDIT && isLocal){
     items.push({sep:true});
     items.push({icon:I_LIST, label:"Reset this month's editions", fn:resetMonthEditions});
     items.push({icon:I_DROP, label:"Reset phase colours", fn:resetColors});
@@ -2960,7 +3269,7 @@ function renderAll(){ ensureCells(); renderCrumb(); buildRailBig(); renderSummar
 /* ============================================================
    Supabase: sign-in, loading, saving, live updates, history
    ============================================================ */
-const APP_VERSION = "v14 · 22 Sep";
+const APP_VERSION = "v15 · 22 Sep";
 const SB_URL  = "https://hrorfxgbrnnmtkxqfnca.supabase.co";
 const SB_KEY  = "sb_publishable_qD2oVBu0myLcBpQO1-QYhg_r3auRvZe";
 
@@ -2991,11 +3300,13 @@ function gateMsg(text, kind){
 async function loadAll(){
   setLive("busy");
   const q = t => sb.from(t).select("*");
-  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections] =
+  const [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections,
+         memberTasks, memberSteps] =
     await Promise.all(["folders","months","editions","month_editions","phases","steps",
-                       "entries","comments","profiles","assignments","sections"].map(q));
-  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections]
-    .find(r => r.error);
+                       "entries","comments","profiles","assignments","sections",
+                       "member_tasks","member_steps"].map(q));
+  const bad = [folders, months, editions, monthEds, phases, steps, entries, comments, profiles, assignments, sections,
+               memberTasks, memberSteps].find(r => r.error);
   if (bad){ setLive("off"); throw bad.error; }
 
   const bySort = (a, b) => (a.sort || 0) - (b.sort || 0);
@@ -3007,7 +3318,12 @@ async function loadAll(){
     })),
     phases: phases.data.sort(bySort).map(p => ({id:p.id, name:p.name, color:p.color || ""})),
     steps: steps.data.sort(bySort).map(s => ({
-      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || "", icon_color:s.icon_color || ""
+      id:s.id, phase:s.phase_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || ""
+    })),
+    memberTasks: memberTasks.data.sort(bySort).map(t => ({id:t.id, userId:t.user_id, name:t.name, color:t.color || ""})),
+    memberSteps: memberSteps.data.sort(bySort).map(s => ({
+      id:s.id, taskId:s.task_id, label:s.label, type:s.type, done:s.done_word || "Done", icon:s.icon || "",
+      progress:s.progress || 0, dateValue:s.date_value || ""
     })),
     issues: [], data: {},
     me: {name:(ME && ME.name) || ""},
@@ -3089,10 +3405,15 @@ async function pushStructure(){
       flag:e.flag || null, std:!!e.std, sort:i})));
     await sb.from("phases").upsert(DB.phases.map((p, i) => ({id:p.id, name:p.name, color:p.color || "", sort:i})));
     await sb.from("steps").upsert(DB.steps.map((s, i) => ({
-      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "", icon_color:s.icon_color || "", sort:i})));
+      id:s.id, phase_id:s.phase, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "", sort:i})));
     await sb.from("months").upsert(DB.issues.map((m, i) => ({
       id:m.id, folder_id:m.folder, label:m.label, submitted:m.submitted || null,
       color:m.color || "", sort:i})));
+    await sb.from("member_tasks").upsert(DB.memberTasks.map((t, i) => ({
+      id:t.id, user_id:t.userId, name:t.name, color:t.color || "", sort:i})));
+    await sb.from("member_steps").upsert(DB.memberSteps.map((s, i) => ({
+      id:s.id, task_id:s.taskId, label:s.label, type:s.type, done_word:s.done || "Done", icon:s.icon || "",
+      progress:s.progress || 0, date_value:s.dateValue || "", sort:i})));
 
     const wanted = [];
     DB.issues.forEach(m => m.editions.forEach((eid, i) => wanted.push({month_id:m.id, edition_id:eid, sort:i})));
@@ -3107,6 +3428,8 @@ async function pushStructure(){
     await keep("editions", DB.editions.map(e => e.id));
     await keep("phases",   DB.phases.map(p => p.id));
     await keep("steps",    DB.steps.map(s => s.id));
+    await keep("member_tasks", DB.memberTasks.map(t => t.id));
+    await keep("member_steps", DB.memberSteps.map(s => s.id));
 
     const all = await sb.from("month_editions").select("month_id,edition_id");
     if (!all.error){
@@ -3242,11 +3565,12 @@ function scheduleReload(){
       return;
     }
     const keepOpen = new Set(open), keepPhase = new Set(openPhase),
-          keepNoting = new Set(noting), y = window.scrollY;
+          keepNoting = new Set(noting), keepMemberTask = new Set(openMemberTask), y = window.scrollY;
     try { await loadAll(); } catch(e){ setLive("off"); return; }
     open = keepOpen;
     openPhase.clear(); keepPhase.forEach(k => openPhase.add(k));
     noting.clear();   keepNoting.forEach(k => noting.add(k));
+    openMemberTask.clear(); keepMemberTask.forEach(k => openMemberTask.add(k));
     renderAll();
     window.scrollTo(0, y);
   }, 500);
@@ -3264,7 +3588,8 @@ function mine(payload){
   if (payload.table === "sections")    return row.updated_by === ME.id;
   if (payload.table === "comments") return row.author === ME.id;
   /* structural tables carry no author, so lean on our own push clock */
-  if (["folders","months","editions","month_editions","phases","steps"].indexOf(payload.table) >= 0)
+  if (["folders","months","editions","month_editions","phases","steps",
+       "member_tasks","member_steps"].indexOf(payload.table) >= 0)
     return Date.now() - myStructurePush < 4000;
   return false;
 }
@@ -3330,13 +3655,16 @@ document.addEventListener("DOMContentLoaded", () => document.body.appendChild(un
 function snapshotStructure(){
   return JSON.parse(JSON.stringify({
     folders:DB.folders, issues:DB.issues, editions:DB.editions,
-    phases:DB.phases, steps:DB.steps, data:DB.data, current:current
+    phases:DB.phases, steps:DB.steps, data:DB.data, current:current,
+    memberTasks:DB.memberTasks, memberSteps:DB.memberSteps
   }));
 }
 async function restoreStructure(snap){
   DB.folders  = snap.folders;  DB.issues = snap.issues;
   DB.editions = snap.editions; DB.phases = snap.phases;
   DB.steps    = snap.steps;    DB.data   = snap.data;
+  if (snap.memberTasks) DB.memberTasks = snap.memberTasks;
+  if (snap.memberSteps) DB.memberSteps = snap.memberSteps;
   if (snap.current && DB.issues.some(i => i.id === snap.current)) current = snap.current;
   lastIssuePct = -1;
   renderAll();
@@ -3618,7 +3946,7 @@ function taskRowsHTML(list, withDate){
   return list.map((t, i) => {
     const st = DB.steps.find(x => x.id === t.stepId);
     const label = st ? st.label : t.stepId;
-    const icon = st && st.icon ? iconGlyph(st.icon, 14, st.icon_color)
+    const icon = st && st.icon ? iconGlyph(st.icon, 14)
       : '<span class="material-symbols-outlined" style="font-size:14px">task_alt</span>';
     return '<div class="task-row' + (withDate ? ' wide' : "") + '" data-i="' + i + '">' +
       '<button type="button" class="task-nav"><span class="task-icon">' + icon + "</span>" +
